@@ -11,6 +11,8 @@ public:
     client(QWidget *parent = nullptr);
     ~client();
 
+private slots:
+    void HelloWorld();
 private:
     Ui::clientClass ui;
 };

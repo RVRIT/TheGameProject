@@ -6,7 +6,7 @@ int main() {
         std::cerr << "ERORR initializing DB!" << std::endl;
         return 1;
     }
-    CROW_ROUTE(app, "/")([]() {
+    CROW_ROUTE(app, "/hello")([]() {
         return "Hello, world!";
         });
     app.port(18080).multithreaded().run();
