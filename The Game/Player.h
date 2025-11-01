@@ -18,6 +18,10 @@ public:
 
 	size_t getId() const;
 	const std::string& getName() const;
+	const std::vector<Card>& getHand() const;
+	size_t getHandSize() const;
+
+	void sortHand();
 
 };
 
