@@ -21,12 +21,12 @@
     <ClCompile Include="Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\background.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\LoginButton.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -37,9 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MainMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

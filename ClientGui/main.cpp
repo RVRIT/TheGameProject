@@ -1,40 +1,33 @@
 ﻿#include <SFML/Graphics.hpp>
+#include "Button.h"
 #include <iostream>
+#include <filesystem>
 
+int main() {
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "Button Example");
 
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode({ 1920, 1080}), "SFML Background Test");
+    sf::Texture bg;
+    bg.loadFromFile("assets/background.png");
+    sf::Sprite background(bg);
 
-    sf::Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("assets/background.png"))
-    {
-        std::cerr << "Nu s-a putut incarca 'assets/background.png'\n";
-        std::cerr << "Calea curenta: " << std::filesystem::current_path() << "\n";
-        return -1;
-    }
+    Button loginButton("assets/LoginButton.png", { 340.f, 500.f }, []() {
+        std::cout << "Login button clicked!\n";
+        });
 
-    const sf::Font font("assets/ARIAL.TTF");
-    sf::Text text(font, "Hello SFML", 100);
-
-    sf::Sprite background(backgroundTexture);
-
-
-    while (window.isOpen())
-    {
-        while (const std::optional event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-            {
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
                 window.close();
-            }
+
+            loginButton.handleEvent(event, window);
         }
+
         window.clear();
         window.draw(background);
-        window.draw(text);
+        loginButton.draw(window);
         window.display();
     }
 
-    std::cout << "Window closed successfully." << std::endl;
     return 0;
 }
