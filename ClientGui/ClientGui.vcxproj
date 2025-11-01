@@ -185,16 +185,19 @@ exit 0
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TextBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\background.png" />
     <Image Include="assets\LoginButton.png" />
+    <Image Include="assets\RegisterButton.png" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\ARIAL.TTF" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h" />
+    <ClInclude Include="TextBox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

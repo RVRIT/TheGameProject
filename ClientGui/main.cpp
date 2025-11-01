@@ -1,5 +1,6 @@
 ﻿#include <SFML/Graphics.hpp>
 #include "Button.h"
+#include "TextBox.h"
 #include <iostream>
 #include <filesystem>
 
@@ -10,9 +11,18 @@ int main() {
     bg.loadFromFile("assets/background.png");
     sf::Sprite background(bg);
 
-    Button loginButton("assets/LoginButton.png", { 340.f, 500.f }, []() {
+    Button loginButton("assets/LoginButton.png", { 300.f, 500.f }, []() {
         std::cout << "Login button clicked!\n";
         });
+
+    Button registerButton("assets/RegisterButton.png", { 600.f, 500.f }, []() {
+        std::cout << "Register button clicked!\n";
+        });
+
+    sf::Font font;
+    font.loadFromFile("assets/ARIAL.TTF");
+    TextBox usernameBox(font, { 300.f, 300.f }, { 500.f, 50.f });
+    TextBox passwordBox(font, { 300.f, 400.f }, { 500.f, 50.f });
 
     while (window.isOpen()) {
         sf::Event event;
@@ -21,11 +31,18 @@ int main() {
                 window.close();
 
             loginButton.handleEvent(event, window);
+            registerButton.handleEvent(event, window);
+            usernameBox.handleEvent(event);
+            passwordBox.handleEvent(event);
+           
         }
 
         window.clear();
         window.draw(background);
-        loginButton.draw(window);
+        loginButton.draw(window); 
+        registerButton.draw(window);
+        usernameBox.draw(window);
+        passwordBox.draw(window);
         window.display();
     }
 
