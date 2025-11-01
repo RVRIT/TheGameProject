@@ -5,7 +5,6 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode({ 1920, 1080}), "SFML Background Test");
-    window.setFramerateLimit(60);
 
     sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("assets/background.png"))
