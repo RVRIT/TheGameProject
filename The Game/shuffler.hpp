@@ -1,32 +1,25 @@
 #pragma once
 
+#include <vector>
+#include <random>
+#include <cstddef> 
+#include <span>
 
-import <iostream>;
-import <vector>;
-import <random>;
+namespace game {
 
+    class Shuffler {
+    public:
+        using Deck = std::vector<int>; 
+        using Hands = std::vector<Deck>;
 
-namespace game
-{
-	class Shuffler
-	{
-	public:
+        Shuffler();
 
-		using Deck = std::vector<int>;
-		using Hands = std::vector<Deck>;
+        void shuffle(Deck& deck);
 
-		Shuffler();
+        Hands deal(std::span<const Deck::value_type> deck, std::size_t numPlayers, std::size_t cardsPerPlayer) const;
 
-		void shuffle(Deck& deck);
+    private:
+        mutable std::mt19937 rng;
+    };
 
-		Hands deal(const Deck& deck, std::size_t numPlayers, std::size_t cardsPerPlayer);
-
-
-
-	private:
-
-	std::mt19937 rng;
-	};
-}
-
-
+} 
