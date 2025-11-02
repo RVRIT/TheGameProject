@@ -1,12 +1,12 @@
 #include "LoginMenu.h"
 
-LoginMenu::LoginMenu(sf::Font& font, std::function<void()> onClick):
-	LoginButton("assets/LoginButton.png", { 400.f, 400.f }, []() {} ),
-	RegisterButton("assets/RegisterButton.png", { 700.f, 400.f }, onClick),
-	username(font, { 400.f, 200.f }, { 500.f, 50.f }),
-	password(font, { 400.f, 300.f }, { 500.f, 50.f })
+LoginMenu::LoginMenu(sf::Font& font, std::function<void()> onClick) :
+	LoginButton("assets/LoginButton.png", { 700.f, 400.f }, []() {}),
+	RegisterButton("assets/RegisterButton.png", { 1000.f, 400.f }, onClick),
+	username(font, { 700.f, 200.f }, { 500.f, 50.f }),
+	password(font, { 700.f, 300.f }, { 500.f, 50.f })
 {
-	bgTexture.loadFromFile("assets/background.png");
+	bgTexture.loadFromFile("assets/backgroundTry2.png");
 	background.setTexture(bgTexture);
 }
 
