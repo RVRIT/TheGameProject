@@ -101,3 +101,27 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
     sqlite3_finalize(stmt);
     return rc == SQLITE_DONE;
 }
+bool DBManager::checkLogin(const std::string& username)
+{
+    if (!db)
+    {
+        return false;
+    }
+    sqlite3_stmt* stmt;
+    bool success = false;
+    const char* sql = "SELECT COUNT(*) FROM users WHERE username = ?;";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
+    {
+        sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_TRANSIENT);
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            int count = sqlite3_column_int(stmt, 0);
+            success = (count > 0);
+        }
+    }
+    else {
+        std::cerr << "ERROR SQL: " << sqlite3_errmsg(db) << std::endl;
+    }
+    sqlite3_finalize(stmt);
+    return success;
+}
