@@ -19,7 +19,9 @@ int main() {
     font.loadFromFile("assets/ARIAL.TTF");
     Scene currentScene = Scene::LoginMenu;
 
-    LoginMenu loginMenu(font, [&]()
+    NetworkClient client("http://localhost", 18080);
+
+    LoginMenu loginMenu(font,client,[&]()
         {
             currentScene = Scene::Register;
         });
