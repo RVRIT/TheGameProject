@@ -27,7 +27,7 @@ int main() {
         });
 
 
-    RegisterMenu registerMenu(font, [&]() {
+    RegisterMenu registerMenu(font,client, [&]() {
             currentScene = Scene::LoginMenu;
         });
 

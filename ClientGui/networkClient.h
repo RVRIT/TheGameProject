@@ -10,4 +10,5 @@ private:
 public:
     NetworkClient(const std::string& host = "http://localhost", unsigned short port = 18080);
     bool loginUser(const std::string& username);
+    bool registerUser(const std::string& username);
 };

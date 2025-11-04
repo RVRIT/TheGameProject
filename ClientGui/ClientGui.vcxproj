@@ -98,7 +98,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-network-d.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-network-d.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\SFML-2.6.1\lib</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
@@ -127,7 +127,7 @@ exit 0
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-network-d.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-network-d.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\SFML-2.6.1\lib</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
@@ -152,7 +152,7 @@ exit 0
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-network-d.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-network-d.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\SFML-2.6.1\lib</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
@@ -181,7 +181,7 @@ exit 0
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-network-d.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-network-d.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\SFML-2.6.1\lib</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
@@ -198,6 +198,7 @@ exit 0
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="loginMenu.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="networkClient.cpp" />
     <ClCompile Include="registerMenu.cpp" />
     <ClCompile Include="TextBox.cpp" />
   </ItemGroup>
@@ -212,6 +213,7 @@ exit 0
   <ItemGroup>
     <ClInclude Include="button.h" />
     <ClInclude Include="loginMenu.h" />
+    <ClInclude Include="networkClient.h" />
     <ClInclude Include="registerMenu.h" />
     <ClInclude Include="textBox.h" />
   </ItemGroup>
