@@ -3,23 +3,32 @@
 #include <vector>
 #include <random>
 #include <cstddef> 
-#include <span>
+#include <ranges>
 
-namespace game {
+template <typename T>
 
-    class Shuffler {
-    public:
-        using Deck = std::vector<int>; 
-        using Hands = std::vector<Deck>;
+class Shuffler
+{
+public:
+	Shuffler();
 
-        Shuffler();
+	void shuffle(std::vector<T>& items);
 
-        void shuffle(Deck& deck);
+private:
+	std::mt19937 m_rng;
 
-        Hands deal(std::span<const Deck::value_type> deck, std::size_t numPlayers, std::size_t cardsPerPlayer) const;
+};
 
-    private:
-        mutable std::mt19937 rng;
-    };
+template <typename T>
+Shuffler<T>::Shuffler()
+{
+	std::random_device rd;
+	m_rng.seed(rd());
+}
 
-} 
+template<typename T>
+void Shuffler<T>::shuffle(std::vector<T>& items)
+{
+	std::ranges::shuffle(items, m_rng);
+
+}
