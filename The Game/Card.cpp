@@ -1,10 +1,11 @@
 #include "Card.h"
 #include <stdexcept>
-#include <format> 
+#include <format>
 
-constexpr Card::Card(uint8_t value) : m_value(value)
+constexpr Card::Card(uint8_t value)
+	:m_value(value)
 {
-	if (m_value < 2 || m_value > 99)
+	if (m_value < 2 || m_value>99)
 	{
 		throw std::out_of_range(
 			std::format("Valoarea cartii {} este invalida. Trebuie sa fie intre 2 si 99.",
@@ -23,3 +24,4 @@ std::ostream& operator<<(std::ostream& os, const Card& card)
 	os << static_cast<int>(card.getValue());
 	return os;
 }
+
