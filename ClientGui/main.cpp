@@ -10,7 +10,8 @@
 
 enum class Scene {
     LoginMenu,
-    Register
+    Register,
+    MainMenu
 };
 
 int main() {

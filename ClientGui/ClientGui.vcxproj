@@ -195,10 +195,10 @@ exit 0
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="loginMenu.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="networkClient.cpp" />
     <ClCompile Include="registerMenu.cpp" />
     <ClCompile Include="TextBox.cpp" />
@@ -212,9 +212,9 @@ exit 0
     <Font Include="assets\ARIAL.TTF" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
     <ClInclude Include="button.h" />
     <ClInclude Include="loginMenu.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="networkClient.h" />
     <ClInclude Include="registerMenu.h" />
     <ClInclude Include="textBox.h" />
