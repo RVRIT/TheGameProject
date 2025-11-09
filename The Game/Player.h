@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Card.h"
+#include "Deck.h"
 #include <vector>
 #include <string>
+#include <string_view>
 #include <cstddef>
 
 class Player
@@ -14,14 +16,16 @@ private:
 	std::vector<Card> m_hand;
 
 public:
-	Player(std::string name);
+	explicit Player(std::string_view name);
 
-	size_t getId() const;
-	const std::string& getName() const;
-	const std::vector<Card>& getHand() const;
-	size_t getHandSize() const;
+	[[nodiscard]] size_t getId() const noexcept;
+	[[nodiscard]] const std::string& getName() const noexcept;
+	[[nodiscard]] const std::vector<Card>& getHand() const noexcept;
+	[[nodiscard]] size_t getHandSize() const noexcept;
 
 	void sortHand();
 
-};
+	void drawCard(Deck& deck);
 
+	[[nodiscard]] Card playCard(size_t handIndex);
+};
