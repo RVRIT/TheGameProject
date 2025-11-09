@@ -129,13 +129,15 @@
   <ItemGroup>
     <ClInclude Include="Card.h" />
     <ClInclude Include="Deck.h" />
+    <ClInclude Include="Pile.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="shuffler.hpp" />
+    <ClInclude Include="Shuffler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Pile.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

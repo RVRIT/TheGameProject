@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "Card.h"
-#include "shuffler.hpp"
+#include "Shuffler.h"
 
 class Deck
 {

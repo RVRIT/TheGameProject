@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shuffler.hpp">
+    <ClInclude Include="Shuffler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Card.h">
@@ -25,6 +25,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Deck.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Deck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
