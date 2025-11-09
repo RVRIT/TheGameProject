@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cstdint>
-
+#include <compare> 
 
 class Card
 {
@@ -9,12 +9,11 @@ private:
 	uint8_t m_value;
 
 public:
-	Card(uint8_t value);
+	explicit constexpr Card(uint8_t value);
 
-	uint8_t getValue() const;
+	[[nodiscard]] constexpr uint8_t getValue() const noexcept;
 
-	friend std::ostream& operator<<(std::ostream& os, const Card& card);
-
-	friend bool operator<(const Card& cardA, const Card& cardB);
+	constexpr auto operator<=>(const Card& other) const noexcept = default;
 };
 
+std::ostream& operator<<(std::ostream& os, const Card& card);

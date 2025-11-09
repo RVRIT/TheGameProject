@@ -1,26 +1,25 @@
 #include "Card.h"
 #include <stdexcept>
+#include <format> 
 
-Card::Card(uint8_t value) : m_value(value)
+constexpr Card::Card(uint8_t value) : m_value(value)
 {
 	if (m_value < 2 || m_value > 99)
 	{
-		throw std::out_of_range("Valoarea cartii trebuie sa fie intre 2 si 99.");
+		throw std::out_of_range(
+			std::format("Valoarea cartii {} este invalida. Trebuie sa fie intre 2 si 99.",
+				static_cast<int>(m_value))
+		);
 	}
 }
 
-uint8_t Card::getValue() const
+[[nodiscard]] constexpr uint8_t Card::getValue() const noexcept
 {
 	return m_value;
 }
 
 std::ostream& operator<<(std::ostream& os, const Card& card)
 {
-	os << static_cast<int>(card.m_value);
+	os << static_cast<int>(card.getValue());
 	return os;
-}
-
-bool operator<(const Card& cardA, const Card& cardB)
-{
-	return cardA.m_value < cardB.m_value;
 }
