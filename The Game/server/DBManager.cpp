@@ -101,7 +101,7 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
     sqlite3_finalize(stmt);
     return rc == SQLITE_DONE;
 }
-bool DBManager::checkLogin(const std::string& username)
+bool DBManager::checkExistingUser(const std::string& username)
 {
     if (!db)
     {
@@ -124,4 +124,18 @@ bool DBManager::checkLogin(const std::string& username)
     }
     sqlite3_finalize(stmt);
     return success;
+}
+
+bool DBManager::registerUser(const std::string& username)
+{
+    if (insertUser(username))
+    {
+        std::cout << "User registered successfully!\n";
+        return true;
+    }
+    else
+    {
+        std::cerr << "ERROR inserting user" << std::endl;
+        return false;
+    }
 }
