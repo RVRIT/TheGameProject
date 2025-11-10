@@ -1,12 +1,13 @@
 #include "LoginMenu.h"
 #include <iostream>
 
-LoginMenu::LoginMenu(sf::Font& font,NetworkClient& clientRef,std::function<void()> onClick) :
+LoginMenu::LoginMenu(sf::Font& font,NetworkClient& clientRef,std::function<void()> onClick, std::function<void()> onLoginSuccess) :
 	client(clientRef),
-	LoginButton("assets/LoginButton.png", { 700.f, 400.f }, [this]() {
+	LoginButton("assets/LoginButton.png", { 700.f, 400.f }, [this, onLoginSuccess]() {
 	std::string usernameText = username.getText();
 	if (client.loginUser(usernameText)) {
 		std::cout << "Login success!\n";
+		onLoginSuccess();
 	}
 	else {
 		std::cout << "Login failed!\n";

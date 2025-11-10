@@ -4,6 +4,7 @@
 #include "loginMenu.h"
 #include "registerMenu.h"
 #include "Animation.h"
+#include "MainMenu.h"
 #include <iostream>
 #include <filesystem>
 
@@ -23,15 +24,15 @@ int main() {
 
     NetworkClient client("http://localhost", 18080);
 
-    LoginMenu loginMenu(font,client,[&]()
-        {
-            currentScene = Scene::Register;
-        });
+    LoginMenu loginMenu(font, client, [&]() { currentScene = Scene::Register;},
+        [&]() { currentScene = Scene::MainMenu;});
 
 
-    RegisterMenu registerMenu(font,client, [&]() {
+        RegisterMenu registerMenu(font, client, [&]() {
             currentScene = Scene::LoginMenu;
-        });
+            });
+
+    MainMenu mainMenu(window);
 
     Animation cardTest("assets/cardflip.png", 64, 64, 16, 12.f,true);
     cardTest.setPosition({ 600.f,100.f });
@@ -48,19 +49,27 @@ int main() {
                 loginMenu.handleEvent(event, window);
             else if (currentScene == Scene::Register)
                 registerMenu.handleEvent(event, window);
-           
+            else if (currentScene == Scene::MainMenu)
+                mainMenu.handleInput(event, window);
         }
 
         cardTest.update();
 
         window.clear();
 
-        if (currentScene == Scene::LoginMenu) {
+        switch (currentScene) {
+        case Scene::LoginMenu:
             loginMenu.draw(window);
-        }
-        else if (currentScene == Scene::Register) {
+            break;
+
+        case Scene::Register:
             registerMenu.draw(window);
             window.draw(cardTest);
+            break;
+
+        case Scene::MainMenu:
+            mainMenu.draw();
+            break;
         }
 
         window.display();

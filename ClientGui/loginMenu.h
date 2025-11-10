@@ -2,11 +2,12 @@
 #include "button.h"
 #include "textBox.h"
 #include "networkClient.h"
+#include <functional>
 
 class LoginMenu
 {
 public:
-	LoginMenu(sf::Font& font,NetworkClient& client, std::function<void()> onClick);
+	LoginMenu(sf::Font& font,NetworkClient& client, std::function<void()> onClick, std::function<void()> onLoginSuccess);
 	void handleEvent(const sf::Event& event, sf::RenderWindow& window);
 	void draw(sf::RenderWindow& window);
 	
