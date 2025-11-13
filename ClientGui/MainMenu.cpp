@@ -1,35 +1,31 @@
 #include "MainMenu.h"
 #include <iostream>
 
-MainMenu::MainMenu(sf::RenderWindow& windowRef)
-    : window(windowRef)
+MainMenu::MainMenu(sf::RenderWindow& windowRef, std::function<void()> onClick)
+    : window(windowRef),
+    onSettingsClick(onClick),
+    playButton("assets/play.png", { 700.f, 200.f }, [&]()
+        {}),
+    exitButton("assets/exit.png", { 700.f, 400.f }, [&]() {
+    window.close();
+        }),
+    settingsButton("assets/settings.png", { 700.f, 1000.f }, [&]() {
+    onSettingsClick();
+      })
 {
-    if (!playTexture.loadFromFile("assets/play.png"))
-        std::cerr << "Failed to load play.png\n";
-    if (!exitTexture.loadFromFile("assets/exit.png"))
-        std::cerr << "Failed to load exit.png\n";
-
-    playButton.setTexture(playTexture);
-    exitButton.setTexture(exitTexture);
-
-    playButton.setPosition(500.f, 250.f);
-    exitButton.setPosition(500.f, 400.f);
-
-    
-    playButton.setScale(0.5f, 0.5f);
-    exitButton.setScale(0.5f, 0.5f);
+    bgTexture.loadFromFile("assets/backgroundMainMenu.png");
+    background.setTexture(bgTexture);
 }
 
 void MainMenu::draw() {
-    window.draw(playButton);
-    window.draw(exitButton);
+	window.draw(background);
+	playButton.draw(window);
+	exitButton.draw(window);
+    settingsButton.draw(window);
 }
 
 void MainMenu::handleInput(const sf::Event& event, sf::RenderWindow& window) {
-    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-        sf::Vector2f mousePos(
-            static_cast<float>(event.mouseButton.x),
-            static_cast<float>(event.mouseButton.y)
-        );
-    }
+    playButton.handleEvent(event, window);
+    exitButton.handleEvent(event, window);
+	settingsButton.handleEvent(event, window);
 }

@@ -1,7 +1,7 @@
 #include "LoginMenu.h"
 #include <iostream>
 
-LoginMenu::LoginMenu(sf::Font& font,NetworkClient& clientRef,std::function<void()> onClick, std::function<void()> onLoginSuccess) :
+LoginMenu::LoginMenu(sf::Font& font,NetworkClient& clientRef, std::function<void()> onClick, std::function<void()> onLoginSuccess) :
 	client(clientRef),
 	LoginButton("assets/LoginButton.png", { 700.f, 400.f }, [this, onLoginSuccess]() {
 	std::string usernameText = username.getText();

@@ -5,6 +5,7 @@
 #include "registerMenu.h"
 #include "Animation.h"
 #include "MainMenu.h"
+#include "SettingsMenu.h"
 #include <iostream>
 #include <filesystem>
 
@@ -12,10 +13,12 @@
 enum class Scene {
     LoginMenu,
     Register,
-    MainMenu
+    MainMenu,
+    SettingsMenu
 };
 
 int main() {
+
     sf::RenderWindow window(sf::VideoMode(1280, 720), "The Game");
 
     sf::Font font;
@@ -25,14 +28,37 @@ int main() {
     NetworkClient client("http://localhost", 18080);
 
     LoginMenu loginMenu(font, client, [&]() { currentScene = Scene::Register;},
-        [&]() { currentScene = Scene::MainMenu;});
+        [&]() { 
+            currentScene = Scene::MainMenu;
+            window.close();
+            window.create(sf::VideoMode::getDesktopMode(), "The Game", sf::Style::Fullscreen);
+        });
 
 
-        RegisterMenu registerMenu(font, client, [&]() {
-            currentScene = Scene::LoginMenu;
-            });
+    RegisterMenu registerMenu(font, client, [&]() {
+           currentScene = Scene::LoginMenu;
+        });
 
-    MainMenu mainMenu(window);
+    MainMenu mainMenu(window, [&]() {
+        currentScene = Scene::SettingsMenu;
+        });
+
+    SettingsMenu settingsMenu(
+        window,
+
+        // BACK callback
+        [&]() {
+            currentScene = Scene::MainMenu;
+        },
+
+        // FULLSCREEN callback
+        [&]() {
+            window.close();
+            window.create(sf::VideoMode::getDesktopMode(),
+                "The Game",
+                sf::Style::Fullscreen);
+        }
+    );
 
     Animation cardTest("assets/cardflip.png", 64, 64, 16, 12.f,true);
     cardTest.setPosition({ 600.f,100.f });
@@ -45,12 +71,22 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (currentScene == Scene::LoginMenu)
-                loginMenu.handleEvent(event, window);
-            else if (currentScene == Scene::Register)
-                registerMenu.handleEvent(event, window);
-            else if (currentScene == Scene::MainMenu)
-                mainMenu.handleInput(event, window);
+            switch (currentScene) {
+            case Scene::LoginMenu:
+              loginMenu.handleEvent(event, window);
+			  break;
+            case Scene::Register:
+				registerMenu.handleEvent(event, window);
+				break;
+			case Scene::MainMenu:
+				mainMenu.handleInput(event, window);
+				break;
+
+            case Scene::SettingsMenu:
+                settingsMenu.handleInput(event);
+                break;
+            }
+            
         }
 
         cardTest.update();
@@ -69,6 +105,10 @@ int main() {
 
         case Scene::MainMenu:
             mainMenu.draw();
+            break;
+
+        case Scene::SettingsMenu:
+            settingsMenu.draw();
             break;
         }
 
