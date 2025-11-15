@@ -16,6 +16,8 @@ public:
 
 	PileType getType() const;
 
+	uint8_t getTopValue() const;
+
 private:
 	PileType m_type;
 	uint8_t m_topCardValue;
