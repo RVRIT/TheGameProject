@@ -35,10 +35,11 @@ void Player::sortHand()
 	std::ranges::sort(m_hand);
 }
 
-void Player::drawCard(Deck& deck)
+void Player::addCard(const Card& card)
 {
-	m_hand.push_back(deck.drawCard());
+	m_hand.push_back(card);
 }
+
 
 [[nodiscard]] Card Player::playCard(size_t handIndex)
 {

@@ -25,7 +25,7 @@ public:
 
 	void sortHand();
 
-	void drawCard(Deck& deck);
+	void addCard(const Card& card);
 
 	[[nodiscard]] Card playCard(size_t handIndex);
 };

@@ -48,8 +48,15 @@ void Game::setupGame()
 		{
 			if (!m_deck.isEmpty())
 			{
-				player.drawCard(m_deck);
+				Card drawnCard = m_deck.drawCard();
+
+				player.addCard(drawnCard);
 			}
 		}
+	}
+
+	for (auto& player : m_players)
+	{
+		player.sortHand();
 	}
 }
