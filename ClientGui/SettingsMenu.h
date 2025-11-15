@@ -10,6 +10,8 @@ public:
 
     void draw();
     void handleInput(const sf::Event& event);
+    void updateBackgroundScale();
+
 
 private:
     sf::RenderWindow& window;

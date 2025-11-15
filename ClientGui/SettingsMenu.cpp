@@ -37,3 +37,13 @@ void SettingsMenu::handleInput(const sf::Event& event) {
     fullscreenButton.handleEvent(event, window);
     volumeButton.handleEvent(event, window);
 }
+
+void SettingsMenu::updateBackgroundScale() {
+    sf::Vector2u win = window.getSize();
+    sf::Vector2u tex = bgTexture.getSize();
+
+    background.setScale(
+        float(win.x) / tex.x,
+        float(win.y) / tex.y
+    );
+}

@@ -22,7 +22,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "The Game");
 
     sf::Font font;
-    font.loadFromFile("assets/ARIAL.TTF");
+    font.loadFromFile("assets/PIXEL.TTF");
     Scene currentScene = Scene::LoginMenu;
 
     NetworkClient client("http://localhost", 18080);
@@ -39,13 +39,9 @@ int main() {
            currentScene = Scene::LoginMenu;
         });
 
-    MainMenu mainMenu(window, [&]() {
-        currentScene = Scene::SettingsMenu;
-        });
 
     SettingsMenu settingsMenu(
         window,
-
         // BACK callback
         [&]() {
             currentScene = Scene::MainMenu;
@@ -59,6 +55,15 @@ int main() {
                 sf::Style::Fullscreen);
         }
     );
+
+    MainMenu mainMenu(window, [&]() {
+        currentScene = Scene::SettingsMenu;
+        window.close();
+        window.create(sf::VideoMode::getDesktopMode(), "The Game", sf::Style::Fullscreen);
+
+		settingsMenu.updateBackgroundScale();
+
+        });
 
     Animation cardTest("assets/cardflip.png", 64, 64, 16, 12.f,true);
     cardTest.setPosition({ 600.f,100.f });

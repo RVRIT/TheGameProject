@@ -9,6 +9,7 @@ public:
     MainMenu(sf::RenderWindow& window, std::function<void()> onClick);
     void draw();
     void handleInput(const sf::Event& event, sf::RenderWindow& window);
+    void updateBackgroundScale();
 
 private:
     sf::RenderWindow& window;
@@ -17,5 +18,5 @@ private:
     Button settingsButton;
     sf::Texture bgTexture;
     sf::Sprite background;
-    std::function<void()> onSettingsClick;
+
 };
