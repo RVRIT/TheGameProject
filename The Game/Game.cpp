@@ -60,3 +60,33 @@ void Game::setupGame()
 		player.sortHand();
 	}
 }
+
+void Game::displayGameState() const
+{
+	std::cout << std::format("\n--- Deck: {} cards left ---\n", m_deck.size());
+
+	std::cout << "Piles:\n";
+
+	for (size_t i = 0; i < m_piles.size(); ++i)
+	{
+		const char* typeStr = (m_piles[i].getType() == PileType::ASCENDING) ? "ASC " : "DESC ";
+
+		std::cout << std::format("  {}: {}  - {}\n", i, typeStr, static_cast<int>(m_piles[i].getTopValue()));
+	}
+
+	const auto& currentPlayer = m_players[m_currentPlayerIndex];
+
+	std::cout << std::format("\n--- It's {}'s turn ---\n", currentPlayer.getName());
+
+	std::cout << "Your hand:\n";
+
+	const auto& hand = currentPlayer.getHand();
+
+	for (size_t i = 0; i < hand.size(); ++i)
+	{
+		
+		std::cout << std::format("  {}: [{}]\n", i, static_cast<int>(hand[i].getValue()));
+	}
+
+	std::cout << "----------------------------------------\n";
+}
