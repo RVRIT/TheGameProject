@@ -19,12 +19,11 @@ public:
 	uint8_t getTopValue() const;
 
 	[[nodiscard]] bool canPlace(const Card& card) const noexcept;
+	[[nodiscard]] bool isTenBackMove(const Card& card) const noexcept;
 
 	void placeCard(const Card& card);
 
 private:
 	PileType m_type;
 	uint8_t m_topCardValue;
-
 };
-

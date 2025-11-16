@@ -1,6 +1,6 @@
 #include "Pile.h"
 
-Pile::Pile(PileType type) : m_type{type}
+Pile::Pile(PileType type) : m_type{ type }
 {
 	if (m_type == PileType::ASCENDING)
 	{
@@ -37,6 +37,19 @@ bool Pile::canPlace(const Card& card) const noexcept
 		if (val == m_topCardValue + 10) return true;
 	}
 	return false;
+}
+
+[[nodiscard]] bool Pile::isTenBackMove(const Card& card) const noexcept
+{
+	uint8_t val = card.getValue();
+	if (m_type == PileType::ASCENDING)
+	{
+		return val == m_topCardValue - 10;
+	}
+	else
+	{
+		return val == m_topCardValue + 10;
+	}
 }
 
 void Pile::placeCard(const Card& card)
