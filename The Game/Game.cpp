@@ -90,3 +90,44 @@ void Game::displayGameState() const
 
 	std::cout << "----------------------------------------\n";
 }
+
+void Game::nextTurn() noexcept
+{
+	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
+}
+
+void Game::handlePlayerInput(Player& currentPlayer, size_t& cardsPlayedThisTurn)
+{
+	while (true)
+	{
+		std::cout << "Choose a card to play (index): ";
+		size_t cardIndex, pileIndex;
+		std::cin >> cardIndex;
+
+		std::cout << "Choose a pile (index): ";
+		std::cin >> pileIndex;
+
+		if (std::cin.fail() || cardIndex >= currentPlayer.getHandSize()
+			|| pileIndex >= m_piles.size())
+		{
+			std::cerr << "Invalid input.Please try again.\n";
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			continue;
+		}
+
+		const Card& selectedCard = currentPlayer.getHand().at(cardIndex);
+
+		if (m_piles[pileIndex].canPlace(selectedCard))
+		{
+			Card cardToPlay = currentPlayer.playCard(cardIndex);
+			m_piles[pileIndex].placeCard(cardToPlay);
+			cardsPlayedThisTurn++;
+			break;
+		}
+		else
+		{
+			std::cerr << "Invalid move! The card cannot be placed on this pile.\n";
+		}
+	}
+}
