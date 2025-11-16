@@ -1,4 +1,5 @@
 #include "DBManager.h"
+#include "PasswordService.h"
 bool DBManager::initialize(const std::string& db_path)
 {
     std::filesystem::create_directories(
@@ -12,6 +13,7 @@ bool DBManager::initialize(const std::string& db_path)
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL, 
                 rating REAL DEFAULT 0.0,
                 hours_played REAL DEFAULT 0.0,
                 games_played INT DEFAULT 0,

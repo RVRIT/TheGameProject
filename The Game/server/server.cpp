@@ -1,4 +1,5 @@
 #include "DBManager.h"
+#include "PasswordService.h"
 int main() {
     crow::SimpleApp app;
     DBManager db;

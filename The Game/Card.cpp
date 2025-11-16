@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <format>
 
-constexpr Card::Card(uint8_t value)
+ Card::Card(uint8_t value)
 	:m_value(value)
 {
 	if (m_value < 2 || m_value>99)
@@ -14,7 +14,7 @@ constexpr Card::Card(uint8_t value)
 	}
 }
 
-[[nodiscard]] constexpr uint8_t Card::getValue() const noexcept
+[[nodiscard]]  uint8_t Card::getValue() const noexcept
 {
 	return m_value;
 }

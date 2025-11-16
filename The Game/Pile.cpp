@@ -16,3 +16,8 @@ PileType Pile::getType() const
 {
 	return m_type;
 }
+
+uint8_t Pile::getTopValue() const
+{
+	return m_topCardValue;
+}
