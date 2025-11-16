@@ -10,13 +10,13 @@ public:
 	void handleEvent(const sf::Event& event, sf::RenderWindow& window);
 	void draw(sf::RenderWindow& window);
 
+
 private:
 	NetworkClient& client;
 	Button CreateAccount;
 	Button Back;
 	TextBox username;
-	//TextBox password;
-	//TextBox confirmPassword;
+	TextBox password;
 	sf::Texture bgTexture;
 	sf::Sprite background;
 

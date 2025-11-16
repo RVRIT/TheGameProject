@@ -59,7 +59,7 @@ int main() {
     MainMenu mainMenu(window, [&]() {
         currentScene = Scene::SettingsMenu;
         window.close();
-        window.create(sf::VideoMode::getDesktopMode(), "The Game", sf::Style::Fullscreen);
+        window.create(sf::VideoMode::getDesktopMode(), "The Game", sf::Style::Default);
 
 		settingsMenu.updateBackgroundScale();
 

@@ -16,7 +16,7 @@ private:
 	Button LoginButton;
 	Button RegisterButton;
 	TextBox username;
-	//TextBox password;
+	TextBox password;
 	sf::Texture bgTexture;
 	sf::Sprite background;
 	
