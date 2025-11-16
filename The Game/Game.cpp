@@ -1,4 +1,4 @@
-#include "Game.h"
+﻿#include "Game.h"
 #include <iostream>
 #include <stdexcept>
 #include <format>
@@ -6,8 +6,11 @@
 #include <limits>
 #include <algorithm>
 #include <ranges>
+#include <chrono>
+#include <thread>
+#include <optional>
 
-Game::Game(const std::vector<std::string_view>& playerNames)
+Game::Game(const std::vector<PlayerConfig>& playerConfigs)
 	: m_piles{
 		Pile(PileType::ASCENDING),
 		Pile(PileType::ASCENDING),
@@ -17,17 +20,18 @@ Game::Game(const std::vector<std::string_view>& playerNames)
 	m_currentPlayerIndex(0),
 	m_minCardsToPlayPerTurn(2),
 	m_initialHandSize(0),
-	m_isGameOver(false)
+	m_isGameOver(false),
+	m_playerWon(false)
 {
-	if (playerNames.empty() || playerNames.size() > 5)
+	if (playerConfigs.empty() || playerConfigs.size() > 5)
 	{
 		throw std::invalid_argument("Numar invalid de jucatori. Trebuie sa fie intre 1 si 5.");
 	}
 
-	m_players.reserve(playerNames.size());
-	for (const auto& name : playerNames)
+	m_players.reserve(playerConfigs.size());
+	for (const auto& config : playerConfigs)
 	{
-		m_players.emplace_back(name);
+		m_players.emplace_back(config.first, config.second);
 	}
 
 	setupGame();
@@ -49,7 +53,6 @@ void Game::setupGame()
 			if (!m_deck.isEmpty())
 			{
 				Card drawnCard = m_deck.drawCard();
-
 				player.addCard(drawnCard);
 			}
 		}
@@ -84,7 +87,6 @@ void Game::displayGameState() const
 
 	for (size_t i = 0; i < hand.size(); ++i)
 	{
-		
 		std::cout << std::format("  {}: [{}]\n", i, static_cast<int>(hand[i].getValue()));
 	}
 
@@ -96,21 +98,40 @@ void Game::nextTurn() noexcept
 	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
 }
 
-void Game::handlePlayerInput(Player& currentPlayer, size_t& cardsPlayedThisTurn)
+void Game::humanPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 {
-	while (true)
+	bool turnFinished = false;
+	while (!turnFinished)
 	{
-		std::cout << "Choose a card to play (index): ";
-		size_t cardIndex, pileIndex;
-		std::cin >> cardIndex;
+		std::cout << "Alege o carte (index) sau 'p' pentru a pasa: ";
+		std::string cardInput;
+		std::cin >> cardInput;
 
-		std::cout << "Choose a pile (index): ";
+		if (cardInput == "p" || cardInput == "P")
+		{
+			turnFinished = true;
+			continue;
+		}
+
+		size_t cardIndex;
+		try
+		{
+			cardIndex = std::stoull(cardInput);
+		}
+		catch (const std::exception&)
+		{
+			std::cerr << "Input invalid. Introdu un număr sau 'p'.\n";
+			continue;
+		}
+
+		std::cout << "Alege un pachet (index): ";
+		size_t pileIndex;
 		std::cin >> pileIndex;
 
 		if (std::cin.fail() || cardIndex >= currentPlayer.getHandSize()
 			|| pileIndex >= m_piles.size())
 		{
-			std::cerr << "Invalid input.Please try again.\n";
+			std::cerr << "Input invalid. Te rog reîncearcă.\n";
 			std::cin.clear();
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			continue;
@@ -123,11 +144,205 @@ void Game::handlePlayerInput(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 			Card cardToPlay = currentPlayer.playCard(cardIndex);
 			m_piles[pileIndex].placeCard(cardToPlay);
 			cardsPlayedThisTurn++;
-			break;
+
+			std::cout << std::format("Ai jucat [{}] pe pachetul {}.\n",
+				cardToPlay, pileIndex);
+
+			std::cout << "Mâna ta actualizată:\n";
+			const auto& hand = currentPlayer.getHand();
+			for (size_t i = 0; i < hand.size(); ++i)
+			{
+				std::cout << std::format("  {}: [{}]\n", i, hand[i]);
+			}
 		}
 		else
 		{
-			std::cerr << "Invalid move! The card cannot be placed on this pile.\n";
+			std::cerr << "Mutare invalidă! Cartea nu poate fi pusă pe acest pachet.\n";
 		}
 	}
+}
+
+void Game::aiPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
+{
+	std::cout << std::format("Este tura lui {} (AI). AI-ul se gândește...\n",
+		currentPlayer.getName());
+
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+
+	size_t minCards = (m_deck.isEmpty()) ? 1 : m_minCardsToPlayPerTurn;
+
+	while (cardsPlayedThisTurn < minCards)
+	{
+		auto moves = currentPlayer.findPossibleMoves(m_piles);
+		if (moves.empty())
+		{
+			break;
+		}
+
+		std::optional<Player::Move> bestMove;
+		int bestScore = -1;
+
+		for (const auto& move : moves)
+		{
+			size_t cardIdx = move.first;
+			size_t pileIdx = move.second;
+			const Card& card = currentPlayer.getHand()[cardIdx];
+			const Pile& pile = m_piles[pileIdx];
+
+			int currentScore = 0;
+			if (pile.isTenBackMove(card))
+			{
+				currentScore = 100;
+			}
+			else
+			{
+				int diff = std::abs(static_cast<int>(card.getValue()) -
+					static_cast<int>(pile.getTopValue()));
+				currentScore = 50 - diff;
+			}
+
+			if (currentScore > bestScore)
+			{
+				bestScore = currentScore;
+				bestMove = move;
+			}
+		}
+
+		if (bestMove)
+		{
+			size_t cardIdx = bestMove->first;
+			size_t pileIdx = bestMove->second;
+
+			Card cardToPlay = currentPlayer.getHand()[cardIdx];
+
+			currentPlayer.playCard(cardIdx);
+			m_piles[pileIdx].placeCard(cardToPlay);
+			cardsPlayedThisTurn++;
+
+			std::cout << std::format("AI-ul {} a jucat [{}] pe pachetul {}.\n",
+				currentPlayer.getName(), cardToPlay, pileIdx);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		}
+		else
+		{
+			break;
+		}
+	}
+}
+
+void Game::drawCardsForPlayer(Player& player, size_t cardsToDraw)
+{
+	for (size_t i = 0; i < cardsToDraw; ++i)
+	{
+		if (m_deck.isEmpty())
+		{
+			break;
+		}
+		player.addCard(m_deck.drawCard());
+	}
+	player.sortHand();
+}
+
+
+[[nodiscard]] bool Game::canPlayerMakeAnyMove(const Player& player) const noexcept
+{
+	return !player.findPossibleMoves(m_piles).empty();
+}
+
+[[nodiscard]] bool Game::checkWinCondition() const noexcept
+{
+	if (m_deck.isEmpty())
+	{
+		bool allHandsEmpty = std::ranges::all_of(m_players,
+			[](const Player& p) { return p.getHandSize() == 0; }
+		);
+
+		if (allHandsEmpty)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void Game::playTurn()
+{
+	Player& currentPlayer = m_players[m_currentPlayerIndex];
+
+	if (!canPlayerMakeAnyMove(currentPlayer))
+	{
+		std::cout << std::format("\n!!!! GAME OVER !!!!\n");
+		std::cout << std::format("Jucătorul {} nu mai poate face nicio mutare.\n",
+			currentPlayer.getName());
+		m_isGameOver = true;
+		m_playerWon = false;
+		return;
+	}
+
+	displayGameState();
+
+	size_t cardsPlayedThisTurn = 0;
+
+	if (currentPlayer.isAI())
+	{
+		aiPlayTurn(currentPlayer, cardsPlayedThisTurn);
+	}
+	else
+	{
+		humanPlayTurn(currentPlayer, cardsPlayedThisTurn);
+	}
+
+	size_t minCardsRequired = (m_deck.isEmpty()) ? 1 : m_minCardsToPlayPerTurn;
+
+	if (cardsPlayedThisTurn < minCardsRequired)
+	{
+		if (cardsPlayedThisTurn == 0 && canPlayerMakeAnyMove(currentPlayer))
+		{
+			std::cout << std::format("\n!!!! GAME OVER !!!!\n");
+			std::cout << std::format("Jucătorul {} a pasat, dar mai avea mutări.\n",
+				currentPlayer.getName());
+			m_isGameOver = true;
+			m_playerWon = false;
+			return;
+		}
+	}
+
+	drawCardsForPlayer(currentPlayer, cardsPlayedThisTurn);
+
+	if (checkWinCondition())
+	{
+		std::cout << std::format("\n****** FELICITĂRI! ******\n");
+		std::cout << "Ați câștigat jocul! Pachetul și toate mâinile sunt goale!\n";
+		m_isGameOver = true;
+		m_playerWon = true;
+		return;
+	}
+
+	nextTurn();
+}
+
+void Game::run()
+{
+	std::cout << "Bun venit la THE GAME!\n";
+	std::cout << "Reguli: Jucați cel puțin " << m_minCardsToPlayPerTurn
+		<< " cărți pe tur.\n";
+	std::cout << "Pachetele ASC (1) cresc, pachetele DESC (100) descresc.\n";
+	std::cout << "Puteți juca o carte cu exact 10 mai mică (pe ASC) sau 10 mai mare (pe DESC) pentru a 'reseta' pachetul.\n";
+
+	while (!m_isGameOver)
+	{
+		playTurn();
+	}
+
+	std::cout << "\n--- STATISTICI FINALE ---\n";
+	std::cout << "Rezultat: " << (m_playerWon ? "Victorie!" : "Înfrângere") << "\n";
+	std::cout << "Cărți rămase în pachet: " << m_deck.size() << "\n";
+	size_t totalCardsInHand = 0;
+	for (const auto& player : m_players)
+	{
+		totalCardsInHand += player.getHandSize();
+	}
+	std::cout << "Total cărți în mâinile jucătorilor: " << totalCardsInHand << "\n";
+	std::cout << "---------------------------\n";
 }

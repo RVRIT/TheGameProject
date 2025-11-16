@@ -13,7 +13,8 @@
 class Game
 {
 public:
-	explicit Game(const std::vector<std::string_view>& playerNames);
+	using PlayerConfig = std::pair<std::string_view, bool>;
+	explicit Game(const std::vector<PlayerConfig>& playerConfigs);
 
 	void run();
 
@@ -25,7 +26,10 @@ private:
 
 	[[nodiscard]] bool checkWinCondition() const noexcept;
 	[[nodiscard]] bool canPlayerMakeAnyMove(const Player& player) const noexcept;
-	void handlePlayerInput(Player& currentPlayer, size_t& cardsPlayedThisTurn);
+
+	void humanPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn);
+	void aiPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn);
+	void drawCardsForPlayer(Player& player, size_t cardsToDraw);
 
 	Deck m_deck;
 	std::vector<Player> m_players;
@@ -35,4 +39,5 @@ private:
 	size_t m_minCardsToPlayPerTurn;
 	size_t m_initialHandSize;
 	bool m_isGameOver;
+	bool m_playerWon;
 };
