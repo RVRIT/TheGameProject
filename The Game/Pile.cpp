@@ -21,3 +21,25 @@ uint8_t Pile::getTopValue() const
 {
 	return m_topCardValue;
 }
+
+bool Pile::canPlace(const Card& card) const noexcept
+{
+	uint8_t val = card.getValue();
+
+	if (m_type == PileType::ASCENDING)
+	{
+		if (val > m_topCardValue) return true;
+		if (val == m_topCardValue - 10) return true;
+	}
+	else
+	{
+		if (val < m_topCardValue) return true;
+		if (val == m_topCardValue + 10) return true;
+	}
+	return false;
+}
+
+void Pile::placeCard(const Card& card)
+{
+	m_topCardValue = card.getValue();
+}
