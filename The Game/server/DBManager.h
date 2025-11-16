@@ -2,6 +2,7 @@
 #include "crow.h"
 #include <sqlite3.h>
 #include <filesystem>
+#include <optional>
 class DBManager
 {
 private:
@@ -13,6 +14,8 @@ public:
     bool updateUserStats(int user_id, bool won, double hours_played);
     bool checkExistingUser(const std::string& username);
     bool registerUser(const std::string& username);
+    std::optional<std::string> getHashedPassword(const std::string& username);
+    std::optional<int> getUserId(const std::string& username);
     sqlite3* get_db() { return db; }
     ~DBManager() { if (db) sqlite3_close(db); }
 };
