@@ -38,27 +38,6 @@ bool DBManager::initialize(const std::string& db_path)
     std::cout << "Database initialized successfully!" << std::endl;
     return true;
 }
-bool DBManager::insertUser(const std::string& username)
-{
-    const char* sql = "INSERT INTO users (username) VALUES (?)";
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
-    if (rc != SQLITE_OK)
-    {
-        std::cerr << "ERROR preparing statement: " << sqlite3_errmsg(db) << std::endl;
-        return false;
-    }
-    sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE)
-    {
-        std::cerr << "ERROR insert execution: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_finalize(stmt);
-        return false;
-    }
-    sqlite3_finalize(stmt);
-    return true;
-}
 bool DBManager::insertGameSession(int user_id, int score)
 {
     const char* sql = "INSERT INTO game_sessions (user_id, score) VALUES (?, ?)";
@@ -127,19 +106,18 @@ bool DBManager::checkExistingUser(const std::string& username)
     sqlite3_finalize(stmt);
     return success;
 }
+bool DBManager::registerUser(const std::string& username, const std::string& hashed_password) {
+    const char* sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) return false;
 
-bool DBManager::registerUser(const std::string& username)
-{
-    if (insertUser(username))
-    {
-        std::cout << "User registered successfully!\n";
-        return true;
-    }
-    else
-    {
-        std::cerr << "ERROR inserting user" << std::endl;
-        return false;
-    }
+    sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, hashed_password.c_str(), -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    return rc == SQLITE_DONE;
 }
 std::optional<std::string> DBManager::getHashedPassword(const std::string& username) {
     if (!db) return std::nullopt;
