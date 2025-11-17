@@ -202,6 +202,8 @@ exit 0
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="networkClient.cpp" />
     <ClCompile Include="registerMenu.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SettingsMenu.cpp" />
     <ClCompile Include="TextBox.cpp" />
   </ItemGroup>
@@ -220,6 +222,8 @@ exit 0
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="networkClient.h" />
     <ClInclude Include="registerMenu.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SettingsMenu.h" />
     <ClInclude Include="textBox.h" />
   </ItemGroup>

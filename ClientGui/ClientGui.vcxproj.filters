@@ -13,34 +13,58 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{e8dac53b-5dd9-4686-98d0-345071d77a74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MENUS">
+      <UniqueIdentifier>{f956273c-ac82-423a-ab59-3de4894acf98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SCENES">
+      <UniqueIdentifier>{e6a95ed9-5e93-4041-b9a1-db10ca935853}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MENUS">
+      <UniqueIdentifier>{9ba42bd6-a6e8-4e21-9004-e46a07aea4e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SCENES">
+      <UniqueIdentifier>{20c0d994-57e6-473e-ace5-e57d88b14f32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{11a014d4-7656-4bd2-b521-5b09b0c8b737}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="loginMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="registerMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="networkClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenu.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="TextBox.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="Animation.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="loginMenu.cpp">
+      <Filter>Source Files\MENUS</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Source Files\MENUS</Filter>
+    </ClCompile>
+    <ClCompile Include="registerMenu.cpp">
+      <Filter>Source Files\MENUS</Filter>
     </ClCompile>
     <ClCompile Include="SettingsMenu.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\MENUS</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\SCENES</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source Files\SCENES</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,29 +84,35 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="textBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="loginMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="registerMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="networkClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MainMenu.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="button.h">
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="textBox.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="loginMenu.h">
+      <Filter>Header Files\MENUS</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
+      <Filter>Header Files\MENUS</Filter>
+    </ClInclude>
+    <ClInclude Include="registerMenu.h">
+      <Filter>Header Files\MENUS</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\SCENES</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Header Files\SCENES</Filter>
     </ClInclude>
     <ClInclude Include="SettingsMenu.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\MENUS</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

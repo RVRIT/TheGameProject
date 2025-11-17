@@ -1,30 +1,46 @@
 #include "MainMenu.h"
+#include "SceneManager.h"   
+#include "SettingsMenu.h" 
 #include <iostream>
+#include <memory>
 
-MainMenu::MainMenu(sf::RenderWindow& windowRef, std::function<void()> onClick)
-    : window(windowRef),
-    playButton("assets/play.png", { 700.f, 200.f }, [&]()
-        {}),
-    exitButton("assets/exit.png", { 700.f, 400.f }, [&]() {
-    window.close();
+MainMenu::MainMenu(SceneManager& manager, sf::RenderWindow& windowRef)
+    : sceneManager(manager),
+    window(windowRef),
+    playButton("assets/play.png", { 700.f, 200.f },
+        [this]() {
+            // TODO
+            // sceneManager.pushScene(std::make_unique<GameScene>(...));
         }),
-    settingsButton("assets/settings.png", { 700.f, 1000.f }, onClick)
+        exitButton("assets/exit.png", { 700.f, 400.f },
+            [this]() {
+                sceneManager.popScene(); 
+            }),
+    settingsButton("assets/settings.png", { 700.f, 1000.f },
+        [this]() {
+            // TODO
+            // sceneManager.pushScene(std::make_unique<SettingsMenu>(sceneManager, window));
+        })
 {
     bgTexture.loadFromFile("assets/backgroundMainMenu.png");
     background.setTexture(bgTexture);
 }
 
-void MainMenu::draw() {
-	window.draw(background);
-	playButton.draw(window);
-	exitButton.draw(window);
-    settingsButton.draw(window);
+void MainMenu::update(sf::Time dt)
+{
 }
 
-void MainMenu::handleInput(const sf::Event& event, sf::RenderWindow& window) {
+void MainMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     playButton.handleEvent(event, window);
     exitButton.handleEvent(event, window);
-	settingsButton.handleEvent(event, window);
+    settingsButton.handleEvent(event, window);
+}
+
+void MainMenu::draw(sf::RenderWindow& window) {
+    window.draw(background);
+    playButton.draw(window);
+    exitButton.draw(window);
+    settingsButton.draw(window);
 }
 
 void MainMenu::updateBackgroundScale()
