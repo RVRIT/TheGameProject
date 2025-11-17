@@ -1,5 +1,6 @@
 #include "DBManager.h"
 #include "PasswordService.h"
+#include <regex>
 int main() {
     crow::SimpleApp app;
     DBManager db;
@@ -51,7 +52,15 @@ int main() {
         std::string username = body["username"].s();
         std::string password = body["password"].s();
         crow::json::wvalue res;
-
+        std::regex validUsernamePattern("^[a-zA-Z0-9]+$");
+        if (!std::regex_match(username, validUsernamePattern)) {
+            crow::json::wvalue res;
+            res["status"] = "error";
+            res["message"] = "Username must contain only letters and numbers";
+            crow::response r(400, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
+        }
         if (db.checkExistingUser(username)) {
             res["status"] = "error";
             res["message"] = "Username taken";
