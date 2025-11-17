@@ -12,9 +12,8 @@ Button::Button(const std::string& texturePath, sf::Vector2f position, std::funct
     sprite.setPosition(position);
 }
 
-void Button::handleEvent(const sf::Event& event, const sf::RenderWindow& window) {
-    sf::Vector2i mouse = sf::Mouse::getPosition(window);
-    bool inside = sprite.getGlobalBounds().contains(static_cast<float>(mouse.x), static_cast<float>(mouse.y));
+void Button::handleEvent(const sf::Event& event, const sf::Vector2f& mousePosition) {
+    bool inside = sprite.getGlobalBounds().contains(mousePosition);
 
     if (inside && !hovered) {
         hovered = true;

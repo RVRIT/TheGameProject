@@ -31,9 +31,11 @@ void MainMenu::update(sf::Time dt)
 }
 
 void MainMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
-    playButton.handleEvent(event, window);
-    exitButton.handleEvent(event, window);
-    settingsButton.handleEvent(event, window);
+    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+    playButton.handleEvent(event, mousePos);
+    exitButton.handleEvent(event, mousePos);
+    settingsButton.handleEvent(event, mousePos);
 }
 
 void MainMenu::draw(sf::RenderWindow& window) {

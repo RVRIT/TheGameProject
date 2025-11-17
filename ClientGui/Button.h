@@ -5,7 +5,7 @@
 class Button {
 public:
     Button(const std::string& texturePath, sf::Vector2f position, std::function<void()> callback = nullptr);
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
+    void handleEvent(const sf::Event& event, const sf::Vector2f& mousePosition);
     void draw(sf::RenderWindow& window);
 
 private:

@@ -33,9 +33,11 @@ void SettingsMenu::draw() {
 }
 
 void SettingsMenu::handleInput(const sf::Event& event) {
-    backButton.handleEvent(event, window);
-    fullscreenButton.handleEvent(event, window);
-    volumeButton.handleEvent(event, window);
+    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+    backButton.handleEvent(event, mousePos);
+    fullscreenButton.handleEvent(event, mousePos);
+    volumeButton.handleEvent(event, mousePos);
 }
 
 void SettingsMenu::updateBackgroundScale() {

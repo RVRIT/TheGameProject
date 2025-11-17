@@ -14,12 +14,19 @@ LoginMenu::LoginMenu(sf::Font& font, NetworkClient& clientRef, SceneManager& man
 			std::string usernameText = username.getText();
 			std::string passwordText = password.getText();
 
+			if (usernameText.empty() || passwordText.empty()) {
+				errorText.setString("Numele si parola nu pot fi goale!");
+				return; 
+			}
+
 			if (client.loginUser(usernameText, passwordText)) {
 				std::cout << "Login success!\n";
+				errorText.setString("");
 				sceneManager.changeScene(std::make_unique<MainMenu>(sceneManager, window));
 			}
 			else {
 				std::cout << "Login failed!\n";
+				errorText.setString("Nume de utilizator sau parola incorecte!");
 			}
 		}),
 	RegisterButton("assets/RegisterButton.png", { 1000.f, 400.f },
@@ -31,6 +38,11 @@ LoginMenu::LoginMenu(sf::Font& font, NetworkClient& clientRef, SceneManager& man
 {
 	bgTexture.loadFromFile("assets/backgroundTry2.png");
 	background.setTexture(bgTexture);
+
+	errorText.setFont(font);
+	errorText.setFillColor(sf::Color::Red);
+	errorText.setCharacterSize(12); 
+	errorText.setPosition(700.f, 500.f);
 }
 
 
@@ -46,12 +58,16 @@ void LoginMenu::draw(sf::RenderWindow& window)
     RegisterButton.draw(window);
     username.draw(window);
     password.draw(window);
+	window.draw(errorText);
 }
 
 void LoginMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window)
 {
-    LoginButton.handleEvent(event, window);
-    RegisterButton.handleEvent(event, window);
+	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+    LoginButton.handleEvent(event, mousePos);
+    RegisterButton.handleEvent(event, mousePos);
     username.handleEvent(event);
     password.handleEvent(event);
+	
 }

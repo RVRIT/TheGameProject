@@ -22,6 +22,7 @@ private:
 	TextBox password;
 	sf::Texture bgTexture;
 	sf::Sprite background;
+	sf::Text errorText;
 
 };
 
