@@ -10,6 +10,17 @@
 #include <thread>
 #include <optional>
 
+//@TODO:
+/* - read comments at DisplayGameState method
+   - completely delete AI functionalities (nu folosim asa ceva)
+   - eliminam functia de skip la turn, maxim se termina jocul cand nu mai poti juca carti
+   sau se scoate player-ul respectiv din joc in functie de cum ni se permite
+   - sa se adauge functie de calculat scor, return scor:  se incepe cu un scor de 100 de puncte si se pierd
+   puncte per fiecare carte nejucata la final de joc sau la eliminarea jucatorului X
+   in caz ca ni se permite sa continuam jocul dupa ce un player a fost eliminat scorul se calculeaza astfel:
+     scor = 100 - carti_in_mana - (carti_in_teanc / numar_de_jucatori)
+	 si gamestate intoarce lista de jucatori in ordinea scorurilor (locul 1, 2, 3 si scorul lor)
+*/
 Game::Game(const std::vector<PlayerConfig>& playerConfigs)
 	: m_piles{
 		Pile(PileType::ASCENDING),
@@ -66,6 +77,14 @@ void Game::setupGame()
 
 void Game::displayGameState() const
 {
+	//trebuie sa se construiasca un obiect cu toate informatiile de display pentru a fi returnate dupa
+	// functia nu poate fi void
+	// return topvalue la fiecare pile (+lungimea piles pentru afisare front end), hand ul la fiecare player
+	// a cui e tura, size-ul la cartile de tras + ultima carte de sus ca sa o poti afisa
+	// si daca exista move de facut la fiecare player (True, False) -> map cu fiecare player si state-ul lui
+	// (daca mai poate juca sau nu) -> pentru a putea afisa in UI cine joaca si cine nu
+	// VEDEM LA CHECK IN DE FAZA CU MAP CU STATE UL PLAYERILOR
+
 	std::cout << std::format("\n--- Deck: {} cards left ---\n", m_deck.size());
 
 	std::cout << "Piles:\n";
@@ -73,7 +92,6 @@ void Game::displayGameState() const
 	for (size_t i = 0; i < m_piles.size(); ++i)
 	{
 		const char* typeStr = (m_piles[i].getType() == PileType::ASCENDING) ? "ASC " : "DESC ";
-
 		std::cout << std::format("  {}: {}  - {}\n", i, typeStr, static_cast<int>(m_piles[i].getTopValue()));
 	}
 
@@ -95,6 +113,7 @@ void Game::displayGameState() const
 
 void Game::nextTurn() noexcept
 {
+	// verifica daca mai e in joc sau nu, si daca nu da skip
 	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
 }
 
@@ -103,7 +122,9 @@ void Game::humanPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 	bool turnFinished = false;
 	while (!turnFinished)
 	{
+		// nu exista functia de a da "skip" la tura, poti doar sa tragi sau sa pui carte
 		std::cout << "Alege o carte (index) sau 'p' pentru a pasa: ";
+		//cardInput vine ca parametru din UI, ca index -> int, size_t whatever
 		std::string cardInput;
 		std::cin >> cardInput;
 
@@ -124,9 +145,11 @@ void Game::humanPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 			continue;
 		}
 
+		// si pileIndex o sa vina din UI (se apasa pe pile)
 		std::cout << "Alege un pachet (index): ";
 		size_t pileIndex;
 		std::cin >> pileIndex;
+
 
 		if (std::cin.fail() || cardIndex >= currentPlayer.getHandSize()
 			|| pileIndex >= m_piles.size())
@@ -162,6 +185,7 @@ void Game::humanPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 	}
 }
 
+//delete this bro
 void Game::aiPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 {
 	std::cout << std::format("Este tura lui {} (AI). AI-ul se gândește...\n",
@@ -233,6 +257,8 @@ void Game::aiPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn)
 
 void Game::drawCardsForPlayer(Player& player, size_t cardsToDraw)
 {
+	// functia asta o sa iti traga un singur card (ultimul din varf) la fiecare click, nu primeste
+	// cardsToDraw ca parametru
 	for (size_t i = 0; i < cardsToDraw; ++i)
 	{
 		if (m_deck.isEmpty())
@@ -284,6 +310,7 @@ void Game::playTurn()
 
 	size_t cardsPlayedThisTurn = 0;
 
+	// se scoate asta cu AI-ul
 	if (currentPlayer.isAI())
 	{
 		aiPlayTurn(currentPlayer, cardsPlayedThisTurn);
