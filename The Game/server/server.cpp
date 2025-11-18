@@ -84,7 +84,6 @@ int main() {
             return r;
         }
         std::string hashed = PasswordService::hashPassword(password);
-        std::cout << hashed << std::endl;
         if (db.registerUser(username, hashed)) {
             res["status"] = "success";
             res["message"] = "Registered successfully";
