@@ -90,7 +90,7 @@ bool DBManager::checkExistingUser(const std::string& username)
     }
     sqlite3_stmt* stmt;
     bool success = false;
-    const char* sql = "SELECT COUNT(*) FROM users WHERE username = ?;";
+    const char* sql = "SELECT COUNT(*) FROM users WHERE username LIKE ?;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
     {
         sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_TRANSIENT);
@@ -122,7 +122,7 @@ bool DBManager::registerUser(const std::string& username, const std::string& has
 std::optional<std::string> DBManager::getHashedPassword(const std::string& username) {
     if (!db) return std::nullopt;
 
-    const char* sql = "SELECT password_hash FROM users WHERE username = ?";
+    const char* sql = "SELECT password_hash FROM users WHERE username LIKE ?";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -142,7 +142,7 @@ std::optional<std::string> DBManager::getHashedPassword(const std::string& usern
 std::optional<int> DBManager::getUserId(const std::string& username) {
     if (!db) return std::nullopt;
 
-    const char* sql = "SELECT id FROM users WHERE username = ?";
+    const char* sql = "SELECT id FROM users WHERE username LIKE ?";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
