@@ -5,7 +5,7 @@ int main() {
     crow::SimpleApp app;
     DBManager db;
     if (!db.initialize("./data/game.db")) {
-        std::cerr << "ERORR initializing DB!" << std::endl;
+        std::cerr << "ERROR initializing DB!" << std::endl;
         return 1;
     }
     CROW_ROUTE(app, "/login").methods(crow::HTTPMethod::POST)([&db](const crow::request& req) {
@@ -54,9 +54,16 @@ int main() {
         crow::json::wvalue res;
         std::regex validUsernamePattern("^[a-zA-Z0-9]+$");
         if (!std::regex_match(username, validUsernamePattern)) {
-            crow::json::wvalue res;
             res["status"] = "error";
             res["message"] = "Username must contain only letters and numbers";
+            crow::response r(400, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
+        }
+        if (username.length() < 3 || username.length() > 20)
+        {
+            res["status"] = "error";
+            res["message"] = "Username must be between 3-20 characters long";
             crow::response r(400, res.dump());
             r.set_header("Content-Type", "application/json");
             return r;
@@ -65,6 +72,14 @@ int main() {
             res["status"] = "error";
             res["message"] = "Username taken";
             crow::response r(409, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
+        }
+        if (password.length() < 6)
+        {
+            res["status"] = "error";
+            res["message"] = "Password must be at least 6 characters long";
+            crow::response r(400, res.dump());
             r.set_header("Content-Type", "application/json");
             return r;
         }
