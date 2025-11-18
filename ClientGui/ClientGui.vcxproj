@@ -218,6 +218,7 @@ exit 0
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="loginMenu.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="networkClient.h" />

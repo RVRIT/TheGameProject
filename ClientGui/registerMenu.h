@@ -3,6 +3,7 @@
 #include "textBox.h"
 #include "networkClient.h"
 #include "Scene.h"
+#include "Animation.h"
 
 class RegisterMenu : public Scene
 {
@@ -23,6 +24,8 @@ private:
 	sf::Texture bgTexture;
 	sf::Sprite background;
 	sf::Text errorText;
+
+	Animation cardAnimation;
 
 };
 

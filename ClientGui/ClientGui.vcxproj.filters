@@ -114,5 +114,8 @@
     <ClInclude Include="Animation.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

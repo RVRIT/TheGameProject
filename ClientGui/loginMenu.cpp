@@ -3,7 +3,10 @@
 #include "RegisterMenu.h"     
 #include "MainMenu.h"         
 #include <iostream>
+#include "json.hpp"
 #include <memory>
+
+using json = nlohmann::json;
 
 LoginMenu::LoginMenu(sf::Font& font, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& win) :
 	client(clientRef),
@@ -19,14 +22,29 @@ LoginMenu::LoginMenu(sf::Font& font, NetworkClient& clientRef, SceneManager& man
 				return; 
 			}
 
-			if (client.loginUser(usernameText, passwordText)) {
-				std::cout << "Login success!\n";
+			auto response = client.loginUser(usernameText, passwordText);
+			
+			if (response.first){
+				std::cout << "LOGIN SUCCESFUL!\n";
 				errorText.setString("");
 				sceneManager.changeScene(std::make_unique<MainMenu>(sceneManager, window));
 			}
 			else {
-				std::cout << "Login failed!\n";
-				errorText.setString("Nume de utilizator sau parola incorecte!");
+				std::cout << "LOGIN FAILED! RAW JSON: " << response.second << '\n';
+
+				try
+				{
+					json jsonResponse = json::parse(response.second);
+
+					if (jsonResponse.contains("message")) {
+						std::string msg = jsonResponse["message"];
+						errorText.setString(msg);
+					}
+					else errorText.setString("Eroare necunoscuta de la server");
+				}
+				catch (json::parse_error& e) {
+					errorText.setString("Eroare de comunicare cu serverul.");
+				}
 			}
 		}),
 	RegisterButton("assets/RegisterButton.png", { 1000.f, 400.f },

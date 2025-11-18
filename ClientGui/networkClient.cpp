@@ -4,7 +4,7 @@
 NetworkClient::NetworkClient(const std::string& host, unsigned short port)
     : host(host), port(port) {}
 
-bool NetworkClient::loginUser(const std::string& username, const std::string& password) {
+std::pair<bool, std::string> NetworkClient::loginUser(const std::string& username, const std::string& password) {
     sf::Http http(host, port);
 
     sf::Http::Request request;
@@ -20,10 +20,14 @@ bool NetworkClient::loginUser(const std::string& username, const std::string& pa
     std::cout << "Login response: " << response.getStatus()
         << " - " << response.getBody() << "\n";
 
-    return response.getStatus() == sf::Http::Response::Ok;
+    if (response.getStatus() == sf::Http::Response::Ok || response.getStatus() == sf::Http::Response::Created) 
+        return { true, response.getBody() };
+    else 
+        return { false, response.getBody()};
+    
 }
 
-bool NetworkClient::registerUser(const std::string& username, const std::string& password) {
+std::pair<bool, std::string> NetworkClient::registerUser(const std::string& username, const std::string& password) {
     sf::Http http(host, port);
 
     sf::Http::Request request;
@@ -39,5 +43,8 @@ bool NetworkClient::registerUser(const std::string& username, const std::string&
     std::cout << "Register response: " << response.getStatus()
         << " - " << response.getBody() << "\n";
 
-    return response.getStatus() == sf::Http::Response::Ok;
+    if (response.getStatus() == sf::Http::Response::Ok || response.getStatus() == sf::Http::Response::Created)
+        return { true, response.getBody() };
+    else
+        return { false, response.getBody() };
 }
