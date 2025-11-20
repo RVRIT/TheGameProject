@@ -130,6 +130,7 @@
     <ClInclude Include="Card.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameSnapshot.h" />
     <ClInclude Include="Pile.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Shuffler.h" />
