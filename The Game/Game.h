@@ -9,6 +9,8 @@
 #include <string_view>
 #include <array>
 #include <cstddef>
+#include "GameSnapshot.h"
+
 
 class Game
 {
@@ -18,17 +20,21 @@ public:
 
 	void run();
 
+	[[nodiscard]] GameSnapshot getSnapshot(const std::string& requestingPlayerName) const;
+
 private:
 	void setupGame();
 	void playTurn();
-	void displayGameState() const;
 	void nextTurn() noexcept;
 
 	[[nodiscard]] bool checkWinCondition() const noexcept;
 	[[nodiscard]] bool canPlayerMakeAnyMove(const Player& player) const noexcept;
 
+	[[nodiscard]] int getMinCardsRequired() const; // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
+
+
 	void humanPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn);
-	void aiPlayTurn(Player& currentPlayer, size_t& cardsPlayedThisTurn);
+	
 	void drawCardsForPlayer(Player& player, size_t cardsToDraw);
 
 	Deck m_deck;

@@ -1,6 +1,6 @@
 #include "Pile.h"
 
-Pile::Pile(PileType type) : m_type{ type }
+Pile::Pile(PileType type) : m_type{ type }, m_cardCount{0}
 {
 	if (m_type == PileType::ASCENDING)
 	{
@@ -52,7 +52,13 @@ bool Pile::canPlace(const Card& card) const noexcept
 	}
 }
 
+int Pile::getCardCount() const
+{
+	return m_cardCount;
+}
+
 void Pile::placeCard(const Card& card)
 {
 	m_topCardValue = card.getValue();
+	m_cardCount++;
 }

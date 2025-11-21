@@ -20,10 +20,14 @@ public:
 
 	[[nodiscard]] bool canPlace(const Card& card) const noexcept;
 	[[nodiscard]] bool isTenBackMove(const Card& card) const noexcept;
+	[[nodiscard]] int getCardCount() const;
+
 
 	void placeCard(const Card& card);
 
 private:
 	PileType m_type;
 	uint8_t m_topCardValue;
+
+	int m_cardCount;
 };
