@@ -144,11 +144,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DBManager.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="PasswordService.cpp" />
     <ClCompile Include="server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DBManager.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="PasswordService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
