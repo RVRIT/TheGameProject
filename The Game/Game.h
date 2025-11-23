@@ -46,7 +46,7 @@ private:
 
 	[[nodiscard]] bool checkWinCondition() const noexcept;
 	[[nodiscard]] bool canPlayerMakeAnyMove(const Player& player) const noexcept;
-
+	[[nodiscard]] int calculateScore(const Player& player) const;
 
 	Deck m_deck;
 	std::vector<Player> m_players;

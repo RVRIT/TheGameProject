@@ -249,3 +249,19 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 	return snap;
 
 }
+
+int Game::calculateScore(const Player& player) const
+{
+	// Formula: 100 - carti_in_mana - (carti_in_teanc / numar_jucatori)
+	int score = 100;
+
+	// Scadem cartile din mana
+	score -= static_cast<int>(player.getHandSize());
+	if (!m_players.empty())
+	{
+		int deckPenalty = static_cast<int>(m_deck.size()) / static_cast<int>(m_players.size());
+		score -= deckPenalty;
+	}
+
+	return score;
+}
