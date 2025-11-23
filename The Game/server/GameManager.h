@@ -5,37 +5,31 @@
 #include <string>
 #include <memory>
 #include <mutex>
-#include "crow.h"
-
-#include "../Game.h"
-
-
+#include "../Lobby.h"
 class GameManager
 {
 private:
-    // Structura interna pentru o camera de asteptare
-    struct Lobby {
-        std::string hostName;       // numele jucatorului care a creat camera
-        std::vector<std::string> players;
-        bool isStarted = false;
-    };
 
-    // Stocarea datelor
+    // se va sterge asta cu map ul de m_lobbies
+    // lobby-urile vor fi salvate in DB
     std::map<std::string, Lobby> m_lobbies;
-    std::map<std::string, std::unique_ptr<Game>> m_activeGames;
 
     // Mutex for Thread Safety
     std::mutex m_mtx;
 
 public: 
+
     GameManager() = default;
 
-    crow::response createLobby(const std::string& lobbyName, const std::string& hostName);
+    // Ne mai gandim la tipul returnat de functii, inca nu s sigur
 
-    crow::response joinLobby(const std::string& lobbyName, const std::string& playerName);
+    // MA VOI OCUPA DE APELURILE DIN DBMANAGER ASTFEL INCAT JOCUL SA FIE UPDATAT DOAR DIN DB
+    // PENTRU A NU OCUPA MEMORIE
+    int createLobby(const std::string& name, const int lobbyId, const std::string& hostName);
 
-    crow::json::wvalue getGameState(const std::string& lobbyName);
+    int joinLobby(const int& lobbyId, const std::string& playerName);
 
+    Lobby& getGameState(const int& lobbyId);
 
 };
 

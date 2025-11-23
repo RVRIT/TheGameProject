@@ -11,7 +11,7 @@ bool DBManager::initialize(const std::string& db_path)
     }
     const char* create_tables_sql = R"(
             CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL, 
                 rating REAL DEFAULT 0.0,
@@ -20,15 +20,27 @@ bool DBManager::initialize(const std::string& db_path)
                 games_won INT DEFAULT 0 
             );
             
-            CREATE TABLE IF NOT EXISTS game_sessions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+            CREATE TABLE IF NOT EXISTS games (
+                game_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
                 score INTEGER,
                 duration REAL,
                 result TEXT,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             );
+
+
+            CREATE TABLE IF NOT EXISTS lobbies (
+                lobby_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                game_state TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS lobby_players (
+                FOREIGN KEY(lobby_id) REFERENCES lobby(lobby_id),
+                FOREIGN KEY(user_id) REFERENCES users(id),
+            );
         )";
+    // game_state will return a built json with all of the current game details
     char* errmsg;
     if (sqlite3_exec(db, create_tables_sql, nullptr, nullptr, &errmsg) != SQLITE_OK) {
         std::cerr << "SQL ERROR: " << errmsg << std::endl;
