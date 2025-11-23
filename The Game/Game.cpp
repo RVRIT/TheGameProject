@@ -226,6 +226,7 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 
 			// Temporary placeholder: 'cardsPlayed' is currently a local variable in the run loop. 
 			// Will be connected to a class member variable when switching to Server architecture.
+			//acum trebuie modificata functia pentru ca am creat calculate score
 			snap.cardsPlayedThisTurn = 0; 
 			snap.minCardsToPlay = getMinCardsRequired();
 		}
@@ -248,4 +249,20 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 
 	return snap;
 
+}
+
+int Game::calculateScore(const Player& player) const
+{
+	// Formula: 100 - carti_in_mana - (carti_in_teanc / numar_jucatori)
+	int score = 100;
+
+	// Scadem cartile din mana
+	score -= static_cast<int>(player.getHandSize());
+	if (!m_players.empty())
+	{
+		int deckPenalty = static_cast<int>(m_deck.size()) / static_cast<int>(m_players.size());
+		score -= deckPenalty;
+	}
+
+	return score;
 }

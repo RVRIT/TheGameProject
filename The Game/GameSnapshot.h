@@ -3,7 +3,11 @@
 #include <vector>
 #include <string>
 #include <map>
-
+//functie pentru leaderboard entry
+struct LeaderboardEntry {
+    std::string name;
+    int score;
+};
 
 struct PileInfo {
     int id;             
@@ -31,6 +35,7 @@ struct GameSnapshot {
     std::vector<PileInfo> piles; 
     int deckSize;                
 
+    std::vector<LeaderboardEntry> leaderboard;//lista cu jucatori si scorurile acestora
     
     std::string message;   // Global Message
     bool isGameOver;      // If true -> Switch to EndScreen immediately.
