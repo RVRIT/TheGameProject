@@ -226,6 +226,7 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 
 			// Temporary placeholder: 'cardsPlayed' is currently a local variable in the run loop. 
 			// Will be connected to a class member variable when switching to Server architecture.
+			//acum trebuie modificata functia pentru ca am creat calculate score
 			snap.cardsPlayedThisTurn = 0; 
 			snap.minCardsToPlay = getMinCardsRequired();
 		}
