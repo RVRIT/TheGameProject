@@ -3,7 +3,11 @@
 #include <vector>
 #include <string>
 #include <map>
-
+//functie pentru leaderboard entry
+struct LeaderboardEntry {
+    std::string name;
+    int score;
+};
 
 struct PileInfo {
     int id;             
