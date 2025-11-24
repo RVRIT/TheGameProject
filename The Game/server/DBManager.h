@@ -8,6 +8,7 @@ class DBManager
 private:
     sqlite3* db;
 public:
+    // getGameState needs to be added to return a json which will be used to update game info for users
     bool initialize(const std::string& db_path);
     bool insertGameSession(int user_id, int score);
     bool updateUserStats(int user_id, bool won, double hours_played);

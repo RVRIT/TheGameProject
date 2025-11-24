@@ -10,26 +10,29 @@ class GameManager
 {
 private:
 
-    // se va sterge asta cu map ul de m_lobbies
-    // lobby-urile vor fi salvate in DB
-    std::map<std::string, Lobby> m_lobbies;
-
+    Lobby currentLobby;
+    int currentLobbyId;
     // Mutex for Thread Safety
     std::mutex m_mtx;
 
 public: 
 
-    GameManager() = default;
+    // Constructorul la GameManager va fi chemat doar atunci cand se lucreaza cu lobby-ul in sine 
+    // pentru a putea da refresh la game state, etc, restul se vor salva in DB
+
+    // Chemi constructorul -> faci actiunea -> chemi destructorul 
+    GameManager(int lobbyId) : currentLobbyId{ lobbyId } {};
 
     // Ne mai gandim la tipul returnat de functii, inca nu s sigur
 
     // MA VOI OCUPA DE APELURILE DIN DBMANAGER ASTFEL INCAT JOCUL SA FIE UPDATAT DOAR DIN DB
     // PENTRU A NU OCUPA MEMORIE
+
     int createLobby(const std::string& name, const int lobbyId, const std::string& hostName);
 
     int joinLobby(const int& lobbyId, const std::string& playerName);
 
     Lobby& getGameState(const int& lobbyId);
-
+    ~GameManager() = default;
 };
 

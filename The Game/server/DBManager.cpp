@@ -41,6 +41,9 @@ bool DBManager::initialize(const std::string& db_path)
             );
         )";
     // game_state will return a built json with all of the current game details
+    // all current users who are in a lobby will be saved in lobby_players with their ID and the lobby they are in
+    // from there you can verify lobby_players to see in which lobby the current user is and update the game calling the json
+    // from that lobby
     char* errmsg;
     if (sqlite3_exec(db, create_tables_sql, nullptr, nullptr, &errmsg) != SQLITE_OK) {
         std::cerr << "SQL ERROR: " << errmsg << std::endl;

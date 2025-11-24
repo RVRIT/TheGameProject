@@ -13,6 +13,7 @@ public:
 		InProgress,
 		Finished
 	};
+	Lobby() = default;
 	explicit Lobby(int id, Lobby::LobbyStatus status = Lobby::LobbyStatus::Waiting) : id{ id } {};
 	bool addPlayer(const std::string& name) {
 		if (players.size() >= MAX_PLAYERS) { return false; }
@@ -38,7 +39,7 @@ private:
 	std::string hostingPlayer;
 	std::vector<Player> players;
 	std::unique_ptr<Game> game;
-	static const size_t MAX_PLAYERS = 4;
+	static const size_t MAX_PLAYERS = 5;
 	Lobby::LobbyStatus status = Lobby::LobbyStatus::Waiting;
 
 };
