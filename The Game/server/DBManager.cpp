@@ -172,3 +172,27 @@ std::optional<int> DBManager::getUserId(const std::string& username) {
     sqlite3_finalize(stmt);
     return result;
 }
+
+std::optional<std::string> DBManager::getGameState(const int& lobbyId)
+{
+    if (!db) return std::nullopt;
+
+    const char* sql = "SELECT game_state FROM lobbies WHERE lobby_id = ?";
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        return std::nullopt;
+    }
+
+    sqlite3_bind_int(stmt, 1, lobbyId);
+    std::optional<std::string> result;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* text = sqlite3_column_text(stmt, 0);
+        if (text) {
+            result = std::string(reinterpret_cast<const char*>(text));
+        }
+
+    }
+    sqlite3_finalize(stmt);
+    return result;
+}
