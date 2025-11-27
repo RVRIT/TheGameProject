@@ -5,8 +5,8 @@
 
 size_t Player::s_nextId = 1;
 
-Player::Player(std::string_view name, bool isAI)
-	: m_id(s_nextId++), m_name(name), m_isAI(isAI)
+Player::Player(std::string_view name)
+	: m_id(s_nextId++), m_name(name)
 {
 }
 
@@ -30,10 +30,6 @@ Player::Player(std::string_view name, bool isAI)
 	return m_hand.size();
 }
 
-[[nodiscard]] bool Player::isAI() const noexcept
-{
-	return m_isAI;
-}
 
 [[nodiscard]] std::vector<Player::Move> Player::findPossibleMoves(
 	const std::array<Pile, 4>& piles) const
