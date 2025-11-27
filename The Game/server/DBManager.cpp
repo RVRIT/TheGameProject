@@ -10,36 +10,38 @@ bool DBManager::initialize(const std::string& db_path)
         return false;
     }
     const char* create_tables_sql = R"(
-            CREATE TABLE IF NOT EXISTS users (
-                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL, 
-                rating REAL DEFAULT 0.0,
-                hours_played REAL DEFAULT 0.0,
-                games_played INT DEFAULT 0,
-                games_won INT DEFAULT 0 
-            );
-            
-            CREATE TABLE IF NOT EXISTS games (
-                game_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER,
-                score INTEGER,
-                duration REAL,
-                result TEXT,
-                FOREIGN KEY(user_id) REFERENCES users(id)
-            );
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL, 
+        rating REAL DEFAULT 0.0,
+        hours_played REAL DEFAULT 0.0,
+        games_played INT DEFAULT 0,
+        games_won INT DEFAULT 0 
+    );
+    
+    CREATE TABLE IF NOT EXISTS games (
+        game_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        score INTEGER,
+        duration REAL,
+        result TEXT,
+        FOREIGN KEY(user_id) REFERENCES users(user_id)
+    );
 
+    CREATE TABLE IF NOT EXISTS lobbies (
+        lobby_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        game_state TEXT
+    );
 
-            CREATE TABLE IF NOT EXISTS lobbies (
-                lobby_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                game_state TEXT
-            );
-
-            CREATE TABLE IF NOT EXISTS lobby_players (
-                FOREIGN KEY(lobby_id) REFERENCES lobby(lobby_id),
-                FOREIGN KEY(user_id) REFERENCES users(id),
-            );
-        )";
+    CREATE TABLE IF NOT EXISTS lobby_players (
+        lobby_id INTEGER,
+        user_id INTEGER,
+        PRIMARY KEY (lobby_id, user_id),
+        FOREIGN KEY(lobby_id) REFERENCES lobbies(lobby_id),
+        FOREIGN KEY(user_id) REFERENCES users(user_id)
+    );
+)";
     // game_state will return a built json with all of the current game details
     // all current users who are in a lobby will be saved in lobby_players with their ID and the lobby they are in
     // from there you can verify lobby_players to see in which lobby the current user is and update the game calling the json
