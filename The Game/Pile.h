@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Card.h"
+#include "../CardEngine/Card.h"
 #include <cstdint>
 
 enum class PileType
@@ -15,7 +15,6 @@ public:
 	Pile(PileType type);
 
 	PileType getType() const;
-
 	uint8_t getTopValue() const;
 
 	[[nodiscard]] bool canPlace(const Card& card) const noexcept;

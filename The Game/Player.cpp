@@ -22,12 +22,12 @@ Player::Player(std::string_view name)
 
 [[nodiscard]] const std::vector<Card>& Player::getHand() const noexcept
 {
-	return m_hand;
+	return m_hand.getCards();
 }
 
 [[nodiscard]] size_t Player::getHandSize() const noexcept
 {
-	return m_hand.size();
+	return m_hand.count();
 }
 
 
@@ -35,11 +35,14 @@ Player::Player(std::string_view name)
 	const std::array<Pile, 4>& piles) const
 {
 	std::vector<Move> possibleMoves;
-	for (size_t cardIdx = 0; cardIdx < m_hand.size(); ++cardIdx)
+
+	const auto& handVector = m_hand.getCards();
+
+	for (size_t cardIdx = 0; cardIdx < handVector.size(); ++cardIdx)
 	{
 		for (size_t pileIdx = 0; pileIdx < piles.size(); ++pileIdx)
 		{
-			if (piles[pileIdx].canPlace(m_hand[cardIdx]))
+			if (piles[pileIdx].canPlace(handVector[cardIdx]))
 			{
 				possibleMoves.emplace_back(cardIdx, pileIdx);
 			}
@@ -50,22 +53,15 @@ Player::Player(std::string_view name)
 
 void Player::sortHand()
 {
-	std::ranges::sort(m_hand);
+	m_hand.sort();
 }
 
 void Player::addCard(const Card& card)
 {
-	m_hand.push_back(card);
+	m_hand.add(card);
 }
 
 [[nodiscard]] Card Player::playCard(size_t handIndex)
 {
-	if (handIndex >= m_hand.size())
-	{
-		throw std::out_of_range("Index invalid pentru mâna jucătorului.");
-	}
-
-	Card cardToPlay = m_hand[handIndex];
-	m_hand.erase(m_hand.begin() + handIndex);
-	return cardToPlay;
+	return m_hand.removeAt(handIndex);
 }
