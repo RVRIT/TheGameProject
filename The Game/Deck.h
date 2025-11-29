@@ -1,10 +1,10 @@
 #pragma once
 
 #include <vector>
-#include "Card.h"
+#include "../CardEngine/CardCollection.h"
 #include "Shuffler.h"
 
-class Deck
+class Deck : public CardCollection
 {
 public:
 	Deck();
