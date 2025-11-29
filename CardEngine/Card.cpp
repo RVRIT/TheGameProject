@@ -2,19 +2,23 @@
 #include <stdexcept>
 #include <format>
 
- Card::Card(uint8_t value)
+Card::Card() :m_value(0)
+{
+
+}
+
+Card::Card(uint8_t value)
 	:m_value(value)
 {
 	if (m_value < 2 || m_value>99)
 	{
 		throw std::out_of_range(
-			std::format("Valoarea cartii {} este invalida. Trebuie sa fie intre 2 si 99.",
-				static_cast<int>(m_value))
+			std::format("The value of the book {} is invalid. It must be between 2 and 99.", 
+			static_cast<int>(m_value))
 		);
 	}
 }
-
-[[nodiscard]]  uint8_t Card::getValue() const noexcept
+ uint8_t Card::getValue() const noexcept
 {
 	return m_value;
 }

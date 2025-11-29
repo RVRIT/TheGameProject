@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Card.h"
+#include "../CardEngine/Card.h"
+#include "../CardEngine/CardCollection.h"
+
 #include "Deck.h"
 #include "Pile.h"
 #include <vector>
@@ -15,7 +17,8 @@ private:
 	static size_t s_nextId;
 	size_t m_id;
 	std::string m_name;
-	std::vector<Card> m_hand;
+	
+	CardCollection m_hand;
 	
 
 public:
