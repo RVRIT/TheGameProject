@@ -14,7 +14,11 @@ public:
 		Finished
 	};
 	Lobby() = default;
-	explicit Lobby(int id, Lobby::LobbyStatus status = Lobby::LobbyStatus::Waiting) : id{ id } {};
+	explicit Lobby(int id, const std::string& hostName, LobbyStatus status = LobbyStatus::Waiting)
+		: id{ id }, hostingPlayer{ hostName }, status{ status }
+	{
+		addPlayer(hostName);
+	}
 	bool addPlayer(const std::string& name) {
 		if (players.size() >= MAX_PLAYERS) { return false; }
 		players.emplace_back(name);
