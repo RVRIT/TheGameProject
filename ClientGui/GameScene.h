@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include "Scene.h"
 #include "SceneManager.h"
+#include "Game.h"       
+#include "Button.h"   
+#include <memory>
 
 class GameScene : public Scene
 {
@@ -17,5 +20,11 @@ private:
     SceneManager& sceneManager;
     sf::RenderWindow& windowRef;
 
-    int testValue = 123;
+    std::unique_ptr<Game> game;
+    GameSnapshot currentSnapshot;
+    std::string playerName = "Player1"; // Hardcoded for single player now
+
+    sf::Text statusText; 
+    void refreshSnapshot();
+    sf::FloatRect getPileBounds(int pileIndex) const;
 };

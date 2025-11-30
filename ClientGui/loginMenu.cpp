@@ -8,14 +8,13 @@
 
 using json = nlohmann::json;
 
-// Changed 'font' to 'fontRef' to avoid shadowing the member variable
 LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& win) :
 	font(fontRef),
 	client(clientRef),
 	sceneManager(manager),
 	window(win),
 	LoginButton("assets/LoginButton.png", { 700.f, 400.f },
-		[this]() { // Only capture 'this', we can access members like 'username' and 'font' directly
+		[this]() { 
 			std::string usernameText = username.getText();
 			std::string passwordText = password.getText();
 
@@ -29,7 +28,6 @@ LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& 
 			if (response.first) {
 				std::cout << "LOGIN SUCCESFUL!\n";
 				errorText.setString("");
-				// Use the member 'font' here
 				sceneManager.changeScene(std::make_unique<MainMenu>(font, sceneManager, window));
 			}
 			else {
@@ -45,14 +43,13 @@ LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& 
 					}
 					else errorText.setString("Eroare necunoscuta de la server");
 				}
-				catch (const json::parse_error&) { // Removed unused variable 'e'
+				catch (const json::parse_error&) { 
 					errorText.setString("Eroare de comunicare cu serverul.");
 				}
 			}
 		}),
 	RegisterButton("assets/RegisterButton.png", { 1000.f, 400.f },
-		[this]() { // Only capture 'this'
-			// Use the member 'font' here
+		[this]() { 
 			sceneManager.pushScene(std::make_unique<RegisterMenu>(font, client, sceneManager));
 		}),
 	username(fontRef, { 700.f, 200.f }, { 500.f, 50.f }),

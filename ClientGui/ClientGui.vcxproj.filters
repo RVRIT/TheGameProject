@@ -87,9 +87,6 @@
     <ClCompile Include="..\TheGame\Game.cpp">
       <Filter>Source Files\tempCPPS</Filter>
     </ClCompile>
-    <ClCompile Include="MockGameScene.cpp">
-      <Filter>Source Files\MOCKGAME</Filter>
-    </ClCompile>
     <ClCompile Include="GameScene.cpp">
       <Filter>Source Files\MOCKGAME</Filter>
     </ClCompile>
@@ -143,9 +140,6 @@
     </ClInclude>
     <ClInclude Include="json.hpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MockGameScene.h">
-      <Filter>Header Files\MOCKGAME</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
       <Filter>Header Files\MOCKGAME</Filter>

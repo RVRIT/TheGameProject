@@ -206,7 +206,6 @@ exit 0
     <ClCompile Include="loginMenu.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="MockGameScene.cpp" />
     <ClCompile Include="networkClient.cpp" />
     <ClCompile Include="registerMenu.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -229,7 +228,6 @@ exit 0
     <ClInclude Include="json.hpp" />
     <ClInclude Include="loginMenu.h" />
     <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="MockGameScene.h" />
     <ClInclude Include="networkClient.h" />
     <ClInclude Include="registerMenu.h" />
     <ClInclude Include="Scene.h" />

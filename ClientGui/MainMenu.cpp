@@ -1,17 +1,15 @@
 #include "MainMenu.h"
 #include "SceneManager.h"   
 #include "SettingsMenu.h" 
-#include "GameScene.h" // <--- ADDED: Include GameScene
-#include <iostream>
+#include "GameScene.h" 
 #include <memory>
 
 MainMenu::MainMenu(sf::Font& fontRef, SceneManager& manager, sf::RenderWindow& windowRef)
-    : font(fontRef), // <--- ADDED: Initialize font
+    : font(fontRef), 
     sceneManager(manager),
     window(windowRef),
     playButton("assets/play.png", { 700.f, 200.f },
         [this]() {
-            // IMPLEMENTED: Change to GameScene passing the font, manager, and window
             sceneManager.changeScene(std::make_unique<GameScene>(font, sceneManager, window));
         }),
     exitButton("assets/exit.png", { 700.f, 400.f },
@@ -20,8 +18,6 @@ MainMenu::MainMenu(sf::Font& fontRef, SceneManager& manager, sf::RenderWindow& w
         }),
     settingsButton("assets/settings.png", { 700.f, 1000.f },
         [this]() {
-            // Note: SettingsMenu is not a Scene class in your code, so pushScene won't work directly here.
-            // You likely need to wrap SettingsMenu in a Scene or handle it differently.
             std::cout << "Settings clicked (Implementation pending wrapper)\n";
         })
 {
