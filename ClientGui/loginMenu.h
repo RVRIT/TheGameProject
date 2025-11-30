@@ -16,6 +16,7 @@ public:
 	virtual void update(sf::Time dt) override;
 	virtual void draw(sf::RenderWindow& window) override;
 private:
+	sf::Font& font;
 	SceneManager& sceneManager;
 	sf::RenderWindow& window;
 	NetworkClient& client;

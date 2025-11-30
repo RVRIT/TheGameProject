@@ -31,11 +31,14 @@
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{11a014d4-7656-4bd2-b521-5b09b0c8b737}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\MockGame">
-      <UniqueIdentifier>{96ed13e6-31ed-4d47-ae9a-73418534f421}</UniqueIdentifier>
+    <Filter Include="Source Files\tempCPPS">
+      <UniqueIdentifier>{cee22637-22b7-49f1-b69b-c3206ff293e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\MockGame">
-      <UniqueIdentifier>{4880cedf-aeaf-4cb7-af00-caf5a57e7626}</UniqueIdentifier>
+    <Filter Include="Header Files\MOCKGAME">
+      <UniqueIdentifier>{bf3c9551-2b69-4170-a465-7e02c2feb64c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MOCKGAME">
+      <UniqueIdentifier>{e46619e1-3ced-4f07-bf4f-7454bff7fc7f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,11 +75,23 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>
-    <ClCompile Include="MockGameManager.cpp">
-      <Filter>Source Files\MockGame</Filter>
+    <ClCompile Include="..\TheGame\Deck.cpp">
+      <Filter>Source Files\tempCPPS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TheGame\Player.cpp">
+      <Filter>Source Files\tempCPPS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TheGame\Pile.cpp">
+      <Filter>Source Files\tempCPPS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TheGame\Game.cpp">
+      <Filter>Source Files\tempCPPS</Filter>
+    </ClCompile>
+    <ClCompile Include="MockGameScene.cpp">
+      <Filter>Source Files\MOCKGAME</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
-      <Filter>Source Files\MockGame</Filter>
+      <Filter>Source Files\MOCKGAME</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,11 +144,11 @@
     <ClInclude Include="json.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="MockGameManager.h">
-      <Filter>Header Files\MockGame</Filter>
+    <ClInclude Include="MockGameScene.h">
+      <Filter>Header Files\MOCKGAME</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
-      <Filter>Header Files\MockGame</Filter>
+      <Filter>Header Files\MOCKGAME</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

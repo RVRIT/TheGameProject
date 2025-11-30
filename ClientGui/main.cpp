@@ -9,7 +9,7 @@
 #include "SceneManager.h"
 #include <iostream>
 #include <filesystem>
-
+#include "GameScene.h"
 
 int main() {
 
@@ -20,10 +20,6 @@ int main() {
     NetworkClient client("http://localhost", 18080);
     SceneManager sceneManager(window);
     sceneManager.pushScene(std::make_unique<LoginMenu>(font, client, sceneManager, window));
-
-    //Animation cardTest("assets/cardflip.png", 64, 64, 16, 12.f, true);
-    //cardTest.setPosition({ 600.f,100.f });
-    //cardTest.setScale(10.f, 10.f);
 
     sf::Clock clock;
 
@@ -44,12 +40,10 @@ int main() {
         }
 
         sceneManager.update(dt);
-        //cardTest.update();
 
         window.clear();
 
         sceneManager.draw();
-        //window.draw(cardTest);
 
         window.display();
     }

@@ -8,18 +8,18 @@ using json = nlohmann::json;
 
 RegisterMenu::RegisterMenu(sf::Font& font, NetworkClient& clientRef, SceneManager& manager) :
     client(clientRef),
-    sceneManager(manager), 
+    sceneManager(manager),
     CreateAccount("assets/CreateAccountButton.png", { 100.f, 500.f }, [this]() {
     std::string usernameText = username.getText();
     std::string passwordText = password.getText();
 
-    if(usernameText.empty() || passwordText.empty()) {
-		errorText.setString("Numele si parola nu pot fi goale!");
-        return; 
-	}
+    if (usernameText.empty() || passwordText.empty()) {
+        errorText.setString("Numele si parola nu pot fi goale!");
+        return;
+    }
 
-	auto response = client.registerUser(usernameText, passwordText);
-    if (response.first){
+    auto response = client.registerUser(usernameText, passwordText);
+    if (response.first) {
         std::cout << "REGISTER SUCCESFUL!\n";
         errorText.setString("");
         sceneManager.popScene();
@@ -31,13 +31,13 @@ RegisterMenu::RegisterMenu(sf::Font& font, NetworkClient& clientRef, SceneManage
 
             if (jsonResponse.contains("message")) {
                 std::string msg = jsonResponse["message"];
-                errorText.setString(msg); 
+                errorText.setString(msg);
             }
             else {
                 errorText.setString("Eroare necunoscuta de la server.");
             }
         }
-        catch (json::parse_error& e) {
+        catch (const json::parse_error&) { 
             errorText.setString("Eroare interna server (Invalid JSON).");
         }
     }
@@ -51,11 +51,11 @@ RegisterMenu::RegisterMenu(sf::Font& font, NetworkClient& clientRef, SceneManage
 {
     bgTexture.loadFromFile("assets/background.png");
     background.setTexture(bgTexture);
-    
-	errorText.setFont(font);
-	errorText.setFillColor(sf::Color::White);
-	errorText.setCharacterSize(12);
-	errorText.setPosition(100.f, 400.f);
+
+    errorText.setFont(font);
+    errorText.setFillColor(sf::Color::White);
+    errorText.setCharacterSize(12);
+    errorText.setPosition(100.f, 400.f);
 
     cardAnimation.setPosition({ 600.f,100.f });
     cardAnimation.setScale(10.f, 10.f);
@@ -83,6 +83,6 @@ void RegisterMenu::draw(sf::RenderWindow& window)
     Back.draw(window);
     username.draw(window);
     password.draw(window);
-	window.draw(errorText);
+    window.draw(errorText);
     window.draw(cardAnimation);
 }

@@ -1,25 +1,28 @@
 #include "MainMenu.h"
 #include "SceneManager.h"   
 #include "SettingsMenu.h" 
+#include "GameScene.h" // <--- ADDED: Include GameScene
 #include <iostream>
 #include <memory>
 
-MainMenu::MainMenu(SceneManager& manager, sf::RenderWindow& windowRef)
-    : sceneManager(manager),
+MainMenu::MainMenu(sf::Font& fontRef, SceneManager& manager, sf::RenderWindow& windowRef)
+    : font(fontRef), // <--- ADDED: Initialize font
+    sceneManager(manager),
     window(windowRef),
     playButton("assets/play.png", { 700.f, 200.f },
         [this]() {
-            // TODO
-            // sceneManager.pushScene(std::make_unique<GameScene>(...));
+            // IMPLEMENTED: Change to GameScene passing the font, manager, and window
+            sceneManager.changeScene(std::make_unique<GameScene>(font, sceneManager, window));
         }),
-        exitButton("assets/exit.png", { 700.f, 400.f },
-            [this]() {
-                sceneManager.popScene(); 
-            }),
+    exitButton("assets/exit.png", { 700.f, 400.f },
+        [this]() {
+            sceneManager.popScene();
+        }),
     settingsButton("assets/settings.png", { 700.f, 1000.f },
         [this]() {
-            // TODO
-            // sceneManager.pushScene(std::make_unique<SettingsMenu>(sceneManager, window));
+            // Note: SettingsMenu is not a Scene class in your code, so pushScene won't work directly here.
+            // You likely need to wrap SettingsMenu in a Scene or handle it differently.
+            std::cout << "Settings clicked (Implementation pending wrapper)\n";
         })
 {
     bgTexture.loadFromFile("assets/backgroundMainMenu.png");

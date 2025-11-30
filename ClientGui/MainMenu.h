@@ -8,7 +8,7 @@ class SceneManager;
 class MainMenu : public Scene 
 {
 public:
-    MainMenu(SceneManager& manager, sf::RenderWindow& window);
+    MainMenu(sf::Font& font, SceneManager& manager, sf::RenderWindow& window);
 
     virtual void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     virtual void update(sf::Time dt) override;
@@ -17,6 +17,7 @@ public:
     void updateBackgroundScale();
 
 private:
+    sf::Font& font;
     SceneManager& sceneManager; 
     sf::RenderWindow& window;
     Button playButton;

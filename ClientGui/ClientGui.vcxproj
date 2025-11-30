@@ -147,13 +147,14 @@ exit 0
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\external\SFML\include ; $(SolutionDir)..\TheGame  ; $(SolutionDir)..\CardEngine </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\external\SFML\include ; $(SolutionDir)..\TheGame  ; $(SolutionDir)..\CardEngine ; $(SolutionDir)..\TheGame</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-network-d.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\external\SFML\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-network-d.lib; CardEngine.lib
+ ;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\external\SFML\lib ; $(SolutionDir)..\external\CardEngine\lib </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -195,13 +196,17 @@ exit 0
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\TheGame\Deck.cpp" />
+    <ClCompile Include="..\TheGame\Game.cpp" />
+    <ClCompile Include="..\TheGame\Pile.cpp" />
+    <ClCompile Include="..\TheGame\Player.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="loginMenu.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
-    <ClCompile Include="MockGameManager.cpp" />
+    <ClCompile Include="MockGameScene.cpp" />
     <ClCompile Include="networkClient.cpp" />
     <ClCompile Include="registerMenu.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -224,7 +229,7 @@ exit 0
     <ClInclude Include="json.hpp" />
     <ClInclude Include="loginMenu.h" />
     <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="MockGameManager.h" />
+    <ClInclude Include="MockGameScene.h" />
     <ClInclude Include="networkClient.h" />
     <ClInclude Include="registerMenu.h" />
     <ClInclude Include="Scene.h" />

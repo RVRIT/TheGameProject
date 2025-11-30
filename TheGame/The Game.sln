@@ -8,6 +8,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "server\server.vcxproj", "{4FF04BF9-1194-4E4C-99FF-2FB76F2E6670}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientGui", "..\ClientGui\ClientGui.vcxproj", "{9151B28B-5F03-406B-A517-E41992475A73}"
+	ProjectSection(ProjectDependencies) = postProject
+		{97775187-A6EC-47E3-A78D-B981D7986EDD} = {97775187-A6EC-47E3-A78D-B981D7986EDD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CardEngine", "..\CardEngine\CardEngine.vcxproj", "{97775187-A6EC-47E3-A78D-B981D7986EDD}"
 EndProject
