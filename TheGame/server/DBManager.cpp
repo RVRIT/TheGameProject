@@ -1,5 +1,5 @@
 #include "DBManager.h"
-#include "PasswordService.h"
+
 bool DBManager::initialize(const std::string& db_path)
 {
     std::filesystem::create_directories(
@@ -42,19 +42,15 @@ bool DBManager::initialize(const std::string& db_path)
         FOREIGN KEY(user_id) REFERENCES users(user_id)
     );
 )";
-    // game_state will return a built json with all of the current game details
-    // all current users who are in a lobby will be saved in lobby_players with their ID and the lobby they are in
-    // from there you can verify lobby_players to see in which lobby the current user is and update the game calling the json
-    // from that lobby
     char* errmsg;
     if (sqlite3_exec(db, create_tables_sql, nullptr, nullptr, &errmsg) != SQLITE_OK) {
         std::cerr << "SQL ERROR: " << errmsg << std::endl;
         sqlite3_free(errmsg);
         return false;
     }
-    std::cout << "Database initialized successfully!" << std::endl;
     return true;
 }
+
 bool DBManager::insertGameSession(int user_id, int score)
 {
     const char* sql = "INSERT INTO game_sessions (user_id, score) VALUES (?, ?)";
@@ -62,7 +58,6 @@ bool DBManager::insertGameSession(int user_id, int score)
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK)
     {
-        std::cerr << "ERROR preparing statement: " << sqlite3_errmsg(db) << std::endl;
         return false;
     }
     sqlite3_bind_int(stmt, 1, user_id);
@@ -70,7 +65,6 @@ bool DBManager::insertGameSession(int user_id, int score)
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE)
     {
-        std::cerr << "ERROR insert execution: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_finalize(stmt);
         return false;
     }
@@ -78,6 +72,7 @@ bool DBManager::insertGameSession(int user_id, int score)
     sqlite3_finalize(stmt);
     return true;
 }
+
 bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
 {
     const char* sql = R"(
@@ -85,7 +80,7 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
         SET games_played = games_played + 1,
             hours_played = hours_played + ?,
             games_won = games_won + ?
-        WHERE id = ?
+        WHERE user_id = ?
     )";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
@@ -99,6 +94,7 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
     sqlite3_finalize(stmt);
     return rc == SQLITE_DONE;
 }
+
 bool DBManager::checkExistingUser(const std::string& username)
 {
     if (!db)
@@ -117,12 +113,10 @@ bool DBManager::checkExistingUser(const std::string& username)
             success = (count > 0);
         }
     }
-    else {
-        std::cerr << "ERROR SQL: " << sqlite3_errmsg(db) << std::endl;
-    }
     sqlite3_finalize(stmt);
     return success;
 }
+
 bool DBManager::registerUser(const std::string& username, const std::string& hashed_password) {
     const char* sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
     sqlite3_stmt* stmt;
@@ -136,6 +130,7 @@ bool DBManager::registerUser(const std::string& username, const std::string& has
     sqlite3_finalize(stmt);
     return rc == SQLITE_DONE;
 }
+
 std::optional<std::string> DBManager::getHashedPassword(const std::string& username) {
     if (!db) return std::nullopt;
 
@@ -159,7 +154,7 @@ std::optional<std::string> DBManager::getHashedPassword(const std::string& usern
 std::optional<int> DBManager::getUserId(const std::string& username) {
     if (!db) return std::nullopt;
 
-    const char* sql = "SELECT id FROM users WHERE username LIKE ?";
+    const char* sql = "SELECT user_id FROM users WHERE username LIKE ?";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -197,4 +192,89 @@ std::optional<std::string> DBManager::getGameState(const int& lobbyId)
     }
     sqlite3_finalize(stmt);
     return result;
+}
+
+int DBManager::createLobby(int user_id)
+{
+    if (!db) return -1;
+
+    sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+
+    const char* sqlLobby = "INSERT INTO lobbies (game_state) VALUES ('WAITING')";
+    sqlite3_stmt* stmtLobby;
+
+    if (sqlite3_prepare_v2(db, sqlLobby, -1, &stmtLobby, nullptr) != SQLITE_OK) {
+        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        return -1;
+    }
+
+    if (sqlite3_step(stmtLobby) != SQLITE_DONE) {
+        sqlite3_finalize(stmtLobby);
+        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        return -1;
+    }
+    sqlite3_finalize(stmtLobby);
+
+    int lobby_id = (int)sqlite3_last_insert_rowid(db);
+
+    const char* sqlPlayer = "INSERT INTO lobby_players (lobby_id, user_id) VALUES (?, ?)";
+    sqlite3_stmt* stmtPlayer;
+
+    if (sqlite3_prepare_v2(db, sqlPlayer, -1, &stmtPlayer, nullptr) != SQLITE_OK) {
+        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        return -1;
+    }
+
+    sqlite3_bind_int(stmtPlayer, 1, lobby_id);
+    sqlite3_bind_int(stmtPlayer, 2, user_id);
+
+    if (sqlite3_step(stmtPlayer) != SQLITE_DONE) {
+        sqlite3_finalize(stmtPlayer);
+        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        return -1;
+    }
+    sqlite3_finalize(stmtPlayer);
+
+    sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
+
+    return lobby_id;
+}
+
+bool DBManager::joinLobby(int user_id, int lobby_id)
+{
+    if (!db) return false;
+
+    const char* sql = "INSERT INTO lobby_players (lobby_id, user_id) VALUES (?, ?)";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, lobby_id);
+    sqlite3_bind_int(stmt, 2, user_id);
+
+    int rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    return rc == SQLITE_DONE;
+}
+
+bool DBManager::leaveLobby(int user_id)
+{
+    if (!db) return false;
+
+    const char* sql = "DELETE FROM lobby_players WHERE user_id = ?";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, user_id);
+
+    int rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    return rc == SQLITE_DONE;
 }
