@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "../CardEngine/CardCollection.h"
+#include "CardCollection.h"
 #include "Shuffler.h"
 
 class Deck : public CardCollection
