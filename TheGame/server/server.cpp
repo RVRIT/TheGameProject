@@ -1,9 +1,18 @@
+#include "crow.h"
 #include "DBManager.h"
 #include "PasswordService.h"
 #include <regex>
+
+
 int main() {
     crow::SimpleApp app;
-    DBManager db;
+
+    if (!DBManager::getInstance().initialize("./data/game.db")) {
+        return 1;
+    }
+
+    DBManager& db = DBManager::getInstance();
+
     if (!db.initialize("./data/game.db")) {
         std::cerr << "ERROR initializing DB!" << std::endl;
         return 1;

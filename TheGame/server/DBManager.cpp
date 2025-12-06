@@ -2,7 +2,7 @@
 
 bool DBManager::initialize(const std::string& db_path)
 {
-    std::filesystem::create_directories(
+    /*std::filesystem::create_directories(
         std::filesystem::path(db_path).parent_path()
     );
     if (sqlite3_open(db_path.c_str(), &db) != SQLITE_OK) {
@@ -48,7 +48,19 @@ bool DBManager::initialize(const std::string& db_path)
         sqlite3_free(errmsg);
         return false;
     }
-    return true;
+    return true;*/
+    try {
+        
+        storage = std::make_unique<StorageType>(createStorage(db_path));
+
+       
+        storage->sync_schema();
+        return true;
+    }
+    catch (std::system_error& e) {
+        std::cerr << "Eroare la initializare DB: " << e.what() << std::endl;
+        return false;
+    }
 }
 
 bool DBManager::insertGameSession(int user_id, int score)
