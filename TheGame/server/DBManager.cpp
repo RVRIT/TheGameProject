@@ -133,84 +133,47 @@ std::optional<std::string> DBManager::getGameState(const int& lobbyId)
 
 int DBManager::createLobby(int user_id)
 {
-    if (!db) return -1;
+    try {
+        
+        LobbyDb newLobby{ -1, "WAITING" };
+        int lobbyId = storage->insert(newLobby); // insert returns the generated ID
 
-    sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+       
+        LobbyPlayer link{ -1, lobbyId, user_id }; // adding the host in the lobby
+        storage->insert(link);
 
-    const char* sqlLobby = "INSERT INTO lobbies (game_state) VALUES ('WAITING')";
-    sqlite3_stmt* stmtLobby;
-
-    if (sqlite3_prepare_v2(db, sqlLobby, -1, &stmtLobby, nullptr) != SQLITE_OK) {
-        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+        return lobbyId;
+    }
+    catch (...) {
         return -1;
     }
-
-    if (sqlite3_step(stmtLobby) != SQLITE_DONE) {
-        sqlite3_finalize(stmtLobby);
-        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
-        return -1;
-    }
-    sqlite3_finalize(stmtLobby);
-
-    int lobby_id = (int)sqlite3_last_insert_rowid(db);
-
-    const char* sqlPlayer = "INSERT INTO lobby_players (lobby_id, user_id) VALUES (?, ?)";
-    sqlite3_stmt* stmtPlayer;
-
-    if (sqlite3_prepare_v2(db, sqlPlayer, -1, &stmtPlayer, nullptr) != SQLITE_OK) {
-        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
-        return -1;
-    }
-
-    sqlite3_bind_int(stmtPlayer, 1, lobby_id);
-    sqlite3_bind_int(stmtPlayer, 2, user_id);
-
-    if (sqlite3_step(stmtPlayer) != SQLITE_DONE) {
-        sqlite3_finalize(stmtPlayer);
-        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
-        return -1;
-    }
-    sqlite3_finalize(stmtPlayer);
-
-    sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
-
-    return lobby_id;
 }
 bool DBManager::joinLobby(int user_id, int lobby_id)
 {
-    if (!db) return false;
+    try {
+        // verifying if the lobby exists
+        auto lobbies = storage->get_all<LobbyDb>(where(c(&LobbyDb::id) == lobby_id));
+        if (lobbies.empty()) return false;
 
-    const char* sql = "INSERT INTO lobby_players (lobby_id, user_id) VALUES (?, ?)";
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+       
+        LobbyPlayer link{ -1, lobby_id, user_id }; 
+        storage->insert(link);
+        return true;
+    }
+    catch (...) {
         return false;
     }
-
-    sqlite3_bind_int(stmt, 1, lobby_id);
-    sqlite3_bind_int(stmt, 2, user_id);
-
-    int rc = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-
-    return rc == SQLITE_DONE;
 }
 
 bool DBManager::leaveLobby(int user_id)
 {
-    if (!db) return false;
+    try {
+        // Delete entries from lobby_players where user_id matches
 
-    const char* sql = "DELETE FROM lobby_players WHERE user_id = ?";
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        storage->remove_all<LobbyPlayer>(where(c(&LobbyPlayer::user_id) == user_id)); 
+        return true;
+    }
+    catch (...) {
         return false;
     }
-
-    sqlite3_bind_int(stmt, 1, user_id);
-
-    int rc = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-
-    return rc == SQLITE_DONE;
 }
