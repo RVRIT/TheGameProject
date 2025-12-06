@@ -1,5 +1,8 @@
 #include "DBManager.h"
 
+
+using namespace sqlite_orm;
+
 bool DBManager::initialize(const std::string& db_path)
 {
     /*std::filesystem::create_directories(
@@ -65,29 +68,20 @@ bool DBManager::initialize(const std::string& db_path)
 
 bool DBManager::insertGameSession(int user_id, int score)
 {
-    const char* sql = "INSERT INTO game_sessions (user_id, score) VALUES (?, ?)";
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
-    if (rc != SQLITE_OK)
-    {
+    try {
+        
+        GameSession session{ -1, user_id, score, 0.0, "" }; // duration 0, result empty for now
+        storage->insert(session);
+        return true;
+    }
+    catch (...) {
         return false;
     }
-    sqlite3_bind_int(stmt, 1, user_id);
-    sqlite3_bind_int(stmt, 2, score);
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE)
-    {
-        sqlite3_finalize(stmt);
-        return false;
-    }
-
-    sqlite3_finalize(stmt);
-    return true;
 }
 
 bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
 {
-    const char* sql = R"(
+    /*const char* sql = R"(
         UPDATE users 
         SET games_played = games_played + 1,
             hours_played = hours_played + ?,
@@ -104,12 +98,31 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
 
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
-    return rc == SQLITE_DONE;
+    return rc == SQLITE_DONE;*/
+
+    try {
+       
+        auto user = storage->get<User>(user_id); 
+
+        // changing values in the memory
+        user.games_played++;
+        user.hours_played += hours_played;
+        if (won) {
+            user.games_won++;
+        }
+
+        
+        storage->update(user); //sending the update back to the database
+        return true;
+    }
+    catch (...) {
+        return false;
+    }
 }
 
 bool DBManager::checkExistingUser(const std::string& username)
 {
-    if (!db)
+    /*if (!db)
     {
         return false;
     }
@@ -126,25 +139,34 @@ bool DBManager::checkExistingUser(const std::string& username)
         }
     }
     sqlite3_finalize(stmt);
-    return success;
+    return success;*/
+
+    try {
+        
+        auto count = storage->count<User>(where(c(&User::username) == username));
+        return count > 0;
+    }
+    catch (...) {
+        return false;
+    }
 }
 
 bool DBManager::registerUser(const std::string& username, const std::string& hashed_password) {
-    const char* sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
-    if (rc != SQLITE_OK) return false;
+    try {
+        // ID -1 for auto increment
 
-    sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, hashed_password.c_str(), -1, SQLITE_STATIC);
-
-    rc = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-    return rc == SQLITE_DONE;
+        User newUser{ -1, username, hashed_password, 0.0, 0.0, 0, 0 };
+        storage->insert(newUser);
+        return true;
+    }
+    catch (...) {
+        
+        return false;
+    }
 }
 
 std::optional<std::string> DBManager::getHashedPassword(const std::string& username) {
-    if (!db) return std::nullopt;
+   /* if (!db) return std::nullopt;
 
     const char* sql = "SELECT password_hash FROM users WHERE username LIKE ?";
     sqlite3_stmt* stmt;
@@ -160,7 +182,21 @@ std::optional<std::string> DBManager::getHashedPassword(const std::string& usern
         if (hash) result = std::string(hash);
     }
     sqlite3_finalize(stmt);
-    return result;
+    return result;*/
+
+    try {
+        // We search for users with this name (there should be at most 1 because of the UNIQUE constraint)    
+        
+         auto users = storage->get_all<User>(where(c(&User::username) == username));
+
+        if (users.empty()) {
+            return std::nullopt;
+        }
+        return users[0].password_hash;
+    }
+    catch (...) {
+        return std::nullopt;
+    }
 }
 
 std::optional<int> DBManager::getUserId(const std::string& username) {
