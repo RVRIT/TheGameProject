@@ -1,5 +1,14 @@
 #include "CardCollection.h"
+#include "Shuffler.h"
 #include <algorithm>
+
+CardCollection::CardCollection() = default;
+
+CardCollection::~CardCollection() = default;
+
+CardCollection::CardCollection(const CardCollection& other) : m_cards{ other.m_cards }
+{
+}
 
 void CardCollection::add(const Card& c)
 {

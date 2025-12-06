@@ -8,7 +8,7 @@
 #include "Card.h"
 #include <vector>
 #include <stdexcept>
-#include "Shuffler.h"
+
 
 class CARD_API CardCollection
 {
@@ -16,7 +16,12 @@ protected:
     std::vector<Card> m_cards;
 
 public:
-    virtual ~CardCollection() = default;
+
+    CardCollection();
+
+    virtual ~CardCollection();
+
+    CardCollection(const CardCollection& other);
 
     void add(const Card& c);
     Card removeLast();
