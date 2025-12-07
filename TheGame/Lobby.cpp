@@ -1,11 +1,11 @@
 #include "lobby.h"
 #include <algorithm>
-
 bool Lobby::addPlayer(const std::string& name) {
     if (status != LobbyStatus::Waiting || players.size() >= MAX_PLAYERS) {
         return false;
     }
-    players.push_back({name, false});
+    int newId = static_cast<int>(players.size());
+    players.push_back({newId, name, false});
     return true;
 }
 
@@ -88,7 +88,6 @@ json Lobby::getStateJSON() const {
     j["status"] = (status == LobbyStatus::Waiting ? "Waiting" :
         (status == LobbyStatus::InProgress ? "InProgress" : "Finished"));
     j["MAX_PLAYERS"] = 5;
-
     j["players"] = players;
     j["chat"] = chatHistory;
 
