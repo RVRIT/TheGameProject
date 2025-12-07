@@ -4,7 +4,17 @@
 GameScene::GameScene(sf::Font& f, SceneManager& manager, sf::RenderWindow& window)
     : font(f),
     sceneManager(manager),
-    windowRef(window)
+    windowRef(window),
+    endTurnButton("assets/BackButton.png", { 1050.f, 600.f }, [this]() {
+    if (game->attemptEndTurn()) {
+        selectedHandIndex = -1;
+        logAction("Turn Ended. Hand refilled.");
+        refreshSnapshot();
+    }
+    else {
+        logAction("Cannot end turn! Play minimum cards first.");
+    }
+        })
 {
     if (standardCursor.loadFromSystem(sf::Cursor::Arrow)) windowRef.setMouseCursor(standardCursor);
     if (handCursor.loadFromSystem(sf::Cursor::Hand)) {}
@@ -15,9 +25,29 @@ GameScene::GameScene(sf::Font& f, SceneManager& manager, sf::RenderWindow& windo
     statusText.setFont(font);
     statusText.setCharacterSize(24);
     statusText.setFillColor(sf::Color::White);
-    statusText.setPosition(50.f, 50.f);
+    statusText.setPosition(50.f, 30.f);
+
+    deckCountText.setFont(font);
+    deckCountText.setCharacterSize(20);
+    deckCountText.setFillColor(sf::Color::White);
+    deckCountText.setPosition(1100.f, 30.f);
+
+    turnInfoText.setFont(font);
+    turnInfoText.setCharacterSize(18);
+    turnInfoText.setFillColor(sf::Color::Yellow);
+    turnInfoText.setPosition(50.f, 70.f);
+
+    logBackground.setSize({ 450.f, 150.f });
+    logBackground.setFillColor(sf::Color(0, 0, 0, 150));
+    logBackground.setPosition(20.f, 550.f);
+
+    logText.setFont(font);
+    logText.setCharacterSize(14);
+    logText.setFillColor(sf::Color::White);
+    logText.setPosition(30.f, 560.f);
 
     refreshSnapshot();
+    logAction("Game Started.");
 }
 
 void GameScene::refreshSnapshot() {
@@ -28,8 +58,26 @@ void GameScene::refreshSnapshot() {
         else statusText.setString("DEFEAT!");
     }
     else {
-        statusText.setString("Your Turn");
+        statusText.setString("Your Turn: " + playerName);
     }
+    updateHUD();
+}
+
+void GameScene::logAction(const std::string& msg) {
+    gameLogs.push_back(msg);
+    if (gameLogs.size() > 6) gameLogs.erase(gameLogs.begin());
+
+    std::string fullString;
+    for (const auto& log : gameLogs) fullString += "> " + log + "\n";
+    logText.setString(fullString);
+}
+
+void GameScene::updateHUD() {
+    deckCountText.setString("Deck Size: " + std::to_string(currentSnapshot.deckSize));
+
+    std::string info = "Played: " + std::to_string(currentSnapshot.cardsPlayedThisTurn) +
+        " / Required: " + std::to_string(currentSnapshot.minCardsToPlay);
+    turnInfoText.setString(info);
 }
 
 bool GameScene::isMoveValid(int handIdx, int pileIdx) {
@@ -61,6 +109,8 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window)
 {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
+    endTurnButton.handleEvent(event, mousePos);
+
     if (event.type == sf::Event::MouseMoved) {
         hoveredHandIndex = -1;
         hoveredPileIndex = -1;
@@ -91,14 +141,16 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window)
                     bool success = game->attemptPlayCard(selectedHandIndex, i);
 
                     if (success) {
-                        statusText.setString("Card Played!");
+                        int val = currentSnapshot.myHand[selectedHandIndex];
+                        logAction("Played " + std::to_string(val) + " on Pile " + std::to_string(i + 1));
+
                         if (selectedHandIndex >= (int)currentSnapshot.myHand.size() - 1) {
                             selectedHandIndex = -1;
                         }
                         refreshSnapshot();
                     }
                     else {
-                        statusText.setString("Invalid Move!");
+                        logAction("Invalid Move!");
                     }
                 }
                 return;
@@ -123,7 +175,12 @@ void GameScene::update(sf::Time) {}
 
 void GameScene::draw(sf::RenderWindow& window)
 {
+    window.draw(logBackground);
+    window.draw(logText);
     window.draw(statusText);
+    window.draw(deckCountText);
+    window.draw(turnInfoText);
+    endTurnButton.draw(window);
 
     for (size_t i = 0; i < currentSnapshot.piles.size(); ++i) {
         sf::FloatRect bounds = getPileBounds((int)i);

@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "SceneManager.h"
 #include "Game.h"
+#include "Button.h"
 #include <memory>
 #include <vector>
 #include <string>
@@ -26,15 +27,23 @@ private:
     std::string playerName = "Player1";
 
     sf::Text statusText;
+    sf::Text logText;
+    sf::Text deckCountText;
+    sf::Text turnInfoText;
+    sf::RectangleShape logBackground;
+    Button endTurnButton;
 
     int selectedHandIndex = -1;
     int hoveredHandIndex = -1;
     int hoveredPileIndex = -1;
 
+    std::vector<std::string> gameLogs;
     sf::Cursor standardCursor;
     sf::Cursor handCursor;
 
     void refreshSnapshot();
+    void logAction(const std::string& msg);
+    void updateHUD();
     void updateCursor(sf::RenderWindow& window);
     bool isMoveValid(int handIdx, int pileIdx);
 
