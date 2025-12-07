@@ -101,9 +101,7 @@ int main() {
             return r;
         }
         });
-    CROW_ROUTE(app, "/lobby/create")
-        .methods("POST"_method)
-        ([](const crow::request& req) {
+    CROW_ROUTE(app, "/lobby/create").methods("POST"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("hostName")) {
             return crow::response(400, "Missing 'hostName'");
@@ -117,6 +115,27 @@ int main() {
         res["message"] = "Lobby created successfully";
 
         return crow::response(201, res.dump());
+        });
+    CROW_ROUTE(app, "/lobby/join")
+        .methods("POST"_method)
+        ([](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("lobbyId") || !body.has("playerName")) {
+            return crow::response(400, "Missing 'lobbyId' or 'playerName'");
+        }
+
+        int lobbyId = body["lobbyId"].i();
+        std::string playerName = body["playerName"].s();
+
+        bool success = GameManager::getInstance().joinLobby(lobbyId, playerName);
+        if (success) {
+            crow::json::wvalue res;
+            res["message"] = "Joined successfully";
+            return crow::response(200, res.dump());
+        }
+        else {
+            return crow::response(404, "Lobby full or not found");
+        }
         });
     app.port(18080).multithreaded().run();
 }

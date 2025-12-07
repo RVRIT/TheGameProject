@@ -19,8 +19,13 @@ public:
 	{
 		addPlayer(hostName);
 	}
-	bool addPlayer(const std::string& name) {
-		if (players.size() >= MAX_PLAYERS) { return false; }
+	bool Lobby::addPlayer(const std::string& name) {
+		if (status != LobbyStatus::Waiting) {
+			return false;
+		}
+		if (players.size() >= MAX_PLAYERS) {
+			return false;
+		}
 		players.emplace_back(name);
 		return true;
 	}
