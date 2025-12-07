@@ -27,4 +27,7 @@ private:
     sf::Text statusText; 
     void refreshSnapshot();
     sf::FloatRect getPileBounds(int pileIndex) const;
+
+    int selectedHandIndex = -1;
+    sf::FloatRect getHandCardBounds(int cardIndex, int totalCards) const;
 };
