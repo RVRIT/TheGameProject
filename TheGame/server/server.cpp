@@ -137,5 +137,41 @@ int main() {
             return crow::response(404, "Lobby full or not found");
         }
         });
+    CROW_ROUTE(app, "/lobby/<int>/chat").methods("POST"_method)([](int lobbyId, const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("sender") || !body.has("content")) {
+            return crow::response(400, "Missing 'sender' or 'content'");
+        }
+
+        std::string sender = body["sender"].s();
+        std::string content = body["content"].s();
+
+        bool success = GameManager::getInstance().sendChatMessage(lobbyId, sender, content);
+        if (success) {
+            return crow::response(200, "Message sent");
+        }
+        else {
+            return crow::response(404, "Lobby not found or invalid message");
+        }
+    });
+    CROW_ROUTE(app, "/lobby/<int>/chat")([](int lobbyId) {
+        try {
+            auto messages = GameManager::getInstance().getChatHistory(lobbyId);
+
+            std::vector<crow::json::wvalue> jsonMessages;
+            for (const auto& msg : messages) {
+                crow::json::wvalue m;
+                m["sender"] = msg.sender;
+                m["content"] = msg.content;
+                jsonMessages.push_back(std::move(m));
+            }
+
+            crow::json::wvalue res= crow::json::wvalue(jsonMessages);
+            return crow::response(200, res.dump());
+        }
+        catch (const std::out_of_range& e) {
+            return crow::response(404, e.what());
+        }
+    });
     app.port(18080).multithreaded().run();
 }

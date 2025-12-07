@@ -4,6 +4,12 @@
 #include <vector>
 #include <memory>
 #include "Game.h"
+#include <chrono>
+struct ChatMessage
+{
+	std::string sender;
+	std::string content;
+};
 class Lobby
 {
 public:
@@ -19,30 +25,14 @@ public:
 	{
 		addPlayer(hostName);
 	}
-	bool Lobby::addPlayer(const std::string& name) {
-		if (status != LobbyStatus::Waiting) {
-			return false;
-		}
-		if (players.size() >= MAX_PLAYERS) {
-			return false;
-		}
-		players.emplace_back(name);
-		return true;
-	}
-	void removePlayer(const std::string& name)
-	{
-		players.erase(
-			std::remove_if(players.begin(), players.end(),
-				[&name](const Player& p) {
-					return p.getName() == name;
-				}),
-			players.end()
-		);
-	}
+	bool addPlayer(const std::string& name);
+	void removePlayer(const std::string& name);
 	std::vector<Player> getPlayerList() const { return players; }
 	int getId() const { return id; }
 	Game* getGame() const { return game.get(); }
 	LobbyStatus getStatus() const { return status; }
+	bool sendChatMessage(const std::string& sender, const std::string& content);
+	std::vector<ChatMessage> getChatHistory() const;
 private:
 	int id;
 	std::string hostingPlayer;
@@ -50,6 +40,7 @@ private:
 	std::unique_ptr<Game> game;
 	static const size_t MAX_PLAYERS = 5;
 	Lobby::LobbyStatus status = Lobby::LobbyStatus::Waiting;
-
+	std::vector<ChatMessage> chatHistory;
+	static const size_t MAX_CHAT_MESSAGES = 100;
 };
 

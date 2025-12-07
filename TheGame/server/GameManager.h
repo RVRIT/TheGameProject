@@ -14,6 +14,8 @@ public:
 
     int createLobby(const std::string& hostName);
     bool joinLobby(int lobbyId, const std::string& playerName);
+    bool sendChatMessage(int lobbyId, const std::string& sender, const std::string& content);
+    std::vector<ChatMessage> getChatHistory(int lobbyId) const;
 
 private:
     GameManager() = default;
