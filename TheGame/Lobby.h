@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "json.hpp"
+
 #include "gamesnapshot.h"
 
 using json = nlohmann::json;
