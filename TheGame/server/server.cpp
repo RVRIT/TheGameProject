@@ -3,6 +3,8 @@
 #include <regex>
 #include <crow.h>
 #include "GameManager.h"
+#include "lobby.h"
+
 int main() {
     crow::SimpleApp app;
 
@@ -16,6 +18,7 @@ int main() {
         std::cerr << "ERROR initializing DB!" << std::endl;
         return 1;
     }
+
     CROW_ROUTE(app, "/login").methods(crow::HTTPMethod::POST)([&db](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("username") || !body.has("password")) {
@@ -51,6 +54,7 @@ int main() {
             return r;
         }
         });
+
     CROW_ROUTE(app, "/register").methods(crow::HTTPMethod::POST)([&db](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("username") || !body.has("password")) {
@@ -95,7 +99,7 @@ int main() {
         if (db.registerUser(username, hashed)) {
             res["status"] = "success";
             res["message"] = "Registered successfully";
-            crow::response r(200, res.dump()); 
+            crow::response r(200, res.dump());
             r.set_header("Content-Type", "application/json");
             return r;
         }
@@ -107,6 +111,7 @@ int main() {
             return r;
         }
         });
+
     CROW_ROUTE(app, "/lobby/create").methods("POST"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("hostName")) {
@@ -122,9 +127,8 @@ int main() {
 
         return crow::response(201, res.dump());
         });
-    CROW_ROUTE(app, "/lobby/join")
-        .methods("POST"_method)
-        ([](const crow::request& req) {
+
+    CROW_ROUTE(app, "/lobby/join").methods("POST"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("lobbyId") || !body.has("playerName")) {
             return crow::response(400, "Missing 'lobbyId' or 'playerName'");
@@ -143,6 +147,7 @@ int main() {
             return crow::response(404, "Lobby full or not found");
         }
         });
+
     CROW_ROUTE(app, "/lobby/<int>/chat").methods("POST"_method)([](int lobbyId, const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("sender") || !body.has("content")) {
@@ -159,7 +164,8 @@ int main() {
         else {
             return crow::response(404, "Lobby not found or invalid message");
         }
-    });
+        });
+
     CROW_ROUTE(app, "/lobby/<int>/chat")([](int lobbyId) {
         try {
             auto messages = GameManager::getInstance().getChatHistory(lobbyId);
@@ -172,12 +178,27 @@ int main() {
                 jsonMessages.push_back(std::move(m));
             }
 
-            crow::json::wvalue res= crow::json::wvalue(jsonMessages);
+            crow::json::wvalue res = crow::json::wvalue(jsonMessages);
             return crow::response(200, res.dump());
         }
         catch (const std::out_of_range& e) {
             return crow::response(404, e.what());
         }
-    });
+        });
+    //created the endpoint to be fixed soon
+    CROW_ROUTE(app, "/lobby/<int>/state").methods("GET"_method)([](int lobbyId) {
+        Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
+
+        if (lobby) {
+            json stateJson = lobby->GetStateJSON();
+            crow::response res(200, stateJson.dump());
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+        else {
+            return crow::response(404, "Lobby not found");
+        }
+        });
+
     app.port(18080).multithreaded().run();
 }
