@@ -7,15 +7,26 @@ bool DBManager::initialize(const std::string& db_path)
 {
 
     try {
-        
-        storage = std::make_unique<StorageType>(createStorage(db_path));
-
        
+        std::filesystem::path path(db_path);
+        if (path.has_parent_path()) {
+           
+            std::filesystem::create_directories(path.parent_path());
+        }
+       
+
+        storage = std::make_unique<StorageType>(createStorage(db_path));
         storage->sync_schema();
+
+        std::cout << "DB initialized successfully at: " << db_path << std::endl;
         return true;
     }
     catch (std::system_error& e) {
         std::cerr << "Eroare la initializare DB: " << e.what() << std::endl;
+        return false;
+    }
+    catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
         return false;
     }
 }

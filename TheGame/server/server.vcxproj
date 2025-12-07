@@ -154,6 +154,14 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="PasswordService.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CardEngine\CardEngine.vcxproj">
+      <Project>{97775187-a6ec-47e3-a78d-b981d7986edd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\The Game.vcxproj">
+      <Project>{5c8c3286-a179-465c-ae0e-50b9d7834b11}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
