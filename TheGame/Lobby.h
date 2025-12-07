@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 #include <memory>
-
-#include "gamesnapshot.h"
+#include "Game.h"
+#include "GameSnapshot.h"
 
 using json = nlohmann::json;
 
@@ -28,30 +28,36 @@ enum class LobbyStatus {
 
 class Lobby {
 public:
-    Lobby();
+    Lobby() = default;
+    explicit Lobby(int id, const std::string& hostName, LobbyStatus status = LobbyStatus::Waiting)
+        : id{ id }, status{ status }
+    {
+        addPlayer(hostName);
+    }
     ~Lobby();
 
-    bool AddPlayer(int id, const std::string& name);
-    void RemovePlayer(int id);
-    void SetPlayerReady(int id, bool ready);
-    bool IsAllReady() const;
+    bool addPlayer(const std::string& name);
+    void removePlayer(int id);
+    void setPlayerReady(int id, bool ready);
+    bool isAllReady() const;
 
-    bool SendChatMessage(const std::string& sender, const std::string& content);
-    std::vector<ChatMessage> GetChatHistory() const;
+    bool sendChatMessage(const std::string& sender, const std::string& content);
+    std::vector<ChatMessage> getChatHistory() const;
 
     GameSnapshot CreateGameSnapshot();
 
-    const std::vector<PlayerInfo>& GetPlayers() const;
-    LobbyStatus GetStatus() const;
-    void SetMaxPlayers(int max);
-
-    json GetStateJSON() const;
+    const std::vector<PlayerInfo>& getPlayers() const;
+    LobbyStatus getStatus() const;
+    void setMAX_PLAYERS(int max);
+    json getStateJSON() const;
 
 private:
+    int id;
+    std::unique_ptr<Game> game;
     std::vector<PlayerInfo> players;
     std::vector<ChatMessage> chatHistory;
     LobbyStatus status;
-    int maxPlayers;
+    static const size_t MAX_PLAYERS = 5;
     static const size_t MAX_CHAT_MESSAGES = 100;
 };
 

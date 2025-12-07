@@ -7,8 +7,8 @@
 
 class PasswordService
 {
-private: 
-    static constexpr int SALT_SIZE = 32;    
+private:
+    static constexpr int SALT_SIZE = 32;
     static constexpr int KEY_LEN = 32;
     static constexpr int ITERATIONS = 100000;
 public:

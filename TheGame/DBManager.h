@@ -1,5 +1,4 @@
 #pragma once
-#include <sqlite3.h>
 #include <sqlite_orm/sqlite_orm.h>
 #include <string>
 #include <iostream>
@@ -41,11 +40,11 @@ struct LobbyPlayer {
 
 
 inline auto createStorage(const std::string& dbPath) {
-    
+
     using namespace sqlite_orm;
 
     return make_storage(dbPath,
-       
+
         make_table("users",
             make_column("user_id", &User::id, primary_key().autoincrement()),
             make_column("username", &User::username, unique()),
@@ -56,7 +55,7 @@ inline auto createStorage(const std::string& dbPath) {
             make_column("games_won", &User::games_won)
         ),
 
-       
+
         make_table("game_sessions",
             make_column("id", &GameSession::id, primary_key().autoincrement()),
             make_column("user_id", &GameSession::user_id),
@@ -66,13 +65,13 @@ inline auto createStorage(const std::string& dbPath) {
             foreign_key(&GameSession::user_id).references(&User::id)
         ),
 
-        
+
         make_table("lobbies",
             make_column("lobby_id", &LobbyDb::id, primary_key().autoincrement()),
             make_column("game_state", &LobbyDb::game_state)
         ),
 
-       
+
         make_table("lobby_players",
             make_column("id", &LobbyPlayer::id, primary_key().autoincrement()),
             make_column("lobby_id", &LobbyPlayer::lobby_id),
@@ -112,6 +111,6 @@ private:
     DBManager() = default;
 
     // no MORE sqlite3* db!
-    
+
     std::unique_ptr<StorageType> storage; // Smart pointer for orm storage
 };

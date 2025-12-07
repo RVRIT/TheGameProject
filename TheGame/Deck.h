@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "CardCollection.h"
 #include "Shuffler.h"
+#include "CardCollection.h"
 
 class Deck : public CardCollection
 {

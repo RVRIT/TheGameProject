@@ -1,24 +1,15 @@
 #include "lobby.h"
 #include <algorithm>
 
-Lobby::Lobby() : maxPlayers(4), status(LobbyStatus::Waiting) {}
-
-Lobby::~Lobby() {}
-
-bool Lobby::AddPlayer(int id, const std::string& name) {
-    if (status != LobbyStatus::Waiting || players.size() >= maxPlayers) {
+bool Lobby::addPlayer(const std::string& name) {
+    if (status != LobbyStatus::Waiting || players.size() >= MAX_PLAYERS) {
         return false;
     }
-
-    for (const auto& p : players) {
-        if (p.id == id) return false;
-    }
-
-    players.push_back({ id, name, false });
+    players.push_back({name, false});
     return true;
 }
 
-void Lobby::RemovePlayer(int id) {
+void Lobby::removePlayer(int id) {
     players.erase(
         std::remove_if(players.begin(), players.end(),
             [id](const PlayerInfo& p) { return p.id == id; }),
@@ -26,7 +17,7 @@ void Lobby::RemovePlayer(int id) {
     );
 }
 
-void Lobby::SetPlayerReady(int id, bool ready) {
+void Lobby::setPlayerReady(int id, bool ready) {
     for (auto& p : players) {
         if (p.id == id) {
             p.isReady = ready;
@@ -35,7 +26,7 @@ void Lobby::SetPlayerReady(int id, bool ready) {
     }
 }
 
-bool Lobby::IsAllReady() const {
+bool Lobby::isAllReady() const {
     if (players.empty()) return false;
     for (const auto& p : players) {
         if (!p.isReady) return false;
@@ -43,7 +34,7 @@ bool Lobby::IsAllReady() const {
     return true;
 }
 
-bool Lobby::SendChatMessage(const std::string& sender, const std::string& content) {
+bool Lobby::sendChatMessage(const std::string& sender, const std::string& content) {
     if (content.empty() || sender.empty()) return false;
 
     chatHistory.push_back({ sender, content });
@@ -53,14 +44,14 @@ bool Lobby::SendChatMessage(const std::string& sender, const std::string& conten
     return true;
 }
 
-std::vector<ChatMessage> Lobby::GetChatHistory() const {
+std::vector<ChatMessage> Lobby::getChatHistory() const {
     return chatHistory;
 }
 
 GameSnapshot Lobby::CreateGameSnapshot() {
     GameSnapshot snapshot;
 
-    if (!IsAllReady()) {
+    if (!isAllReady()) {
         snapshot.isGameOver = false;
         return snapshot;
     }
@@ -83,23 +74,20 @@ GameSnapshot Lobby::CreateGameSnapshot() {
     return snapshot;
 }
 
-const std::vector<PlayerInfo>& Lobby::GetPlayers() const {
+const std::vector<PlayerInfo>& Lobby::getPlayers() const {
     return players;
 }
 
-LobbyStatus Lobby::GetStatus() const {
+LobbyStatus Lobby::getStatus() const {
     return status;
 }
 
-void Lobby::SetMaxPlayers(int max) {
-    maxPlayers = max;
-}
 
-json Lobby::GetStateJSON() const {
+json Lobby::getStateJSON() const {
     json j;
     j["status"] = (status == LobbyStatus::Waiting ? "Waiting" :
         (status == LobbyStatus::InProgress ? "InProgress" : "Finished"));
-    j["maxPlayers"] = maxPlayers;
+    j["MAX_PLAYERS"] = 5;
 
     j["players"] = players;
     j["chat"] = chatHistory;

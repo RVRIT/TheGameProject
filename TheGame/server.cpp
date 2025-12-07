@@ -3,7 +3,7 @@
 #include <regex>
 #include <crow.h>
 #include "GameManager.h"
-#include "lobby.h"
+#include "Lobby.h"
 
 int main() {
     crow::SimpleApp app;
@@ -190,7 +190,7 @@ int main() {
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
 
         if (lobby) {
-            json stateJson = lobby->GetStateJSON();
+            json stateJson = lobby->getStateJSON();
             crow::response res(200, stateJson.dump());
             res.set_header("Content-Type", "application/json");
             return res;

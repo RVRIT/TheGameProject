@@ -16,7 +16,7 @@ int GameManager::createLobby(const std::string& hostName)
     return newId;
 }
 
-bool GameManager::joinLobby(int lobbyId, const std::string& playerName)
+bool GameManager::joinLobby(const int lobbyId, const std::string& playerName)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);
