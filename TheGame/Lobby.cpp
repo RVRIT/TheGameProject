@@ -1,12 +1,12 @@
 #include "lobby.h"
 #include <algorithm>
 
-Lobby::Lobby() : maxPlayers(4), gameStarted(false) {}
+Lobby::Lobby() : maxPlayers(4), status(LobbyStatus::Waiting) {}
 
 Lobby::~Lobby() {}
 
 bool Lobby::AddPlayer(int id, const std::string& name) {
-    if (gameStarted || players.size() >= maxPlayers) {
+    if (status != LobbyStatus::Waiting || players.size() >= maxPlayers) {
         return false;
     }
 
@@ -43,19 +43,66 @@ bool Lobby::IsAllReady() const {
     return true;
 }
 
+bool Lobby::SendChatMessage(const std::string& sender, const std::string& content) {
+    if (content.empty() || sender.empty()) return false;
+
+    chatHistory.push_back({ sender, content });
+    if (chatHistory.size() > MAX_CHAT_MESSAGES) {
+        chatHistory.erase(chatHistory.begin());
+    }
+    return true;
+}
+
+std::vector<ChatMessage> Lobby::GetChatHistory() const {
+    return chatHistory;
+}
+
 GameSnapshot Lobby::CreateGameSnapshot() {
+    GameSnapshot snapshot;
+
     if (!IsAllReady()) {
-        return GameSnapshot();
+        snapshot.isGameOver = false;
+        return snapshot;
     }
 
-    gameStarted = true;
-    return GameSnapshot(players);
+    status = LobbyStatus::InProgress;
+
+    for (const auto& p : players) {
+        OtherPlayerInfo opi;
+        opi.name = p.name;
+        opi.cardCount = 0;
+        opi.canMakeMove = false;
+        opi.isCurrentPlayer = false;
+        snapshot.opponents.push_back(opi);
+    }
+
+    snapshot.deckSize = 52;
+    snapshot.message = "Game Started";
+    snapshot.isGameOver = false;
+
+    return snapshot;
 }
 
 const std::vector<PlayerInfo>& Lobby::GetPlayers() const {
     return players;
 }
 
+LobbyStatus Lobby::GetStatus() const {
+    return status;
+}
+
 void Lobby::SetMaxPlayers(int max) {
     maxPlayers = max;
+}
+
+json Lobby::GetStateJSON() const {
+    json j;
+    j["status"] = (status == LobbyStatus::Waiting ? "Waiting" :
+        (status == LobbyStatus::InProgress ? "InProgress" : "Finished"));
+    j["maxPlayers"] = maxPlayers;
+
+    j["players"] = players;
+    j["chat"] = chatHistory;
+
+    return j;
 }
