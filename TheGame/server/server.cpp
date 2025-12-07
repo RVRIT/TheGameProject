@@ -1,6 +1,8 @@
 #include "DBManager.h"
 #include "PasswordService.h"
 #include <regex>
+#include <crow.h>
+#include "GameManager.h"
 int main() {
     crow::SimpleApp app;
     DBManager db;
@@ -98,6 +100,23 @@ int main() {
             r.set_header("Content-Type", "application/json");
             return r;
         }
+        });
+    CROW_ROUTE(app, "/lobby/create")
+        .methods("POST"_method)
+        ([](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("hostName")) {
+            return crow::response(400, "Missing 'hostName'");
+        }
+
+        std::string hostName = body["hostName"].s();
+        int newLobbyId = GameManager::getInstance().createLobby(hostName);
+
+        crow::json::wvalue res;
+        res["lobbyId"] = newLobbyId;
+        res["message"] = "Lobby created successfully";
+
+        return crow::response(201, res.dump());
         });
     app.port(18080).multithreaded().run();
 }
