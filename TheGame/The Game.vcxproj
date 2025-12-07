@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\ClientGui\json.hpp" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameSnapshot.h" />
@@ -144,7 +145,6 @@
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Lobby.cpp" />
-
     <ClCompile Include="Pile.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>

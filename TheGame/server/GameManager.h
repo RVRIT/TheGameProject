@@ -2,7 +2,8 @@
 #include <map>
 #include <string>
 #include <mutex>
-#include "../Lobby.h"
+#include <vector>
+#include "lobby.h"
 
 class GameManager
 {
@@ -16,6 +17,8 @@ public:
     bool joinLobby(int lobbyId, const std::string& playerName);
     bool sendChatMessage(int lobbyId, const std::string& sender, const std::string& content);
     std::vector<ChatMessage> getChatHistory(int lobbyId) const;
+    //to be fixed soon
+    Lobby* getLobby(int lobbyId);
 
 private:
     GameManager() = default;
