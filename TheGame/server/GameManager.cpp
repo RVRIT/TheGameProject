@@ -7,35 +7,36 @@ GameManager& GameManager::getInstance()
     return instance;
 }
 
-bool GameManager::createLobby(int lobbyId, const std::string& hostName)
+int GameManager::createLobby(const std::string& hostName)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
 
-    if (m_lobbies.find(lobbyId) != m_lobbies.end())
-        return false;
-
-    m_lobbies.emplace(lobbyId, Lobby{ lobbyId, hostName });
-    return true;
+    int newId = m_nextLobbyId++;
+    m_lobbies.emplace(newId, Lobby{ newId, hostName });
+    return newId;
 }
 
 bool GameManager::joinLobby(int lobbyId, const std::string& playerName)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
-
     auto it = m_lobbies.find(lobbyId);
     if (it == m_lobbies.end())
         return false;
-
     return it->second.addPlayer(playerName);
 }
-
-Lobby& GameManager::getLobby(int lobbyId)
+bool GameManager::sendChatMessage(int lobbyId, const std::string& sender, const std::string& content)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
+    auto it = m_lobbies.find(lobbyId);
+    if (it == m_lobbies.end()) return false;
+    return it->second.sendChatMessage(sender, content);
+}
 
+std::vector<ChatMessage> GameManager::getChatHistory(int lobbyId) const
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);
     if (it == m_lobbies.end())
-        throw std::out_of_range("Lobby with ID " + std::to_string(lobbyId) + " not found.");
-
-    return it->second;
+        throw std::out_of_range("Lobby not found");
+    return it->second.getChatHistory();
 }
