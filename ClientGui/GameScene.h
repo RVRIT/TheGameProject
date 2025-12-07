@@ -2,9 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include "Scene.h"
 #include "SceneManager.h"
-#include "Game.h"       
-#include "Button.h"   
+#include "Game.h"
 #include <memory>
+#include <vector>
+#include <string>
 
 class GameScene : public Scene
 {
@@ -22,12 +23,21 @@ private:
 
     std::unique_ptr<Game> game;
     GameSnapshot currentSnapshot;
-    std::string playerName = "Player1"; // Hardcoded for single player now
+    std::string playerName = "Player1";
 
-    sf::Text statusText; 
-    void refreshSnapshot();
-    sf::FloatRect getPileBounds(int pileIndex) const;
+    sf::Text statusText;
 
     int selectedHandIndex = -1;
+    int hoveredHandIndex = -1;
+    int hoveredPileIndex = -1;
+
+    sf::Cursor standardCursor;
+    sf::Cursor handCursor;
+
+    void refreshSnapshot();
+    void updateCursor(sf::RenderWindow& window);
+    bool isMoveValid(int handIdx, int pileIdx);
+
+    sf::FloatRect getPileBounds(int pileIndex) const;
     sf::FloatRect getHandCardBounds(int cardIndex, int totalCards) const;
 };
