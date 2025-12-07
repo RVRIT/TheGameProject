@@ -3,43 +3,47 @@
 #include <vector>
 #include <string>
 #include <map>
-//functie pentru leaderboard entry
+#include "json.hpp"
+
+using json = nlohmann::json;
+
 struct LeaderboardEntry {
     std::string name;
     int score;
 };
 
 struct PileInfo {
-    int id;             
-    std::string type;   
-    int topValue;       
-    int cardCount;      
+    int id;
+    std::string type;
+    int topValue;
+    int cardCount;
 };
 
 struct OtherPlayerInfo {
     std::string name;
-    int cardCount;          
-    bool canMakeMove; // Server-calculated. If false while it's this player's turn -> Game Over (Teammate stuck).
-    bool isCurrentPlayer; // UI Logic: Highlight this player. If false for local user -> Disable input/buttons.
+    int cardCount;
+    bool canMakeMove;
+    bool isCurrentPlayer;
 };
 
 struct GameSnapshot {
-    std::vector<int> myHand; 
+    std::vector<int> myHand;
+    int cardsPlayedThisTurn;
+    int minCardsToPlay;
 
-    int cardsPlayedThisTurn; // Display progress (e.g., "Played: 1").
-    int minCardsToPlay;     // Enable "End Turn" button ONLY IF cardsPlayed >= minCards.
-    
     std::vector<OtherPlayerInfo> opponents;
 
-    
-    std::vector<PileInfo> piles; 
-    int deckSize;                
+    std::vector<PileInfo> piles;
+    int deckSize;
 
-    std::vector<LeaderboardEntry> leaderboard;//lista cu jucatori si scorurile acestora
-    
-    std::string message;   // Global Message
-    bool isGameOver;      // If true -> Switch to EndScreen immediately.
-    bool playerWon;      // If GameOver is true: true = "VICTORY Screen", false = "DEFEAT Screen".
+    std::vector<LeaderboardEntry> leaderboard;
 
-               
+    std::string message;
+    bool isGameOver;
+    bool playerWon;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(LeaderboardEntry, name, score)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PileInfo, id, type, topValue, cardCount)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(OtherPlayerInfo, name, cardCount, canMakeMove, isCurrentPlayer)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GameSnapshot, myHand, cardsPlayedThisTurn, minCardsToPlay, opponents, piles, deckSize, leaderboard, message, isGameOver, playerWon)
