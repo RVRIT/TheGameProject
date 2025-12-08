@@ -149,6 +149,7 @@
     <ClCompile Include="Deck.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameSnapshot.cpp" />
     <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="PasswordService.cpp" />
     <ClCompile Include="Pile.cpp" />

@@ -6,8 +6,8 @@
 #include <memory>
 #include "Game.h"
 #include "GameSnapshot.h"
+#include <crow.h>
 
-using json = nlohmann::json;
 
 struct PlayerInfo {
     int id;
@@ -49,7 +49,7 @@ public:
     const std::vector<PlayerInfo>& getPlayers() const;
     LobbyStatus getStatus() const;
     void setMAX_PLAYERS(int max);
-    json getStateJSON() const;
+    crow::json::wvalue getStateJSON() const;
 
 private:
     int id;
@@ -60,8 +60,5 @@ private:
     static const size_t MAX_PLAYERS = 5;
     static const size_t MAX_CHAT_MESSAGES = 100;
 };
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerInfo, id, name, isReady)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ChatMessage, sender, content)
 
 #endif

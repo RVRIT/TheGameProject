@@ -83,13 +83,35 @@ LobbyStatus Lobby::getStatus() const {
 }
 
 
-json Lobby::getStateJSON() const {
-    json j;
-    j["status"] = (status == LobbyStatus::Waiting ? "Waiting" :
-        (status == LobbyStatus::InProgress ? "InProgress" : "Finished"));
-    j["MAX_PLAYERS"] = 5;
-    j["players"] = players;
-    j["chat"] = chatHistory;
+crow::json::wvalue Lobby::getStateJSON() const {
+    crow::json::wvalue j;
+
+    // Status
+    if (status == LobbyStatus::Waiting) {
+        j["status"] = "Waiting";
+    }
+    else if (status == LobbyStatus::InProgress) {
+        j["status"] = "InProgress";
+    }
+    else {
+        j["status"] = "Finished";
+    }
+
+    j["MAX_PLAYERS"] = static_cast<int>(MAX_PLAYERS);
+
+    crow::json::wvalue playersArr;
+    for (size_t i = 0; i < players.size(); ++i) {
+        playersArr[i]["id"] = players[i].id;
+        playersArr[i]["name"] = players[i].name;
+        playersArr[i]["isReady"] = players[i].isReady;
+    }
+    j["players"] = std::move(playersArr);
+    crow::json::wvalue chatArr;
+    for (size_t i = 0; i < chatHistory.size(); ++i) {
+        chatArr[i]["sender"] = chatHistory[i].sender;
+        chatArr[i]["content"] = chatHistory[i].content;
+    }
+    j["chat"] = std::move(chatArr);
 
     return j;
 }

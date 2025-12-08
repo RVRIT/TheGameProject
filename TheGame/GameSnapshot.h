@@ -3,10 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "json.hpp"
-
-using json = nlohmann::json;
-
+#include <crow.h>
 struct LeaderboardEntry {
     std::string name;
     int score;
@@ -41,9 +38,5 @@ struct GameSnapshot {
     std::string message;
     bool isGameOver;
     bool playerWon;
+    crow::json::wvalue toJson(const GameSnapshot& snapshot);
 };
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(LeaderboardEntry, name, score)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PileInfo, id, type, topValue, cardCount)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(OtherPlayerInfo, name, cardCount, canMakeMove, isCurrentPlayer)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GameSnapshot, myHand, cardsPlayedThisTurn, minCardsToPlay, opponents, piles, deckSize, leaderboard, message, isGameOver, playerWon)

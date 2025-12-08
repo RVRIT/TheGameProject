@@ -190,7 +190,7 @@ int main() {
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
 
         if (lobby) {
-            json stateJson = lobby->getStateJSON();
+            crow::json::wvalue stateJson = lobby->getStateJSON();
             crow::response res(200, stateJson.dump());
             res.set_header("Content-Type", "application/json");
             return res;
