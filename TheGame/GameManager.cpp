@@ -42,6 +42,14 @@ std::vector<ChatMessage> GameManager::getChatHistory(int lobbyId) const
         throw std::out_of_range("Lobby not found");
     return it->second.getChatHistory();
 }
+bool GameManager::setPlayerReady(int lobbyId, int playerId, bool ready) {
+    std::lock_guard<std::mutex> lock(lobbiesMutex);
+    auto it = lobbies.find(lobbyId);
+    if (it == lobbies.end()) {
+        return false;
+    }
+    return it->second.setPlayerReady(playerId, ready);
+}
 //added the game lobby to be fixed soon
 Lobby* GameManager::getLobby(int lobbyId)
 {

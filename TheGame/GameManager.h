@@ -16,6 +16,7 @@ public:
     bool joinLobby(int lobbyId, const std::string& playerName);
     bool sendChatMessage(int lobbyId, const std::string& sender, const std::string& content);
     std::vector<ChatMessage> getChatHistory(int lobbyId) const;
+    bool setPlayerReady(int lobbyId, int playerId, bool ready);
     //to be fixed soon
     Lobby* getLobby(int lobbyId);
 
