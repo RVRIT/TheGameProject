@@ -218,5 +218,29 @@ int main() {
             return crow::response(404, "Lobby or player not found");
         }
         });
+
+    CROW_ROUTE(app, "/lobby/<int>/game/end-turn").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("playerId")) {
+            return crow::response(400, "Missing 'playerId'");
+        }
+
+        int playerId = body["playerId"].i();
+
+        auto& gameManager = GameManager::getInstance();
+        bool success = gameManager.attemptEndTurnInLobby(lobbyId, playerId);
+
+        crow::json::wvalue res;
+        if (success) {
+            res["status"] = "success";
+            res["message"] = "Turn ended";
+            return crow::response(200, res.dump());
+        }
+        else {
+            res["status"] = "error";
+            res["message"] = "Cannot end turn (too few cards played, not your turn, or game over)";
+            return crow::response(400, res.dump());
+        }
+        });
     app.port(18080).multithreaded().run();
 }

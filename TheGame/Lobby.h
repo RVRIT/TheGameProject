@@ -38,14 +38,15 @@ public:
 
     bool addPlayer(const std::string& name);
     void removePlayer(int id);
-    void setPlayerReady(int id, bool ready);
+    bool setPlayerReady(int id, bool ready);
     bool isAllReady() const;
 
     bool sendChatMessage(const std::string& sender, const std::string& content);
     std::vector<ChatMessage> getChatHistory() const;
 
     GameSnapshot CreateGameSnapshot();
-
+    Game* getGame() { return game.get(); }
+    const Game* getGame() const { return game.get(); }
     const std::vector<PlayerInfo>& getPlayers() const;
     LobbyStatus getStatus() const;
     void setMAX_PLAYERS(int max);

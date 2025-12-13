@@ -17,13 +17,14 @@ void Lobby::removePlayer(int id) {
     );
 }
 
-void Lobby::setPlayerReady(int id, bool ready) {
+bool Lobby::setPlayerReady(int id, bool ready) {
     for (auto& p : players) {
         if (p.id == id) {
             p.isReady = ready;
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 bool Lobby::isAllReady() const {
