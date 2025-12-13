@@ -12,7 +12,8 @@ int GameManager::createLobby(const std::string& hostName)
     std::lock_guard<std::mutex> lock(m_mtx);
 
     int newId = m_nextLobbyId++;
-    m_lobbies.emplace(newId, Lobby{ newId, hostName });
+   // m_lobbies.emplace(newId, Lobby{ newId, hostName });
+    m_lobbies.try_emplace(newId, newId, hostName);
     return newId;
 }
 

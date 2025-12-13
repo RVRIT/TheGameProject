@@ -3,7 +3,7 @@
 #include <string>
 #include <mutex>
 #include <vector>
-#include "lobby.h"
+#include "Lobby.h"
 class GameManager
 {
 public:

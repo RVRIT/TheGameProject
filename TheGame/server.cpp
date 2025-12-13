@@ -5,6 +5,8 @@
 #include "GameManager.h"
 #include "Lobby.h"
 
+using namespace crow;
+
 int main() {
     crow::SimpleApp app;
 
@@ -148,7 +150,7 @@ int main() {
         }
         });
 
-    CROW_ROUTE(app, "/lobby/<int>/chat").methods("POST"_method)([](int lobbyId, const crow::request& req) {
+    CROW_ROUTE(app, "/lobby/<int>/chat").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("sender") || !body.has("content")) {
             return crow::response(400, "Missing 'sender' or 'content'");

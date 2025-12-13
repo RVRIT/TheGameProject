@@ -19,8 +19,8 @@ int main() {
     font.loadFromFile("assets/PIXEL.TTF");
     NetworkClient client("http://localhost", 18080);
     SceneManager sceneManager(window);
-    //sceneManager.pushScene(std::make_unique<LoginMenu>(font, client, sceneManager, window));
-    sceneManager.pushScene(std::make_unique<GameScene>(font, sceneManager, window));
+    sceneManager.pushScene(std::make_unique<LoginMenu>(font, client, sceneManager, window));
+    //sceneManager.pushScene(std::make_unique<GameScene>(font, sceneManager, window));
 
     sf::Clock clock;
 
