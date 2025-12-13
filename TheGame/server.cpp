@@ -196,6 +196,27 @@ int main() {
             return crow::response(404, "Lobby not found");
         }
         });
+    CROW_ROUTE(app, "/lobby/<int>/ready").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("playerId") || !body.has("ready")) {
+            return crow::response(400, "Missing 'playerId' or 'ready'");
+        }
 
+        int playerId = body["playerId"].i();
+        bool ready = body["ready"].b();
+
+        auto& gameManager = GameManager::getInstance();
+        bool success = gameManager.setPlayerReady(lobbyId, playerId, ready);
+
+        if (success) {
+
+            crow::json::wvalue res;
+            res["message"] = "Updated status";
+            return crow::response(200, res.dump());
+        }
+        else {
+            return crow::response(404, "Lobby or player not found");
+        }
+        });
     app.port(18080).multithreaded().run();
 }
