@@ -9,11 +9,6 @@ using namespace crow;
 
 int main() {
     crow::SimpleApp app;
-
-    if (!DBManager::getInstance().initialize("./data/game.db")) {
-        return 1;
-    }
-
     DBManager& db = DBManager::getInstance();
 
     if (!db.initialize("./data/game.db")) {

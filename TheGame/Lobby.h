@@ -34,7 +34,7 @@ public:
     {
         addPlayer(hostName);
     }
-    ~Lobby();
+    ~Lobby() = default;
 
     bool addPlayer(const std::string& name);
     void removePlayer(int id);
