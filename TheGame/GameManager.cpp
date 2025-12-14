@@ -93,3 +93,15 @@ bool GameManager::attemptEndTurnInLobby(int lobbyId, int playerId)
     // Validate playerId is current player (to be added later)
     return game->attemptEndTurn();
 }
+
+bool GameManager::attemptStartGame(int lobbyId, int requestPlayerId)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    auto it = m_lobbies.find(lobbyId);
+
+    if (it == m_lobbies.end()) {
+        return false;
+    }
+
+    return it->second.tryStartGame(requestPlayerId);
+}
