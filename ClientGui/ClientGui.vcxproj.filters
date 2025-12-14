@@ -91,7 +91,7 @@
       <Filter>Source Files\MOCKGAME</Filter>
     </ClCompile>
     <ClCompile Include="LobbyScene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\SCENES</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,7 +148,7 @@
       <Filter>Header Files\MOCKGAME</Filter>
     </ClInclude>
     <ClInclude Include="LobbyScene.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\SCENES</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
