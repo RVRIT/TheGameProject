@@ -1,4 +1,6 @@
 #include "LobbyScene.h"
+#include "json.hpp" 
+using json = nlohmann::json;
 
 LobbyScene::LobbyScene(sf::Font& font, NetworkClient& client, SceneManager& manager)
     : font(font), client(client), sceneManager(manager),
@@ -32,11 +34,6 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     backButton.handleEvent(event, mousePos);
 }
 
-void LobbyScene::update(sf::Time dt)
-{
-   
-}
-
 void LobbyScene::draw(sf::RenderWindow& window) {
     // background sprite to create
     window.clear(sf::Color(20, 20, 40)); 
@@ -49,4 +46,42 @@ void LobbyScene::draw(sf::RenderWindow& window) {
     sendButton.draw(window);
     readyButton.draw(window);
     backButton.draw(window);
+}
+
+void LobbyScene::update(sf::Time dt) {
+    timeSinceLastUpdate += dt;
+    if (timeSinceLastUpdate.asSeconds() > 0.5f) {
+        fetchLobbyState();
+        timeSinceLastUpdate = sf::Time::Zero;
+    }
+}
+
+void LobbyScene::fetchLobbyState() {
+    std::string jsonResponse = client.getLobbyStatus();
+    if (!jsonResponse.empty()) {
+        parseLobbyJson(jsonResponse);
+    }
+}
+
+void LobbyScene::parseLobbyJson(const std::string& jsonStr) {
+    try {
+        auto j = json::parse(jsonStr);
+
+        // Update UI Text from JSON
+        std::string pList = "Players:\n";
+        for (const auto& p : j["players"]) {
+            pList += std::string(p["name"]) + (p["isReady"] ? " [READY]" : "") + "\n";
+        }
+        playerListText.setString(pList);
+
+        std::string cLog = "Chat:\n";
+        for (const auto& msg : j["chat"]) {
+            cLog += std::string(msg["sender"]) + ": " + std::string(msg["content"]) + "\n";
+        }
+        chatLogText.setString(cLog);
+
+    }
+    catch (std::exception& e) {
+        // Handle error
+    }
 }
