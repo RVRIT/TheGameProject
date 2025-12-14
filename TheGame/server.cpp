@@ -182,7 +182,7 @@ int main() {
             return crow::response(404, e.what());
         }
         });
-    //created the endpoint to be fixed soon
+
     CROW_ROUTE(app, "/lobby/<int>/state").methods("GET"_method)([](int lobbyId) {
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
 
@@ -196,6 +196,7 @@ int main() {
             return crow::response(404, "Lobby not found");
         }
         });
+
     CROW_ROUTE(app, "/lobby/<int>/ready").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("playerId") || !body.has("ready")) {
@@ -209,13 +210,31 @@ int main() {
         bool success = gameManager.setPlayerReady(lobbyId, playerId, ready);
 
         if (success) {
-
             crow::json::wvalue res;
             res["message"] = "Updated status";
             return crow::response(200, res.dump());
         }
         else {
             return crow::response(404, "Lobby or player not found");
+        }
+        });
+
+    CROW_ROUTE(app, "/start_game").methods("POST"_method)([](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("lobbyId") || !body.has("playerId")) {
+            return crow::response(400, "Missing 'lobbyId' or 'playerId'");
+        }
+
+        int lobbyId = body["lobbyId"].i();
+        int playerId = body["playerId"].i();
+
+        bool success = GameManager::getInstance().attemptStartGame(lobbyId, playerId);
+
+        if (success) {
+            return crow::response(200, "Game Started");
+        }
+        else {
+            return crow::response(400, "Cannot start game");
         }
         });
 
@@ -242,5 +261,6 @@ int main() {
             return crow::response(400, res.dump());
         }
         });
+
     app.port(18080).multithreaded().run();
 }
