@@ -44,6 +44,30 @@ bool Lobby::sendChatMessage(const std::string& sender, const std::string& conten
     }
     return true;
 }
+bool Lobby::tryStartGame(int requestPlayerId) {
+    if (players.size() < 2) {
+        return false;
+    }
+
+    if (players.empty() || players[0].id != requestPlayerId) {
+        return false;
+    }
+
+    if (!isAllReady()) {
+        return false;
+    }
+
+    std::vector<std::string> playerNames;
+    for (const auto& p : players) {
+        playerNames.push_back(p.name);
+    }
+
+    game = std::make_unique<Game>(playerNames);
+
+    status = LobbyStatus::InProgress;
+
+    return true;
+}
 
 std::vector<ChatMessage> Lobby::getChatHistory() const {
     return chatHistory;

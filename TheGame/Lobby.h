@@ -40,6 +40,7 @@ public:
     void removePlayer(int id);
     bool setPlayerReady(int id, bool ready);
     bool isAllReady() const;
+    bool tryStartGame(int requestPlayerId);
 
     bool sendChatMessage(const std::string& sender, const std::string& content);
     std::vector<ChatMessage> getChatHistory() const;
