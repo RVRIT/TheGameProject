@@ -6,9 +6,6 @@
 #include <optional>
 #include <memory> 
 
-
-
-
 struct User {
     int id;
     std::string username;
@@ -26,7 +23,6 @@ struct GameSession {
     double duration;
     std::string result; // "Win" or "Loss"
 };
-
 
 inline auto createStorage(const std::string& dbPath) {
 
@@ -74,12 +70,15 @@ public:
     bool registerUser(const std::string& username, const std::string& hashed_password);
     std::optional<std::string> getHashedPassword(const std::string& username);
     std::optional<int> getUserId(const std::string& username);
-   
-    
+
+    // Removed Lobby functions (create, join, etc.) from here.
+    // We now handle active lobbies in the GameManager (in memory) using a map.
+    // The database is only used for Users and saved Game History.
+
+
+
+
 private:
     DBManager() = default;
-
-    // no MORE sqlite3* db!
-
     std::unique_ptr<StorageType> storage; // Smart pointer for orm storage
 };
