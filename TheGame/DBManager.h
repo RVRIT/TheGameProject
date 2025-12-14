@@ -27,17 +27,6 @@ struct GameSession {
     std::string result; // "Win" or "Loss"
 };
 
-struct LobbyDb {
-    int id;
-    std::string game_state; // "WAITING", "PLAYING"
-};
-
-struct LobbyPlayer {
-    int id;
-    int lobby_id;
-    int user_id;
-};
-
 
 inline auto createStorage(const std::string& dbPath) {
 
@@ -62,23 +51,7 @@ inline auto createStorage(const std::string& dbPath) {
             make_column("score", &GameSession::score),
             make_column("duration", &GameSession::duration),
             make_column("result", &GameSession::result),
-            foreign_key(&GameSession::user_id).references(&User::id)
-        ),
-
-
-        make_table("lobbies",
-            make_column("lobby_id", &LobbyDb::id, primary_key().autoincrement()),
-            make_column("game_state", &LobbyDb::game_state)
-        ),
-
-
-        make_table("lobby_players",
-            make_column("id", &LobbyPlayer::id, primary_key().autoincrement()),
-            make_column("lobby_id", &LobbyPlayer::lobby_id),
-            make_column("user_id", &LobbyPlayer::user_id),
-            foreign_key(&LobbyPlayer::lobby_id).references(&LobbyDb::id),
-            foreign_key(&LobbyPlayer::user_id).references(&User::id)
-        )
+            foreign_key(&GameSession::user_id).references(&User::id))
     );
 }
 
@@ -101,12 +74,8 @@ public:
     bool registerUser(const std::string& username, const std::string& hashed_password);
     std::optional<std::string> getHashedPassword(const std::string& username);
     std::optional<int> getUserId(const std::string& username);
-    std::optional<std::string> getGameState(const int& lobbyId);
-
-    int createLobby(int user_id);
-    bool joinLobby(int user_id, int lobby_id);
-    bool leaveLobby(int user_id);
-
+   
+    
 private:
     DBManager() = default;
 
