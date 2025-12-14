@@ -10,6 +10,7 @@
 #include <iostream>
 #include <filesystem>
 #include "GameScene.h"
+#include "LobbyScene.h"
 
 int main() {
 
@@ -19,7 +20,8 @@ int main() {
     font.loadFromFile("assets/PIXEL.TTF");
     NetworkClient client("http://localhost", 18080);
     SceneManager sceneManager(window);
-    sceneManager.pushScene(std::make_unique<LoginMenu>(font, client, sceneManager, window));
+    sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager));
+    //sceneManager.pushScene(std::make_unique<LoginMenu>(font, client, sceneManager, window));
     //sceneManager.pushScene(std::make_unique<GameScene>(font, sceneManager, window));
 
     sf::Clock clock;

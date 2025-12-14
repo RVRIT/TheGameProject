@@ -73,3 +73,23 @@ bool NetworkClient::sendStartGameRequest(int lobbyId, int playerId) {
         return false;
     }
 }
+
+std::string NetworkClient::getLobbyStatus() {
+    // MOCK DATA
+    return R"({
+        "status": "Waiting",
+        "MAX_PLAYERS": 5,
+        "players": [
+            { "id": 0, "name": "RVR", "isReady": true },
+            { "id": 1, "name": "PlayerTwo", "isReady": false }
+        ],
+        "chat": [
+            { "sender": "RVR", "content": "Hello!" },
+            { "sender": "PlayerTwo", "content": "Ready?" }
+        ]
+    })";
+}
+
+void NetworkClient::sendLobbyMessage(const std::string& msg) {
+    // Mock send
+}
