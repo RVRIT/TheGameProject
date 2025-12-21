@@ -10,17 +10,6 @@
 #include <thread>
 #include <optional>
 
-//@TODO:
-/* - read comments at DisplayGameState method
-   - completely delete AI functionalities (nu folosim asa ceva)
-   - eliminam functia de skip la turn, maxim se termina jocul cand nu mai poti juca carti
-   sau se scoate player-ul respectiv din joc in functie de cum ni se permite
-   - sa se adauge functie de calculat scor, return scor:  se incepe cu un scor de 100 de puncte si se pierd
-   puncte per fiecare carte nejucata la final de joc sau la eliminarea jucatorului X
-   in caz ca ni se permite sa continuam jocul dupa ce un player a fost eliminat scorul se calculeaza astfel:
-     scor = 100 - carti_in_mana - (carti_in_teanc / numar_de_jucatori)
-	 si gamestate intoarce lista de jucatori in ordinea scorurilor (locul 1, 2, 3 si scorul lor)
-*/
 Game::Game(const std::vector<std::string_view>& playerNames)
 	: m_piles{
 		Pile(PileType::ASCENDING),
@@ -149,8 +138,6 @@ void Game::nextTurn() noexcept
 
 void Game::drawCardsForCurrentPlayer()
 {
-	// functia asta o sa iti traga un singur card (ultimul din varf) la fiecare click, nu primeste
-	// cardsToDraw ca parametru
 
 	Player& player = m_players[m_currentPlayerIndex];
 
@@ -253,10 +240,8 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 
 int Game::calculateScore(const Player& player) const
 {
-	// Formula: 100 - carti_in_mana - (carti_in_teanc / numar_jucatori)
 	int score = 100;
 
-	// Scadem cartile din mana
 	score -= static_cast<int>(player.getHandSize());
 	if (!m_players.empty())
 	{

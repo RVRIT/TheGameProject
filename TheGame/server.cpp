@@ -237,7 +237,24 @@ int main() {
             return crow::response(400, "Cannot start game");
         }
         });
+    CROW_ROUTE(app, "/lobby/<int>/game/play-card").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("handIndex") || !body.has("pileIndex")) {
+            return crow::response(400, "Invalid JSON");
+        }
 
+        int handIndex = body["handIndex"].i();
+        int pileIndex = body["pileIndex"].i();
+        //needs check if player trying to play-card is current player
+        bool success = GameManager::getInstance().attemptPlayCardInLobby(lobbyId, 0, handIndex, pileIndex);
+
+        if (success) {
+            return crow::response(200, "Card played");
+        }
+        else {
+            return crow::response(400, "Illegal move or not your turn");
+        }
+        });
     CROW_ROUTE(app, "/lobby/<int>/game/end-turn").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("playerId")) {

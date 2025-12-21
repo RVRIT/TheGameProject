@@ -62,7 +62,7 @@ bool Lobby::tryStartGame(int requestPlayerId) {
         playerNames.push_back(p.name);
     }
 
-    game = std::make_unique<Game>(playerNames);
+    // game = std::make_unique<Game>(playerNames);
 
     status = LobbyStatus::InProgress;
 
