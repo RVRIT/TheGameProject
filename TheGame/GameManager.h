@@ -17,8 +17,8 @@ public:
     bool sendChatMessage(int lobbyId, const std::string& sender, const std::string& content);
     std::vector<ChatMessage> getChatHistory(int lobbyId) const;
     bool setPlayerReady(int lobbyId, int playerId, bool ready);
-    bool attemptPlayCardInLobby(int lobbyId, int playerId, size_t handIndex, size_t pileIndex);
-    bool attemptEndTurnInLobby(int lobbyId, int playerId);
+    bool attemptPlayCardInLobby(int lobbyId, const std::string& playerName, size_t handIndex, size_t pileIndex);
+    bool attemptEndTurnInLobby(int lobbyId, const std::string& playerName);
     bool attemptStartGame(int lobbyId, int requestPlayerId);
     Lobby* getLobby(int lobbyId);
 

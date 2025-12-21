@@ -15,7 +15,13 @@
 class Game
 {
 public:
-	
+	std::string getCurrentPlayerName() const {
+		if (m_players.empty()) return "";
+		return std::string(m_players[m_currentPlayerIndex].getName());
+	}
+	bool isPlayerTurn(const std::string& playerName) const {
+		return getCurrentPlayerName() == playerName;
+	}
 	explicit Game(const std::vector<std::string_view>& PlayerNames);
 
 	// COMENZI PENTRU CLIENT(SFML)

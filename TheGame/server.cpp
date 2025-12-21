@@ -273,47 +273,49 @@ int main() {
 
         return crow::response(200, res.dump());
         });
-    CROW_ROUTE(app, "/lobby/<int>/game/play-card").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+    CROW_ROUTE(app, "/lobby/<int>/game/play").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
-        if (!body || !body.has("handIndex") || !body.has("pileIndex")) {
-            return crow::response(400, "Invalid JSON");
+        if (!body || !body.has("playerName") || !body.has("handIndex") || !body.has("pileIndex")) {
+            return crow::response(400, "Invalid params: playerName, handIndex, pileIndex required");
         }
 
-        int handIndex = body["handIndex"].i();
-        int pileIndex = body["pileIndex"].i();
-        //needs check if player trying to play-card is current player
-        bool success = GameManager::getInstance().attemptPlayCardInLobby(lobbyId, 0, handIndex, pileIndex);
+        std::string playerName = body["playerName"].s();
+        size_t handIndex = body["handIndex"].u();
+        size_t pileIndex = body["pileIndex"].u();
 
-        if (success) {
-            return crow::response(200, "Card played");
-        }
-        else {
-            return crow::response(400, "Illegal move or not your turn");
-        }
-        });
-    CROW_ROUTE(app, "/lobby/<int>/game/end-turn").methods("POST"_method)([](const crow::request& req, int lobbyId) {
-        auto body = crow::json::load(req.body);
-        if (!body || !body.has("playerId")) {
-            return crow::response(400, "Missing 'playerId'");
-        }
-
-        int playerId = body["playerId"].i();
-
-        auto& gameManager = GameManager::getInstance();
-        bool success = gameManager.attemptEndTurnInLobby(lobbyId, playerId);
+        bool success = GameManager::getInstance().attemptPlayCardInLobby(lobbyId, playerName, handIndex, pileIndex);
 
         crow::json::wvalue res;
         if (success) {
             res["status"] = "success";
-            res["message"] = "Turn ended";
             return crow::response(200, res.dump());
         }
         else {
             res["status"] = "error";
-            res["message"] = "Cannot end turn (too few cards played, not your turn, or game over)";
-            return crow::response(400, res.dump());
+            res["message"] = "Not your turn or invalid move";
+            return crow::response(403, res.dump());
         }
         });
 
+    CROW_ROUTE(app, "/lobby/<int>/game/end-turn").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("playerName")) {
+            return crow::response(400, "Missing 'playerName'");
+        }
+
+        std::string playerName = body["playerName"].s();
+        bool success = GameManager::getInstance().attemptEndTurnInLobby(lobbyId, playerName);
+
+        crow::json::wvalue res;
+        if (success) {
+            res["status"] = "success";
+            return crow::response(200, res.dump());
+        }
+        else {
+            res["status"] = "error";
+            res["message"] = "Cannot end turn (not your turn or rules not met)";
+            return crow::response(400, res.dump());
+        }
+        });
     app.port(18080).multithreaded().run();
 }

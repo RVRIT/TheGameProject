@@ -61,8 +61,7 @@ Lobby* GameManager::getLobby(int lobbyId)
     return nullptr;
 }
 
-bool GameManager::attemptPlayCardInLobby(int lobbyId, int playerId, size_t handIndex, size_t pileIndex)
-{
+bool GameManager::attemptPlayCardInLobby(int lobbyId, const std::string& playerName, size_t handIndex, size_t pileIndex) {
     std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);
     if (it == m_lobbies.end()) return false;
@@ -73,27 +72,28 @@ bool GameManager::attemptPlayCardInLobby(int lobbyId, int playerId, size_t handI
     Game* game = lobby.getGame();
     if (!game) return false;
 
-    // Validate playerId is current player (to be added later)
+    if (!game->isPlayerTurn(playerName)) {
+        return false;
+    }
 
     return game->attemptPlayCard(handIndex, pileIndex);
 }
 
-bool GameManager::attemptEndTurnInLobby(int lobbyId, int playerId)
-{
+bool GameManager::attemptEndTurnInLobby(int lobbyId, const std::string& playerName) {
     std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);
     if (it == m_lobbies.end()) return false;
 
     Lobby& lobby = it->second;
-    if (lobby.getStatus() != LobbyStatus::InProgress) return false;
-
     Game* game = lobby.getGame();
-    if (!game) return false;
+    if (!game || lobby.getStatus() != LobbyStatus::InProgress) return false;
 
-    // Validate playerId is current player (to be added later)
+    if (!game->isPlayerTurn(playerName)) {
+        return false;
+    }
+
     return game->attemptEndTurn();
 }
-
 bool GameManager::attemptStartGame(int lobbyId, int requestPlayerId)
 {
     std::lock_guard<std::mutex> lock(m_mtx);

@@ -57,12 +57,11 @@ bool Lobby::tryStartGame(int requestPlayerId) {
         return false;
     }
 
-    std::vector<std::string> playerNames;
-    for (const auto& p : players) {
-        playerNames.push_back(p.name);
-    }
+    std::vector<std::string_view> namesView;
+    for (const auto& p : players) namesView.push_back(p.name);
 
-    // game = std::make_unique<Game>(playerNames);
+    game = std::make_unique<Game>(namesView);
+    status = LobbyStatus::InProgress;
 
     status = LobbyStatus::InProgress;
 
