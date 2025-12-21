@@ -237,6 +237,42 @@ int main() {
             return crow::response(400, "Cannot start game");
         }
         });
+    CROW_ROUTE(app, "/lobby/<int>/game/state").methods("GET"_method)([](const crow::request& req, int lobbyId) {
+        char* playerNameQuery = req.url_params.get("playerName");
+        if (!playerNameQuery) return crow::response(400, "Missing 'playerName' query param");
+
+        std::string playerName = playerNameQuery;
+        Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
+
+        if (!lobby || lobby->getStatus() != LobbyStatus::InProgress) {
+            return crow::response(404, "Game not in progress");
+        }
+
+        Game* game = lobby->getGame();
+        if (!game) return crow::response(500, "Game instance missing");
+
+        GameSnapshot snap = game->getSnapshot(playerName);
+
+        crow::json::wvalue res;
+        res["deckSize"] = snap.deckSize;
+        res["isGameOver"] = snap.isGameOver;
+        res["playerWon"] = snap.playerWon;
+
+        for (size_t i = 0; i < snap.piles.size(); ++i) {
+            res["piles"][i]["type"] = snap.piles[i].type;
+            res["piles"][i]["topValue"] = snap.piles[i].topValue;
+        }
+
+        res["myHand"] = snap.myHand;
+
+        for (size_t i = 0; i < snap.opponents.size(); ++i) {
+            res["opponents"][i]["name"] = snap.opponents[i].name;
+            res["opponents"][i]["cardCount"] = snap.opponents[i].cardCount;
+            res["opponents"][i]["isTurn"] = snap.opponents[i].isCurrentPlayer;
+        }
+
+        return crow::response(200, res.dump());
+        });
     CROW_ROUTE(app, "/lobby/<int>/game/play-card").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("handIndex") || !body.has("pileIndex")) {
