@@ -16,7 +16,7 @@ MainMenu::MainMenu(sf::Font& fontRef, SceneManager& manager, sf::RenderWindow& w
         [this]() {
             sceneManager.popScene();
         }),
-    settingsButton("assets/settings.png", { 700.f, 1000.f },
+    settingsButton("assets/settings.png", { 700.f, 600.f },
         [this]() {
             std::cout << "Settings clicked (Implementation pending wrapper)\n";
         })

@@ -1,51 +1,33 @@
 #include "SettingsMenu.h"
-#include <iostream>
 
-SettingsMenu::SettingsMenu(sf::RenderWindow& windowRef,std::function<void()> onBack, std::function<void()> onToggleFullscreen)
-    : window(windowRef),
-    backCallback(onBack),
-    fullscreenCallback(onToggleFullscreen),
-
-    backButton("assets/back.png", { 100.f, 600.f }, [&]() {
-    backCallback(); 
-        }),
-
-    fullscreenButton("assets/fullscreen.png", { 700.f, 200.f }, [&]() {
-    fullscreenCallback(); 
-        }),
-
-    volumeButton("assets/volume.png", { 700.f, 350.f }, [&]() {})
+SettingsMenu::SettingsMenu(sf::RenderWindow& win, SceneManager& mgr, sf::Font& f)
+    : window(win), sceneManager(mgr), font(f),
+    backButton("assets/back.png", { 50.f, 50.f }, [&]() { mgr.popScene(); }), 
+    fullscreenButton("assets/fullscreen.png", { 400.f, 300.f }, []() {}),
+    volumeButton("assets/volume.png", { 400.f, 450.f }, []() {})
 {
-    bgTexture.loadFromFile("assets/backgroundSettings.png");
-    background.setTexture(bgTexture);
+    if (bgTexture.loadFromFile("assets/backgroundSettings.png")) {
+        background.setTexture(bgTexture);
+    }
 
-    float scaleX = static_cast<float>(window.getSize().x) / bgTexture.getSize().x;
-    float scaleY = static_cast<float>(window.getSize().y) / bgTexture.getSize().y;
-    background.setScale(scaleX, scaleY);
+    titleText.setFont(font);
+    titleText.setString("Settings");
+    titleText.setPosition(500, 50);
 }
 
-void SettingsMenu::draw() {
-    window.clear();
-    window.draw(background);
-    backButton.draw(window);
-    fullscreenButton.draw(window);
-    volumeButton.draw(window);
-}
-
-void SettingsMenu::handleInput(const sf::Event& event) {
+void SettingsMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
     backButton.handleEvent(event, mousePos);
     fullscreenButton.handleEvent(event, mousePos);
     volumeButton.handleEvent(event, mousePos);
 }
 
-void SettingsMenu::updateBackgroundScale() {
-    sf::Vector2u win = window.getSize();
-    sf::Vector2u tex = bgTexture.getSize();
+void SettingsMenu::update(sf::Time dt) {}
 
-    background.setScale(
-        float(win.x) / tex.x,
-        float(win.y) / tex.y
-    );
+void SettingsMenu::draw(sf::RenderWindow& window) {
+    window.draw(background);
+    window.draw(titleText);
+    backButton.draw(window);
+    fullscreenButton.draw(window);
+    volumeButton.draw(window);
 }
