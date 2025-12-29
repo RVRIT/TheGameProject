@@ -25,4 +25,16 @@ private:
     sf::Texture bgTexture;
     sf::Sprite background;
     sf::Text titleText;
+
+    sf::Text volumeText;
+    sf::RectangleShape sliderBar;      
+    sf::RectangleShape sliderFill;     
+    sf::CircleShape sliderHandle;      
+
+    bool isDragging = false;           
+    float currentVolume = 50.0f;       
+
+    void updateSliderVisuals();
+
+    
 };
