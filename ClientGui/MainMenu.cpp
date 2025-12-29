@@ -18,7 +18,7 @@ MainMenu::MainMenu(sf::Font& fontRef, SceneManager& manager, sf::RenderWindow& w
         }),
     settingsButton("assets/settings.png", { 700.f, 600.f },
         [this]() {
-            std::cout << "Settings clicked (Implementation pending wrapper)\n";
+            sceneManager.pushScene(std::make_unique<SettingsMenu>(window, sceneManager, font));
         })
 {
     bgTexture.loadFromFile("assets/backgroundMainMenu.png");
