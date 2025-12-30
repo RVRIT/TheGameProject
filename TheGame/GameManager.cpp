@@ -61,6 +61,21 @@ Lobby* GameManager::getLobby(int lobbyId)
     return nullptr;
 }
 
+bool GameManager::leaveLobby(int lobbyId, const std::string& playerName)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    auto it = m_lobbies.find(lobbyId);
+    if (it == m_lobbies.end()) return false;
+
+    
+     //  it->second.removePlayerByName(playerName);   //needs to be implemented in Lobby
+
+    if (it->second.getPlayers().empty()) {
+        m_lobbies.erase(it);
+    }
+    return true;
+}
+
 bool GameManager::attemptPlayCardInLobby(int lobbyId, const std::string& playerName, size_t handIndex, size_t pileIndex) {
     std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);

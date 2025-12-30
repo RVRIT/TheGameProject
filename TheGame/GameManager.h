@@ -22,6 +22,7 @@ public:
     bool attemptStartGame(int lobbyId, int requestPlayerId);
     Lobby* getLobby(int lobbyId);
 
+    bool leaveLobby(int lobbyId, const std::string& playerName);
 
 private:
     GameManager() = default;
