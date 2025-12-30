@@ -4,6 +4,7 @@
 #include <crow.h>
 #include "GameManager.h"
 #include "Lobby.h"
+#include <ctime>
 
 using namespace crow;
 
@@ -393,5 +394,21 @@ int main() {
             return crow::response(400, "Player not found");
         }
         });
+
+    CROW_ROUTE(app, "/server/info").methods("GET"_method)([]() {
+        crow::json::wvalue res;
+        res["status"] = "online";
+        res["version"] = "1.0.0";
+        res["game"] = "The Game";
+
+        std::time_t t = std::time(nullptr);
+        char mbstr[100];
+        if (std::strftime(mbstr, sizeof(mbstr), "%c", std::localtime(&t))) {
+            res["server_time"] = mbstr;
+        }
+
+        return crow::response(200, res.dump());
+        });
+
     app.port(18080).multithreaded().run();
 }
