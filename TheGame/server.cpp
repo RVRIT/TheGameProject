@@ -317,5 +317,24 @@ int main() {
             return crow::response(400, res.dump());
         }
         });
+
+    CROW_ROUTE(app, "/user/stats").methods("GET"_method)([](const crow::request& req) {
+        char* usernameParam = req.url_params.get("username");
+        if (!usernameParam) return crow::response(400, "Missing username param");
+
+        std::string username = usernameParam;
+
+        auto userOpt = DBManager::getInstance().getUserStats(username);
+        if (!userOpt) return crow::response(404, "User not found");
+
+        crow::json::wvalue res;
+        res["username"] = userOpt->username;
+        res["games_played"] = userOpt->games_played;
+        res["games_won"] = userOpt->games_won;
+        res["hours_played"] = userOpt->hours_played;
+        res["rating"] = userOpt->rating;
+
+        return crow::response(200, res.dump());
+        });
     app.port(18080).multithreaded().run();
 }
