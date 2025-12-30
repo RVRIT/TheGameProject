@@ -336,5 +336,31 @@ int main() {
 
         return crow::response(200, res.dump());
         });
+
+    CROW_ROUTE(app, "/lobby/<int>/restart").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("playerName")) {
+            return crow::response(400, "Missing 'playerName'");
+        }
+
+        std::string playerName = body["playerName"].s();
+
+        Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
+        if (!lobby) {
+            return crow::response(404, "Lobby not found");
+        }
+
+        bool success = GameManager::getInstance().restartGame(lobbyId);
+
+        if (success) {
+            crow::json::wvalue res;
+            res["status"] = "success";
+            res["message"] = "Game reset to lobby state";
+            return crow::response(200, res.dump());
+        }
+        else {
+            return crow::response(500, "Could not restart game");
+        }
+        });
     app.port(18080).multithreaded().run();
 }

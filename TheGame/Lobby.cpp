@@ -138,4 +138,15 @@ crow::json::wvalue Lobby::getStateJSON() const {
     j["chat"] = std::move(chatArr);
 
     return j;
+
+}
+
+void Lobby::resetGame() {
+    game.reset();
+
+    status = LobbyStatus::Waiting;
+
+    for (auto& p : players) {
+        p.isReady = false;
+    }
 }

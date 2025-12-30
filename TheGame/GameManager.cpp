@@ -120,3 +120,12 @@ bool GameManager::attemptStartGame(int lobbyId, int requestPlayerId)
 
     return it->second.tryStartGame(requestPlayerId);
 }
+
+bool GameManager::restartGame(int lobbyId) {
+    Lobby* lobby = getLobby(lobbyId);
+    if (lobby) {
+        lobby->resetGame();
+        return true;
+    }
+    return false;
+}
