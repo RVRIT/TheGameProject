@@ -21,9 +21,9 @@ public:
     bool attemptEndTurnInLobby(int lobbyId, const std::string& playerName);
     bool attemptStartGame(int lobbyId, int requestPlayerId);
     Lobby* getLobby(int lobbyId);
-
     bool leaveLobby(int lobbyId, const std::string& playerName);
-
+    bool restartGame(int lobbyId);
+    bool kickPlayer(int lobbyId, const std::string& playerName);
 private:
     GameManager() = default;
     std::map<int, Lobby> m_lobbies;

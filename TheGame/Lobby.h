@@ -52,6 +52,7 @@ public:
     LobbyStatus getStatus() const;
     void setMAX_PLAYERS(int max);
     crow::json::wvalue getStateJSON() const;
+    void resetGame();
 
 private:
     int id;
