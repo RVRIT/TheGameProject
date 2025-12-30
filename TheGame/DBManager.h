@@ -70,6 +70,8 @@ public:
     bool registerUser(const std::string& username, const std::string& hashed_password);
     std::optional<std::string> getHashedPassword(const std::string& username);
     std::optional<int> getUserId(const std::string& username);
+    std::optional<User> getUserStats(const std::string& username);
+
 
     // Removed Lobby functions (create, join, etc.) from here.
     // We now handle active lobbies in the GameManager (in memory) using a map.
