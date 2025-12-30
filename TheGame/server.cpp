@@ -362,5 +362,36 @@ int main() {
             return crow::response(500, "Could not restart game");
         }
         });
+
+    CROW_ROUTE(app, "/lobby/<int>/kick").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("hostName") || !body.has("targetName")) {
+            return crow::response(400, "Missing 'hostName' or 'targetName'");
+        }
+
+        std::string hostName = body["hostName"].s();
+        std::string targetName = body["targetName"].s();
+
+        Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
+        if (!lobby) return crow::response(404, "Lobby not found");
+
+        auto players = lobby->getPlayers();
+        if (players.empty() || players[0].name != hostName) {
+            return crow::response(403, "Only the host can kick players");
+        }
+
+        if (hostName == targetName) {
+            return crow::response(400, "Host cannot kick themselves");
+        }
+
+        bool success = GameManager::getInstance().kickPlayer(lobbyId, targetName);
+
+        if (success) {
+            return crow::response(200, "Player kicked successfully");
+        }
+        else {
+            return crow::response(400, "Player not found");
+        }
+        });
     app.port(18080).multithreaded().run();
 }

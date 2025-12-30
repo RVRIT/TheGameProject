@@ -143,9 +143,7 @@ crow::json::wvalue Lobby::getStateJSON() const {
 
 void Lobby::resetGame() {
     game.reset();
-
     status = LobbyStatus::Waiting;
-
     for (auto& p : players) {
         p.isReady = false;
     }

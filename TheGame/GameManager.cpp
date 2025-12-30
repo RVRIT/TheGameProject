@@ -129,3 +129,22 @@ bool GameManager::restartGame(int lobbyId) {
     }
     return false;
 }
+
+bool GameManager::kickPlayer(int lobbyId, const std::string& playerName) {
+    Lobby* lobby = getLobby(lobbyId);
+    if (!lobby) return false;
+
+    int playerIdToRemove = -1;
+    for (const auto& p : lobby->getPlayers()) {
+        if (p.name == playerName) {
+            playerIdToRemove = p.id;
+            break;
+        }
+    }
+
+    if (playerIdToRemove != -1) {
+        lobby->removePlayer(playerIdToRemove);
+        return true;
+    }
+    return false;
+}
