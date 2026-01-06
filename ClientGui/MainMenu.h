@@ -2,13 +2,15 @@
 #include <SFML/Graphics.hpp>
 #include "button.h"
 #include "Scene.h"  
+#include "NetworkClient.h"
 
 class SceneManager; 
 
 class MainMenu : public Scene 
 {
 public:
-    MainMenu(sf::Font& font, SceneManager& manager, sf::RenderWindow& window);
+    NetworkClient& client;
+    MainMenu(sf::Font& font, NetworkClient& client, SceneManager& manager, sf::RenderWindow& window);
 
     virtual void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     virtual void update(sf::Time dt) override;
@@ -25,4 +27,6 @@ private:
     Button settingsButton;
     sf::Texture bgTexture;
     sf::Sprite background;
+
+    Button createLobbyButton;
 };

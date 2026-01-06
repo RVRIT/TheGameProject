@@ -1,6 +1,8 @@
 #include "NetworkClient.h"
 #include <iostream>
 #include <string>
+#include "json.hpp"
+using json = nlohmann::json;
 
 NetworkClient::NetworkClient(const std::string& host, unsigned short port)
     : host(host), port(port) {
@@ -92,4 +94,35 @@ std::string NetworkClient::getLobbyStatus() {
 
 void NetworkClient::sendLobbyMessage(const std::string& msg) {
     // Mock send
+}
+
+int NetworkClient::createLobby(const std::string& hostName) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    // 1. Prepare the request
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/create"); // The endpoint the server listens to
+    request.setField("Content-Type", "application/json");
+
+    // 2. Create JSON Payload
+    json payload;
+    payload["hostName"] = hostName;
+    request.setBody(payload.dump());
+
+    // 3. Send and Wait for Response
+    sf::Http::Response response = http.sendRequest(request);
+
+    // 4. Check if it worked
+    if (response.getStatus() == sf::Http::Response::Ok ||
+        response.getStatus() == sf::Http::Response::Created) {
+
+        // Parse the response to get the Lobby ID
+        auto jsonResponse = json::parse(response.getBody());
+        if (jsonResponse.contains("lobbyId")) {
+            return jsonResponse["lobbyId"];
+        }
+    }
+
+    return -1; // Return -1 if it failed
 }

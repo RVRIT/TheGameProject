@@ -15,4 +15,6 @@ public:
     bool sendStartGameRequest(int lobbyId, int playerId);
     std::string getLobbyStatus();
     void sendLobbyMessage(const std::string& msg);
+
+    int createLobby(const std::string& hostName);
 };
