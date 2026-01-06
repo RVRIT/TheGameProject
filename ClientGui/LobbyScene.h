@@ -3,12 +3,14 @@
 #include "SceneManager.h"
 #include "NetworkClient.h"
 #include "Button.h"
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include "json.hpp"
 #include "TextBox.h"
-#include <vector>
 
 class LobbyScene : public Scene {
 public:
-    LobbyScene(sf::Font& font, NetworkClient& client, SceneManager& manager);
+    LobbyScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId);
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
@@ -18,19 +20,18 @@ private:
     sf::Font& font;
     NetworkClient& client;
     SceneManager& sceneManager;
+    int lobbyId;
 
     sf::Text titleText;
-    sf::Text playerListText;
-    sf::Text chatLogText;
-
-    TextBox chatInput;
-    Button sendButton;
-    Button readyButton;
+    sf::Text infoText;
     Button backButton;
+    
+    sf::RectangleShape chatBackground;
+    sf::Text chatDisplay;       
+    TextBox chatInput;         
+    Button sendButton;
 
-    sf::Time timeSinceLastUpdate;
+    std::string chatHistoryString; 
 
-	//TO IMPLEMENT 
-    void fetchLobbyState();
-    void parseLobbyJson(const std::string& jsonStr);
+    void parseLobbyState(const std::string& jsonStr);
 };

@@ -76,53 +76,81 @@ bool NetworkClient::sendStartGameRequest(int lobbyId, int playerId) {
     }
 }
 
-std::string NetworkClient::getLobbyStatus() {
-    // MOCK DATA
-    return R"({
-        "status": "Waiting",
-        "MAX_PLAYERS": 5,
-        "players": [
-            { "id": 0, "name": "RVR", "isReady": true },
-            { "id": 1, "name": "PlayerTwo", "isReady": false }
-        ],
-        "chat": [
-            { "sender": "RVR", "content": "Hello!" },
-            { "sender": "PlayerTwo", "content": "Ready?" }
-        ]
-    })";
+std::string NetworkClient::getLobbyState(int lobbyId) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Get);
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/state");
+    sf::Http::Response response = http.sendRequest(request);
+
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        return response.getBody();
+    }
+    return "";
 }
 
-void NetworkClient::sendLobbyMessage(const std::string& msg) {
-    // Mock send
+bool NetworkClient::sendLobbyChat(int lobbyId, const std::string& playerName, const std::string& msg) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/chat");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["lobbyId"] = lobbyId;
+    payload["sender"] = playerName;
+    payload["content"] = msg;
+
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
 }
 
 int NetworkClient::createLobby(const std::string& hostName) {
     sf::Http http(host, port);
     sf::Http::Request request;
 
-    // 1. Prepare the request
     request.setMethod(sf::Http::Request::Post);
-    request.setUri("/lobby/create"); // The endpoint the server listens to
+    request.setUri("/lobby/create");
     request.setField("Content-Type", "application/json");
 
-    // 2. Create JSON Payload
     json payload;
     payload["hostName"] = hostName;
     request.setBody(payload.dump());
 
-    // 3. Send and Wait for Response
     sf::Http::Response response = http.sendRequest(request);
 
-    // 4. Check if it worked
-    if (response.getStatus() == sf::Http::Response::Ok ||
-        response.getStatus() == sf::Http::Response::Created) {
-
-        // Parse the response to get the Lobby ID
-        auto jsonResponse = json::parse(response.getBody());
-        if (jsonResponse.contains("lobbyId")) {
-            return jsonResponse["lobbyId"];
+    if (response.getStatus() == sf::Http::Response::Created || response.getStatus() == sf::Http::Response::Ok) {
+        try {
+            auto jsonResponse = json::parse(response.getBody());
+            if (jsonResponse.contains("lobbyId")) {
+                return jsonResponse["lobbyId"];
+            }
+        }
+        catch (...) {
+            std::cerr << "Error parsing lobby creation response\n";
         }
     }
+    return -1; 
+}
 
-    return -1; // Return -1 if it failed
+bool NetworkClient::joinLobby(int lobbyId, const std::string& playerName) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/join");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["lobbyId"] = lobbyId;
+    payload["playerName"] = playerName;
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    return (response.getStatus() == sf::Http::Response::Ok);
 }

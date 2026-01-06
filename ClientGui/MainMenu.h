@@ -3,6 +3,8 @@
 #include "button.h"
 #include "Scene.h"  
 #include "NetworkClient.h"
+#include "TextBox.h"
+
 
 class SceneManager; 
 
@@ -28,5 +30,8 @@ private:
     sf::Texture bgTexture;
     sf::Sprite background;
 
-    Button createLobbyButton;
+    Button createLobbyButton;   
+
+    TextBox lobbyIdInput;
+    Button joinLobbyButton;
 };

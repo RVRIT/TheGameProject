@@ -3,41 +3,66 @@
 #include "SettingsMenu.h" 
 #include "GameScene.h" 
 #include <memory>
+#include "LobbyScene.h"
 
 
 MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& windowRef)
     : font(fontRef),
-    client(clientRef), // <--- FIX: Initialize client
+    client(clientRef), 
     sceneManager(manager),
     window(windowRef),
-    // --- BUTTON INITIALIZERS START ---
     playButton("assets/play.png", { 700.f, 200.f },
         [this]() {
-            // Pass client to GameScene (we will fix GameScene later)
            // sceneManager.changeScene(std::make_unique<GameScene>(font, sceneManager, window, client));
             std::cout << "Play clicked\n";
-        }), // <--- COMMA HERE IS CRITICAL
+        }), 
 
     exitButton("assets/exit.png", { 700.f, 400.f },
         [this]() {
             sceneManager.popScene();
-        }), // <--- COMMA HERE IS CRITICAL
+        }), 
 
     settingsButton("assets/settings.png", { 700.f, 600.f },
         [this]() {
             sceneManager.pushScene(std::make_unique<SettingsMenu>(window, sceneManager, font));
-        }), // <--- COMMA HERE IS CRITICAL
+        }), 
 
     createLobbyButton("assets/btn_create_lobby.png", { 700.f, 500.f },
         [this]() {
             std::cout << "Requesting Lobby Creation...\n";
-            // Call the client function (make sure createLobby exists in NetworkClient)
-            // int id = client.createLobby("PlayerHost"); 
-            // if(id != -1) std::cout << "Lobby Created: " << id << "\n";
+            int newLobbyId = this->client.createLobby("Player1"); // We will use real names later
+
+            if (newLobbyId != -1) {
+                std::cout << "Success! Entering Lobby " << newLobbyId << "\n";
+                sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager, newLobbyId));
+            }
+            else {
+                std::cout << "Failed to create lobby. Is Server running?\n";
+            }
+        }),
+    lobbyIdInput(font, { 700.f, 650.f }, { 200.f, 40.f }),
+    joinLobbyButton("assets/btn_join.png", { 500.f, 650.f }, [this]() {
+    std::string idStr = lobbyIdInput.getText();
+    if (idStr.empty()) return;
+
+    try {
+        int id = std::stoi(idStr); 
+        std::cout << "Joining Lobby " << id << "...\n";
+
+        if (client.joinLobby(id, "Player2")) { // Hardcoded name for now
+            std::cout << "Join Successful!\n";
+            sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager, id));
+        }
+        else {
+            std::cout << "Failed to join lobby.\n";
+        }
+    }
+    catch (...) {
+        std::cout << "Invalid Lobby ID format.\n";
+    }
         })
-    // --- BUTTON INITIALIZERS END ---
+
 {
-    // Constructor Body
     if (bgTexture.loadFromFile("assets/backgroundMainMenu.png")) {
         background.setTexture(bgTexture);
         updateBackgroundScale();
@@ -55,6 +80,8 @@ void MainMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     exitButton.handleEvent(event, mousePos);
     settingsButton.handleEvent(event, mousePos);
 	createLobbyButton.handleEvent(event, mousePos);
+	lobbyIdInput.handleEvent(event);
+	joinLobbyButton.handleEvent(event, mousePos);
 }
 
 void MainMenu::draw(sf::RenderWindow& window) {
@@ -63,6 +90,8 @@ void MainMenu::draw(sf::RenderWindow& window) {
     exitButton.draw(window);
     settingsButton.draw(window);
 	createLobbyButton.draw(window);
+    lobbyIdInput.draw(window);
+	joinLobbyButton.draw(window);
 }
 
 void MainMenu::updateBackgroundScale()

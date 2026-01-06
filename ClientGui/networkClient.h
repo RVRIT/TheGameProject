@@ -17,4 +17,8 @@ public:
     void sendLobbyMessage(const std::string& msg);
 
     int createLobby(const std::string& hostName);
+    bool joinLobby(int lobbyId, const std::string& playerName);
+
+    std::string getLobbyState(int lobbyId);
+    bool sendLobbyChat(int lobbyId, const std::string& playerName, const std::string& message);
 };

@@ -10,7 +10,7 @@ public:
 	void draw(sf::RenderWindow& window);
 	std::string getText() const { return input; }
 	void setSelected(bool sel) { selected = sel; }
-
+	void clear();
 
 private:
 	sf::RectangleShape box;

@@ -39,3 +39,7 @@ void TextBox::draw(sf::RenderWindow& window) {
     window.draw(box);
     window.draw(text);
 }
+
+void TextBox::clear() {
+    this->text.setString("");
+}
