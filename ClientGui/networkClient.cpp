@@ -154,3 +154,21 @@ bool NetworkClient::joinLobby(int lobbyId, const std::string& playerName) {
 
     return (response.getStatus() == sf::Http::Response::Ok);
 }
+
+bool NetworkClient::setPlayerReady(int lobbyId, int playerId, bool ready) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/ready");
+    request.setMethod(sf::Http::Request::Post);
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["playerId"] = playerId;
+    payload["ready"] = ready;
+
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
+}

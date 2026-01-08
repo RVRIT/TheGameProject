@@ -1,20 +1,31 @@
 #include "LobbyScene.h"
-#include <string>
+#include "json.hpp"
+#include <iostream>
+
 using json = nlohmann::json;
 
-LobbyScene::LobbyScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id)
-    : font(f), client(c), sceneManager(mgr), lobbyId(id),
-    backButton("assets/back.png", { 50.f, 50.f }, [&]() { mgr.popScene(); }) ,
+LobbyScene::LobbyScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, std::string name)
+    : font(f), client(c), sceneManager(mgr), lobbyId(id), myName(name),
+
+ 
+    backButton("assets/back.png", { 50.f, 50.f }, [&]() { mgr.popScene(); }),
+
     chatInput(font, { 800.f, 600.f }, { 300.f, 40.f }),
 
-    // Initialize Send Button (Next to Input)
     sendButton("assets/btn_send.png", { 1120.f, 600.f }, [this]() {
     std::string msg = chatInput.getText();
     if (!msg.empty()) {
-        // Send to Server (Hardcoded name "Player" for now)
-        client.sendLobbyChat(lobbyId, "Me", msg);
-        chatInput.clear(); // You might need to add a clear() method to TextBox
+        client.sendLobbyChat(lobbyId, myName, msg);
+        chatInput.clear();
     }
+        }),
+
+    readyButton("assets/btn_not_ready.png", { 500.f, 500.f }, [this]() {
+    if (myPlayerId == -1) return; 
+
+    amIReady = !amIReady;
+    client.setPlayerReady(lobbyId, myPlayerId, amIReady);
+    std::cout << "Ready clicked. State: " << amIReady << "\n";
         })
 {
     titleText.setFont(font);
@@ -28,7 +39,7 @@ LobbyScene::LobbyScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id)
     infoText.setPosition(400, 150);
 
     chatBackground.setSize({ 400.f, 500.f });
-    chatBackground.setFillColor(sf::Color(0, 0, 0, 150)); // Semi-transparent black
+    chatBackground.setFillColor(sf::Color(0, 0, 0, 150));
     chatBackground.setPosition(800.f, 50.f);
 
     chatDisplay.setFont(font);
@@ -39,17 +50,18 @@ LobbyScene::LobbyScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id)
 
 void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
     backButton.handleEvent(event, mousePos);
-	chatInput.handleEvent(event);
-	sendButton.handleEvent(event, mousePos);
-    
+    sendButton.handleEvent(event, mousePos);
+    readyButton.handleEvent(event, mousePos); 
+    chatInput.handleEvent(event);
+	readyButton.handleEvent(event, mousePos);
 }
 
 void LobbyScene::update(sf::Time dt) {
     static float timer = 0.0f;
     timer += dt.asSeconds();
 
-    // Poll every 0.5 seconds for snappier chat
     if (timer > 0.5f) {
         timer = 0.0f;
         std::string state = client.getLobbyState(lobbyId);
@@ -58,15 +70,19 @@ void LobbyScene::update(sf::Time dt) {
 }
 
 void LobbyScene::draw(sf::RenderWindow& window) {
-    window.clear(sf::Color(50, 50, 50)); // Dark Grey Background
+    window.clear(sf::Color(50, 50, 50));
+
     window.draw(titleText);
     window.draw(infoText);
+
     backButton.draw(window);
-	window.draw(chatBackground);
+    readyButton.draw(window); 
+
+    window.draw(chatBackground);
     window.draw(chatDisplay);
     chatInput.draw(window);
-	sendButton.draw(window);
-
+    sendButton.draw(window);
+	readyButton.draw(window);
 }
 
 void LobbyScene::parseLobbyState(const std::string& jsonStr) {
@@ -75,16 +91,23 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
     try {
         auto j = json::parse(jsonStr);
 
-        // 1. Parse Players (Update Info Text)
-        std::string pList = "Players in Lobby:\n";
+        std::string pList = "Players:\n";
         if (j.contains("players")) {
             for (const auto& p : j["players"]) {
-                pList += "- " + std::string(p["name"]) + "\n";
+                std::string pName = p["name"];
+                int pId = p["id"];
+                bool isReady = p["isReady"];
+
+                if (pName == myName) {
+                    myPlayerId = pId;
+                }
+
+                std::string status = isReady ? " [READY]" : " [...]";
+                pList += "- " + pName + status + "\n";
             }
         }
         infoText.setString(pList);
 
-        // 2. Parse Chat (Update Chat Display)
         std::string cHist = "";
         if (j.contains("chat")) {
             for (const auto& msg : j["chat"]) {
@@ -95,6 +118,6 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
 
     }
     catch (...) {
-        // Ignore parsing errors for now
+       
     }
 }

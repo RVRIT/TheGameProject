@@ -21,4 +21,6 @@ public:
 
     std::string getLobbyState(int lobbyId);
     bool sendLobbyChat(int lobbyId, const std::string& playerName, const std::string& message);
+
+    bool setPlayerReady(int lobbyId, int playerId, bool ready);
 };
