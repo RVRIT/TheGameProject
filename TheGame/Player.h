@@ -17,7 +17,6 @@ private:
 	static size_t s_nextId;
 	size_t m_id;
 	std::string m_name;
-	
 	CardCollection m_hand;
 	
 

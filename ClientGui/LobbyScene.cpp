@@ -55,7 +55,7 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     sendButton.handleEvent(event, mousePos);
     readyButton.handleEvent(event, mousePos); 
     chatInput.handleEvent(event);
-	readyButton.handleEvent(event, mousePos);
+	//readyButton.handleEvent(event, mousePos);
 }
 
 void LobbyScene::update(sf::Time dt) {
@@ -102,8 +102,8 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                     myPlayerId = pId;
                 }
 
-                std::string status = isReady ? " [READY]" : " [...]";
-                pList += "- " + pName + status + "\n";
+                std::string m_status = isReady ? " [READY]" : " [...]";
+                pList += "- " + pName + m_status + "\n";
             }
         }
         infoText.setString(pList);

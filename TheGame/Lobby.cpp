@@ -1,24 +1,24 @@
 #include "lobby.h"
 #include <algorithm>
 bool Lobby::addPlayer(const std::string& name) {
-    if (status != LobbyStatus::Waiting || players.size() >= MAX_PLAYERS) {
+    if (m_status != LobbyStatus::Waiting || m_players.size() >= MAX_PLAYERS) {
         return false;
     }
-    int newId = static_cast<int>(players.size());
-    players.push_back({newId, name, false});
+    int newId = static_cast<int>(m_players.size());
+    m_players.push_back({newId, name, false});
     return true;
 }
 
 void Lobby::removePlayer(int id) {
-    players.erase(
-        std::remove_if(players.begin(), players.end(),
+    m_players.erase(
+        std::remove_if(m_players.begin(), m_players.end(),
             [id](const PlayerInfo& p) { return p.id == id; }),
-        players.end()
+        m_players.end()
     );
 }
 
 bool Lobby::setPlayerReady(int id, bool ready) {
-    for (auto& p : players) {
+    for (auto& p : m_players) {
         if (p.id == id) {
             p.isReady = ready;
             return true;
@@ -28,8 +28,8 @@ bool Lobby::setPlayerReady(int id, bool ready) {
 }
 
 bool Lobby::isAllReady() const {
-    if (players.empty()) return false;
-    for (const auto& p : players) {
+    if (m_players.empty()) return false;
+    for (const auto& p : m_players) {
         if (!p.isReady) return false;
     }
     return true;
@@ -38,18 +38,18 @@ bool Lobby::isAllReady() const {
 bool Lobby::sendChatMessage(const std::string& sender, const std::string& content) {
     if (content.empty() || sender.empty()) return false;
 
-    chatHistory.push_back({ sender, content });
-    if (chatHistory.size() > MAX_CHAT_MESSAGES) {
-        chatHistory.erase(chatHistory.begin());
+    m_chatHistory.push_back({ sender, content });
+    if (m_chatHistory.size() > MAX_CHAT_MESSAGES) {
+        m_chatHistory.erase(m_chatHistory.begin());
     }
     return true;
 }
 bool Lobby::tryStartGame(int requestPlayerId) {
-    if (players.size() < 2) {
+    if (m_players.size() < 2) {
         return false;
     }
 
-    if (players.empty() || players[0].id != requestPlayerId) {
+    if (m_players.empty() || m_players[0].id != requestPlayerId) {
         return false;
     }
 
@@ -58,18 +58,18 @@ bool Lobby::tryStartGame(int requestPlayerId) {
     }
 
     std::vector<std::string_view> namesView;
-    for (const auto& p : players) namesView.push_back(p.name);
+    for (const auto& p : m_players) namesView.push_back(p.name);
 
-    game = std::make_unique<Game>(namesView);
-    status = LobbyStatus::InProgress;
+    m_game = std::make_unique<Game>(namesView);
+    m_status = LobbyStatus::InProgress;
 
-    status = LobbyStatus::InProgress;
+    m_status = LobbyStatus::InProgress;
 
     return true;
 }
 
 std::vector<ChatMessage> Lobby::getChatHistory() const {
-    return chatHistory;
+    return m_chatHistory;
 }
 
 GameSnapshot Lobby::CreateGameSnapshot() {
@@ -80,9 +80,9 @@ GameSnapshot Lobby::CreateGameSnapshot() {
         return snapshot;
     }
 
-    status = LobbyStatus::InProgress;
+    m_status = LobbyStatus::InProgress;
 
-    for (const auto& p : players) {
+    for (const auto& p : m_players) {
         OtherPlayerInfo opi;
         opi.name = p.name;
         opi.cardCount = 0;
@@ -99,22 +99,22 @@ GameSnapshot Lobby::CreateGameSnapshot() {
 }
 
 const std::vector<PlayerInfo>& Lobby::getPlayers() const {
-    return players;
+    return m_players;
 }
 
 LobbyStatus Lobby::getStatus() const {
-    return status;
+    return m_status;
 }
 
 
-crow::json::wvalue Lobby::getStateJSON() const {
+crow::json::wvalue Lobby::getStateJson() const {
     crow::json::wvalue j;
 
     // Status
-    if (status == LobbyStatus::Waiting) {
+    if (m_status == LobbyStatus::Waiting) {
         j["status"] = "Waiting";
     }
-    else if (status == LobbyStatus::InProgress) {
+    else if (m_status == LobbyStatus::InProgress) {
         j["status"] = "InProgress";
     }
     else {
@@ -124,16 +124,16 @@ crow::json::wvalue Lobby::getStateJSON() const {
     j["MAX_PLAYERS"] = static_cast<int>(MAX_PLAYERS);
 
     crow::json::wvalue playersArr;
-    for (size_t i = 0; i < players.size(); ++i) {
-        playersArr[i]["id"] = players[i].id;
-        playersArr[i]["name"] = players[i].name;
-        playersArr[i]["isReady"] = players[i].isReady;
+    for (size_t i = 0; i < m_players.size(); ++i) {
+        playersArr[i]["id"] = m_players[i].id;
+        playersArr[i]["name"] = m_players[i].name;
+        playersArr[i]["isReady"] = m_players[i].isReady;
     }
     j["players"] = std::move(playersArr);
     crow::json::wvalue chatArr;
-    for (size_t i = 0; i < chatHistory.size(); ++i) {
-        chatArr[i]["sender"] = chatHistory[i].sender;
-        chatArr[i]["content"] = chatHistory[i].content;
+    for (size_t i = 0; i < m_chatHistory.size(); ++i) {
+        chatArr[i]["sender"] = m_chatHistory[i].sender;
+        chatArr[i]["content"] = m_chatHistory[i].content;
     }
     j["chat"] = std::move(chatArr);
 
@@ -142,9 +142,9 @@ crow::json::wvalue Lobby::getStateJSON() const {
 }
 
 void Lobby::resetGame() {
-    game.reset();
-    status = LobbyStatus::Waiting;
-    for (auto& p : players) {
+    m_game.reset();
+    m_status = LobbyStatus::Waiting;
+    for (auto& p : m_players) {
         p.isReady = false;
     }
 }

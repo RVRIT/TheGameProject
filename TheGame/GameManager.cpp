@@ -84,14 +84,14 @@ bool GameManager::attemptPlayCardInLobby(int lobbyId, const std::string& playerN
     Lobby& lobby = it->second;
     if (lobby.getStatus() != LobbyStatus::InProgress) return false;
 
-    Game* game = lobby.getGame();
-    if (!game) return false;
+    Game* m_game = lobby.getGame();
+    if (!m_game) return false;
 
-    if (!game->isPlayerTurn(playerName)) {
+    if (!m_game->isPlayerTurn(playerName)) {
         return false;
     }
 
-    return game->attemptPlayCard(handIndex, pileIndex);
+    return m_game->attemptPlayCard(handIndex, pileIndex);
 }
 
 bool GameManager::attemptEndTurnInLobby(int lobbyId, const std::string& playerName) {
@@ -100,14 +100,14 @@ bool GameManager::attemptEndTurnInLobby(int lobbyId, const std::string& playerNa
     if (it == m_lobbies.end()) return false;
 
     Lobby& lobby = it->second;
-    Game* game = lobby.getGame();
-    if (!game || lobby.getStatus() != LobbyStatus::InProgress) return false;
+    Game* m_game = lobby.getGame();
+    if (!m_game || lobby.getStatus() != LobbyStatus::InProgress) return false;
 
-    if (!game->isPlayerTurn(playerName)) {
+    if (!m_game->isPlayerTurn(playerName)) {
         return false;
     }
 
-    return game->attemptEndTurn();
+    return m_game->attemptEndTurn();
 }
 bool GameManager::attemptStartGame(int lobbyId, int requestPlayerId)
 {

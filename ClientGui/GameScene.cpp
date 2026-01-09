@@ -6,7 +6,7 @@ GameScene::GameScene(sf::Font& f, SceneManager& manager, sf::RenderWindow& windo
     sceneManager(manager),
     windowRef(window),
     endTurnButton("assets/BackButton.png", { 1050.f, 600.f }, [this]() {
-    if (game->attemptEndTurn()) {
+    if (m_game->attemptEndTurn()) {
         selectedHandIndex = -1;
         logAction("Turn Ended. Hand refilled.");
         refreshSnapshot();
@@ -19,8 +19,8 @@ GameScene::GameScene(sf::Font& f, SceneManager& manager, sf::RenderWindow& windo
     if (standardCursor.loadFromSystem(sf::Cursor::Arrow)) windowRef.setMouseCursor(standardCursor);
     if (handCursor.loadFromSystem(sf::Cursor::Hand)) {}
 
-    std::vector<std::string_view> players = { playerName };
-    game = std::make_unique<Game>(players);
+    std::vector<std::string_view> m_players = { playerName };
+    m_game = std::make_unique<Game>(m_players);
 
     statusText.setFont(font);
     statusText.setCharacterSize(24);
@@ -51,7 +51,7 @@ GameScene::GameScene(sf::Font& f, SceneManager& manager, sf::RenderWindow& windo
 }
 
 void GameScene::refreshSnapshot() {
-    currentSnapshot = game->getSnapshot(playerName);
+    currentSnapshot = m_game->getSnapshot(playerName);
 
     if (currentSnapshot.isGameOver) {
         if (currentSnapshot.playerWon) statusText.setString("VICTORY!");
@@ -138,7 +138,7 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window)
         for (int i = 0; i < (int)currentSnapshot.piles.size(); ++i) {
             if (getPileBounds(i).contains(mousePos)) {
                 if (selectedHandIndex != -1) {
-                    bool success = game->attemptPlayCard(selectedHandIndex, i);
+                    bool success = m_game->attemptPlayCard(selectedHandIndex, i);
 
                     if (success) {
                         int val = currentSnapshot.myHand[selectedHandIndex];

@@ -250,10 +250,10 @@ int main() {
             return crow::response(404, "Game not in progress");
         }
 
-        Game* game = lobby->getGame();
-        if (!game) return crow::response(500, "Game instance missing");
+        Game* m_game = lobby->getGame();
+        if (!m_game) return crow::response(500, "Game instance missing");
 
-        GameSnapshot snap = game->getSnapshot(playerName);
+        GameSnapshot snap = m_game->getSnapshot(playerName);
 
         crow::json::wvalue res;
         res["deckSize"] = snap.deckSize;
@@ -377,8 +377,8 @@ int main() {
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
         if (!lobby) return crow::response(404, "Lobby not found");
 
-        auto players = lobby->getPlayers();
-        if (players.empty() || players[0].name != hostName) {
+        auto m_players = lobby->getPlayers();
+        if (m_players.empty() || m_players[0].name != hostName) {
             return crow::response(403, "Only the host can kick players");
         }
 

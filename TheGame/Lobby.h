@@ -29,8 +29,8 @@ enum class LobbyStatus {
 class Lobby {
 public:
     Lobby() = default;
-    explicit Lobby(int id, const std::string& hostName, LobbyStatus status = LobbyStatus::Waiting)
-        : id{ id }, status{ status }
+    explicit Lobby(int id, const std::string& hostName, LobbyStatus m_status = LobbyStatus::Waiting)
+        : id{ id }, m_status{ m_status }
     {
         addPlayer(hostName);
     }
@@ -46,20 +46,19 @@ public:
     std::vector<ChatMessage> getChatHistory() const;
 
     GameSnapshot CreateGameSnapshot();
-    Game* getGame() { return game.get(); }
-    const Game* getGame() const { return game.get(); }
+    Game* getGame() { return m_game.get(); }
+    const Game* getGame() const { return m_game.get(); }
     const std::vector<PlayerInfo>& getPlayers() const;
     LobbyStatus getStatus() const;
-    void setMAX_PLAYERS(int max);
-    crow::json::wvalue getStateJSON() const;
+    crow::json::wvalue getStateJson() const;
     void resetGame();
 
 private:
     int id;
-    std::unique_ptr<Game> game;
-    std::vector<PlayerInfo> players;
-    std::vector<ChatMessage> chatHistory;
-    LobbyStatus status;
+    std::unique_ptr<Game> m_game;
+    std::vector<PlayerInfo> m_players;
+    std::vector<ChatMessage> m_chatHistory;
+    LobbyStatus m_status;
     static const size_t MAX_PLAYERS = 5;
     static const size_t MAX_CHAT_MESSAGES = 100;
 };

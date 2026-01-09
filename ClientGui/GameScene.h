@@ -22,7 +22,7 @@ private:
     SceneManager& sceneManager;
     sf::RenderWindow& windowRef;
 
-    std::unique_ptr<Game> game;
+    std::unique_ptr<Game> m_game;
     GameSnapshot currentSnapshot;
     std::string playerName = "Player1";
 

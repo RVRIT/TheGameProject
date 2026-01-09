@@ -10,8 +10,8 @@ bool DBManager::initialize(const std::string& db_path)
 
             std::filesystem::create_directories(path.parent_path());
         }
-        storage = std::make_unique<StorageType>(createStorage(db_path));
-        storage->sync_schema();
+        m_storage = std::make_unique<StorageType>(createStorage(db_path));
+        m_storage->sync_schema();
 
         std::cout << "DB initialized successfully at: " << db_path << std::endl;
         return true;
@@ -31,7 +31,7 @@ bool DBManager::insertGameSession(int user_id, int score)
     try {
 
         GameSession session{ -1, user_id, score, 0.0, "" }; // duration 0, result empty for now
-        storage->insert(session);
+        m_storage->insert(session);
         return true;
     }
     catch (...) {
@@ -43,7 +43,7 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
 {
     try {
 
-        auto user = storage->get<User>(user_id);
+        auto user = m_storage->get<User>(user_id);
 
         // changing values in the memory
         user.games_played++;
@@ -51,7 +51,7 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
         if (won) {
             user.games_won++;
         }
-        storage->update(user); //sending the update back to the database
+        m_storage->update(user); //sending the update back to the database
         return true;
     }
     catch (...) {
@@ -63,7 +63,7 @@ bool DBManager::checkExistingUser(const std::string& username)
 {
     try {
 
-        auto count = storage->count<User>(where(c(&User::username) == username));
+        auto count = m_storage->count<User>(where(c(&User::username) == username));
         return count > 0;
     }
     catch (...) {
@@ -77,7 +77,7 @@ bool DBManager::registerUser(const std::string& username, const std::string& has
         // ID -1 for auto increment
 
         User newUser{ -1, username, hashed_password, 0.0, 0.0, 0, 0 };
-        storage->insert(newUser);
+        m_storage->insert(newUser);
         return true;
     }
     catch (...) {
@@ -91,7 +91,7 @@ std::optional<std::string> DBManager::getHashedPassword(const std::string& usern
     try {
         // We search for users with this name (there should be at most 1 because of the UNIQUE constraint)    
 
-        auto users = storage->get_all<User>(where(c(&User::username) == username));
+        auto users = m_storage->get_all<User>(where(c(&User::username) == username));
 
         if (users.empty()) {
             return std::nullopt;
@@ -106,7 +106,7 @@ std::optional<std::string> DBManager::getHashedPassword(const std::string& usern
 std::optional<int> DBManager::getUserId(const std::string& username) {
    
     try {
-        auto users = storage->get_all<User>(where(c(&User::username) == username));
+        auto users = m_storage->get_all<User>(where(c(&User::username) == username));
 
         if (users.empty()) {
             return std::nullopt;
@@ -122,7 +122,7 @@ std::optional<User> DBManager::getUserStats(const std::string& username)
 {
     try {
         using namespace sqlite_orm;
-        auto users = storage->get_all<User>(where(c(&User::username) == username));
+        auto users = m_storage->get_all<User>(where(c(&User::username) == username));
         if (users.empty()) return std::nullopt;
         return users[0];
     }

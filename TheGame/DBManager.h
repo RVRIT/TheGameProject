@@ -82,5 +82,5 @@ public:
 
 private:
     DBManager() = default;
-    std::unique_ptr<StorageType> storage; // Smart pointer for orm storage
+    std::unique_ptr<StorageType> m_storage; // Smart pointer for orm storage
 };
