@@ -1,6 +1,7 @@
-#include "LobbyScene.h"
+﻿#include "LobbyScene.h"
 #include "json.hpp"
 #include <iostream>
+#include "GameScene.h"
 
 using json = nlohmann::json;
 
@@ -26,6 +27,18 @@ LobbyScene::LobbyScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id,
     amIReady = !amIReady;
     client.setPlayerReady(lobbyId, myPlayerId, amIReady);
     std::cout << "Ready clicked. State: " << amIReady << "\n";
+        }),
+
+    startGameButton("assets/play.png", { 400.f, 400.f }, [this]() {
+    std::cout << "Host clicked Start Game...\n";
+    if (myPlayerId != -1) {
+        if (client.startGame(lobbyId, myPlayerId)) {
+            std::cout << "Start signal sent successfully!\n";
+        }
+        else {
+            std::cout << "Failed to start (Not all ready? Not host?)\n";
+        }
+    }
         })
 {
     titleText.setFont(font);
@@ -55,7 +68,11 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     sendButton.handleEvent(event, mousePos);
     readyButton.handleEvent(event, mousePos); 
     chatInput.handleEvent(event);
-	//readyButton.handleEvent(event, mousePos);
+
+    if (isHost) {
+        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+        startGameButton.handleEvent(event, mousePos);
+    }
 }
 
 void LobbyScene::update(sf::Time dt) {
@@ -83,15 +100,30 @@ void LobbyScene::draw(sf::RenderWindow& window) {
     chatInput.draw(window);
     sendButton.draw(window);
 	readyButton.draw(window);
+
+    if (isHost) {
+        startGameButton.draw(window);
+    }
 }
 
 void LobbyScene::parseLobbyState(const std::string& jsonStr) {
     if (jsonStr.empty()) return;
-
     try {
         auto j = json::parse(jsonStr);
 
+        if (j.contains("status")) {
+            std::string status = j["status"];
+            if (status == "InProgress") {
+                std::cout << "Server says: Game InProgress! Switching scene...\n";
+
+                sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName));
+                return;
+            }
+        }
+
         std::string pList = "Players:\n";
+        bool firstPlayer = true;
+
         if (j.contains("players")) {
             for (const auto& p : j["players"]) {
                 std::string pName = p["name"];
@@ -102,22 +134,19 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                     myPlayerId = pId;
                 }
 
-                std::string m_status = isReady ? " [READY]" : " [...]";
-                pList += "- " + pName + m_status + "\n";
+                if (firstPlayer) {
+                    if (myPlayerId == pId) isHost = true;
+                    else isHost = false;
+                    firstPlayer = false;
+                }
+
+                std::string statusText = isReady ? " [READY]" : " [...]";
+                pList += "- " + pName + statusText + "\n";
             }
         }
         infoText.setString(pList);
 
-        std::string cHist = "";
-        if (j.contains("chat")) {
-            for (const auto& msg : j["chat"]) {
-                cHist += std::string(msg["sender"]) + ": " + std::string(msg["content"]) + "\n";
-            }
-        }
-        chatDisplay.setString(cHist);
 
     }
-    catch (...) {
-       
-    }
+    catch (...) {}
 }

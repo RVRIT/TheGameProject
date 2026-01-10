@@ -171,4 +171,72 @@ bool NetworkClient::setPlayerReady(int lobbyId, int playerId, bool ready) {
 
     sf::Http::Response response = http.sendRequest(request);
     return (response.getStatus() == sf::Http::Response::Ok);
+}                                                                         
+
+
+bool NetworkClient::startGame(int lobbyId, int playerId) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/start_game");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["lobbyId"] = lobbyId;
+    payload["playerId"] = playerId;
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
+}
+
+std::string NetworkClient::getGameState(int lobbyId, const std::string& playerName) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    std::string uri = "/lobby/" + std::to_string(lobbyId) + "/game/state?playerName=" + playerName;
+
+    request.setMethod(sf::Http::Request::Get);
+    request.setUri(uri);
+
+    sf::Http::Response response = http.sendRequest(request);
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        return response.getBody();
+    }
+    return "";
+}
+
+bool NetworkClient::playCard(int lobbyId, const std::string& playerName, int handIndex, int pileIndex) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/game/play");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["playerName"] = playerName;
+    payload["handIndex"] = handIndex;
+    payload["pileIndex"] = pileIndex;
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
+}
+
+bool NetworkClient::endTurn(int lobbyId, const std::string& playerName) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/game/end-turn");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["playerName"] = playerName;
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
 }

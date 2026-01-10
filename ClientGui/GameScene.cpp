@@ -1,283 +1,198 @@
-#include "GameScene.h"
+﻿#include "GameScene.h"
+#include "json.hpp"
 #include <iostream>
 
-GameScene::GameScene(sf::Font& f, SceneManager& manager, sf::RenderWindow& window)
-    : font(f),
-    sceneManager(manager),
-    windowRef(window),
-    endTurnButton("assets/BackButton.png", { 1050.f, 600.f }, [this]() {
-    if (m_game->attemptEndTurn()) {
-        selectedHandIndex = -1;
-        logAction("Turn Ended. Hand refilled.");
-        refreshSnapshot();
-    }
-    else {
-        logAction("Cannot end turn! Play minimum cards first.");
-    }
+using json = nlohmann::json;
+
+GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, std::string name)
+    : font(f), client(c), sceneManager(mgr), lobbyId(id), myName(name),
+    endTurnButton("assets/exit.png", { 1000.f, 600.f }, [this]() {
+    std::cout << "Requesting End Turn...\n";
+    this->client.endTurn(lobbyId, myName);
         })
 {
-    if (standardCursor.loadFromSystem(sf::Cursor::Arrow)) windowRef.setMouseCursor(standardCursor);
-    if (handCursor.loadFromSystem(sf::Cursor::Hand)) {}
-
-    std::vector<std::string_view> m_players = { playerName };
-    m_game = std::make_unique<Game>(m_players);
-
     statusText.setFont(font);
     statusText.setCharacterSize(24);
+    statusText.setPosition(50, 50);
     statusText.setFillColor(sf::Color::White);
-    statusText.setPosition(50.f, 30.f);
 
-    deckCountText.setFont(font);
-    deckCountText.setCharacterSize(20);
-    deckCountText.setFillColor(sf::Color::White);
-    deckCountText.setPosition(1100.f, 30.f);
-
-    turnInfoText.setFont(font);
-    turnInfoText.setCharacterSize(18);
-    turnInfoText.setFillColor(sf::Color::Yellow);
-    turnInfoText.setPosition(50.f, 70.f);
-
-    logBackground.setSize({ 450.f, 150.f });
-    logBackground.setFillColor(sf::Color(0, 0, 0, 150));
-    logBackground.setPosition(20.f, 550.f);
-
-    logText.setFont(font);
-    logText.setCharacterSize(14);
-    logText.setFillColor(sf::Color::White);
-    logText.setPosition(30.f, 560.f);
-
-    refreshSnapshot();
-    logAction("Game Started.");
+    deckInfoText.setFont(font);
+    deckInfoText.setCharacterSize(20);
+    deckInfoText.setPosition(50, 100);
+    deckInfoText.setFillColor(sf::Color::White);
 }
 
-void GameScene::refreshSnapshot() {
-    currentSnapshot = m_game->getSnapshot(playerName);
-
-    if (currentSnapshot.isGameOver) {
-        if (currentSnapshot.playerWon) statusText.setString("VICTORY!");
-        else statusText.setString("DEFEAT!");
-    }
-    else {
-        statusText.setString("Your Turn: " + playerName);
-    }
-    updateHUD();
-}
-
-void GameScene::logAction(const std::string& msg) {
-    gameLogs.push_back(msg);
-    if (gameLogs.size() > 6) gameLogs.erase(gameLogs.begin());
-
-    std::string fullString;
-    for (const auto& log : gameLogs) fullString += "> " + log + "\n";
-    logText.setString(fullString);
-}
-
-void GameScene::updateHUD() {
-    deckCountText.setString("Deck Size: " + std::to_string(currentSnapshot.deckSize));
-
-    std::string info = "Played: " + std::to_string(currentSnapshot.cardsPlayedThisTurn) +
-        " / Required: " + std::to_string(currentSnapshot.minCardsToPlay);
-    turnInfoText.setString(info);
-}
-
-bool GameScene::isMoveValid(int handIdx, int pileIdx) {
-    if (handIdx < 0 || handIdx >= (int)currentSnapshot.myHand.size()) return false;
-    if (pileIdx < 0 || pileIdx >= (int)currentSnapshot.piles.size()) return false;
-
-    int cardVal = currentSnapshot.myHand[handIdx];
-    const auto& pile = currentSnapshot.piles[pileIdx];
-    int topVal = pile.topValue;
-
-    if (pile.type == "ASC") {
-        return (cardVal > topVal) || (cardVal == topVal - 10);
-    }
-    else {
-        return (cardVal < topVal) || (cardVal == topVal + 10);
-    }
-}
-
-void GameScene::updateCursor(sf::RenderWindow& window) {
-    if (hoveredHandIndex != -1 || hoveredPileIndex != -1) {
-        window.setMouseCursor(handCursor);
-    }
-    else {
-        window.setMouseCursor(standardCursor);
-    }
-}
-
-void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window)
-{
+void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
     endTurnButton.handleEvent(event, mousePos);
 
-    if (event.type == sf::Event::MouseMoved) {
-        hoveredHandIndex = -1;
-        hoveredPileIndex = -1;
-
-        int handSize = (int)currentSnapshot.myHand.size();
-        for (int i = 0; i < handSize; ++i) {
-            if (getHandCardBounds(i, handSize).contains(mousePos)) {
-                hoveredHandIndex = i;
-                break;
-            }
-        }
-
-        for (int i = 0; i < (int)currentSnapshot.piles.size(); ++i) {
-            if (getPileBounds(i).contains(mousePos)) {
-                hoveredPileIndex = i;
-                break;
-            }
-        }
-        updateCursor(window);
-    }
-
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-        if (currentSnapshot.isGameOver) return;
 
-        for (int i = 0; i < (int)currentSnapshot.piles.size(); ++i) {
-            if (getPileBounds(i).contains(mousePos)) {
-                if (selectedHandIndex != -1) {
-                    bool success = m_game->attemptPlayCard(selectedHandIndex, i);
+        for (size_t i = 0; i < myHand.size(); ++i) {
+            if (myHand[i].bounds.contains(mousePos)) {
+                selectedHandIndex = static_cast<int>(i);
+                std::cout << "Selected card: " << myHand[i].value << "\n";
+                return; // Am găsit cartea, ieșim
+            }
+        }
 
-                    if (success) {
-                        int val = currentSnapshot.myHand[selectedHandIndex];
-                        logAction("Played " + std::to_string(val) + " on Pile " + std::to_string(i + 1));
+        if (selectedHandIndex != -1) {
+            for (size_t i = 0; i < piles.size(); ++i) {
+                if (piles[i].bounds.contains(mousePos)) {
+                    std::cout << "Playing card on Pile " << i << "...\n";
 
-                        if (selectedHandIndex >= (int)currentSnapshot.myHand.size() - 1) {
-                            selectedHandIndex = -1;
-                        }
-                        refreshSnapshot();
+                    if (client.playCard(lobbyId, myName, selectedHandIndex, static_cast<int>(i))) {
+                        std::cout << "Move accepted!\n";
+                        selectedHandIndex = -1; 
+                        update(sf::seconds(1.0f)); 
                     }
                     else {
-                        logAction("Invalid Move!");
+                        std::cout << "Move invalid!\n";
                     }
                 }
-                return;
             }
         }
-
-        int handSize = (int)currentSnapshot.myHand.size();
-        bool clickedCard = false;
-        for (int i = 0; i < handSize; ++i) {
-            if (getHandCardBounds(i, handSize).contains(mousePos)) {
-                if (selectedHandIndex == i) selectedHandIndex = -1;
-                else selectedHandIndex = i;
-                clickedCard = true;
-                break;
-            }
-        }
-        if (!clickedCard) selectedHandIndex = -1;
     }
 }
 
-void GameScene::update(sf::Time) {}
+void GameScene::update(sf::Time dt) {
+    static float timer = 0.0f;
+    timer += dt.asSeconds();
 
-void GameScene::draw(sf::RenderWindow& window)
-{
-    window.draw(logBackground);
-    window.draw(logText);
-    window.draw(statusText);
-    window.draw(deckCountText);
-    window.draw(turnInfoText);
-    endTurnButton.draw(window);
+    if (timer > 0.5f) {
+        timer = 0.0f;
+        std::string jsonState = client.getGameState(lobbyId, myName);
+        parseGameState(jsonState);
+    }
+}
 
-    for (size_t i = 0; i < currentSnapshot.piles.size(); ++i) {
-        sf::FloatRect bounds = getPileBounds((int)i);
-        const auto& pileInfo = currentSnapshot.piles[i];
+void GameScene::parseGameState(const std::string& jsonStr) {
+    if (jsonStr.empty()) return;
 
-        sf::RectangleShape pileShape({ bounds.width, bounds.height });
-        pileShape.setPosition(bounds.left, bounds.top);
-        pileShape.setOutlineThickness(3);
+    try {
+        auto j = json::parse(jsonStr);
 
-        if ((int)i == hoveredPileIndex) {
-            if (selectedHandIndex != -1) {
-                if (isMoveValid(selectedHandIndex, (int)i)) pileShape.setOutlineColor(sf::Color::Green);
-                else pileShape.setOutlineColor(sf::Color::Red);
+        piles.clear();
+        int pIndex = 0;
+        float startX = 300.f;
+        if (j.contains("piles")) {
+            for (const auto& p : j["piles"]) {
+                VisualPile vp;
+                vp.type = p["type"];
+                vp.topValue = p["topValue"];
+                vp.bounds = sf::FloatRect(startX + (pIndex * 150), 300.f, 100.f, 140.f);
+                piles.push_back(vp);
+                pIndex++;
             }
-            else {
-                pileShape.setOutlineColor(sf::Color::Yellow);
+        }
+
+        myHand.clear();
+        int cIndex = 0;
+        float handX = 150.f;
+        if (j.contains("myHand")) {
+            for (const auto& val : j["myHand"]) {
+                VisualCard vc;
+                vc.value = val;
+                vc.isSelected = (cIndex == selectedHandIndex);
+                vc.bounds = sf::FloatRect(handX + (cIndex * 90), 550.f, 70.f, 100.f);
+                myHand.push_back(vc);
+                cIndex++;
             }
+        }
+        if (selectedHandIndex >= static_cast<int>(myHand.size())) selectedHandIndex = -1;
+
+        opponents.clear();
+        if (j.contains("opponents")) {
+            for (const auto& opp : j["opponents"]) {
+                VisualOpponent vo;
+                vo.name = opp["name"];
+                vo.cardCount = opp["cardCount"];
+                vo.isTurn = opp["isTurn"];
+                opponents.push_back(vo);
+            }
+        }
+
+        if (j.contains("deckSize")) {
+            deckInfoText.setString("Deck: " + std::to_string(j["deckSize"].get<int>()));
+        }
+
+        if (j.contains("isGameOver") && j["isGameOver"].get<bool>()) {
+            bool won = j["playerWon"];
+            statusText.setString(won ? "VICTORY!" : "GAME OVER - DEFEAT");
+            statusText.setFillColor(won ? sf::Color::Green : sf::Color::Red);
         }
         else {
-            pileShape.setOutlineColor(sf::Color::White);
+            statusText.setString("Game In Progress");
         }
 
-        if (pileInfo.type == "ASC") pileShape.setFillColor(sf::Color(50, 150, 50));
-        else pileShape.setFillColor(sf::Color(150, 50, 50));
+    }
+    catch (...) {
+        std::cout << "Error parsing game state JSON\n";
+    }
+}
 
-        window.draw(pileShape);
+void GameScene::drawCard(sf::RenderWindow& window, int value, sf::Vector2f pos, bool isSelected, bool isPile, int pileType) {
+    sf::RectangleShape rect(sf::Vector2f(isPile ? 100.f : 70.f, isPile ? 140.f : 100.f));
+    rect.setPosition(pos);
 
-        sf::Text valText;
-        valText.setFont(font);
-        valText.setString(std::to_string(pileInfo.topValue));
-        valText.setCharacterSize(40);
-        valText.setFillColor(sf::Color::White);
+    if (isPile) {
+        rect.setFillColor(pileType == 0 ? sf::Color(240, 240, 240) : sf::Color(150, 150, 150));
+        rect.setOutlineColor(sf::Color::Yellow);
+    }
+    else {
+        rect.setFillColor(isSelected ? sf::Color::Green : sf::Color::White);
+    }
 
-        sf::FloatRect tb = valText.getLocalBounds();
-        valText.setOrigin(tb.left + tb.width / 2.0f, tb.top + tb.height / 2.0f);
-        valText.setPosition(bounds.left + bounds.width / 2.0f, bounds.top + bounds.height / 2.0f);
-        window.draw(valText);
+    rect.setOutlineThickness(2.f);
+    window.draw(rect);
 
+    sf::Text t;
+    t.setFont(font);
+    t.setString(std::to_string(value));
+    t.setCharacterSize(isPile ? 30 : 24);
+    t.setFillColor(sf::Color::Black);
+
+    sf::FloatRect tr = t.getLocalBounds();
+    t.setOrigin(tr.left + tr.width / 2.0f, tr.top + tr.height / 2.0f);
+    t.setPosition(pos.x + rect.getSize().x / 2.0f, pos.y + rect.getSize().y / 2.0f);
+    window.draw(t);
+
+    if (isPile) {
         sf::Text label;
         label.setFont(font);
-        label.setString(pileInfo.type);
-        label.setCharacterSize(16);
-        label.setPosition(bounds.left, bounds.top - 25);
+        label.setString(pileType == 0 ? "UP (1->99)" : "DOWN (100->2)");
+        label.setCharacterSize(12);
+        label.setFillColor(sf::Color::Red);
+        label.setPosition(pos.x, pos.y - 15.f);
         window.draw(label);
     }
+}
 
-    int handSize = (int)currentSnapshot.myHand.size();
-    for (int i = 0; i < handSize; ++i) {
-        sf::FloatRect bounds = getHandCardBounds(i, handSize);
-        sf::RectangleShape cardShape({ bounds.width, bounds.height });
-        cardShape.setPosition(bounds.left, bounds.top);
-        cardShape.setOutlineThickness(2);
+void GameScene::draw(sf::RenderWindow& window) {
+    window.clear(sf::Color(34, 139, 34)); 
 
-        float yOffset = 0.f;
-        if (i == selectedHandIndex) {
-            cardShape.setOutlineColor(sf::Color::Yellow);
-            cardShape.setFillColor(sf::Color(100, 100, 255));
-            yOffset = -20.f;
-        }
-        else if (i == hoveredHandIndex) {
-            cardShape.setOutlineColor(sf::Color::White);
-            cardShape.setFillColor(sf::Color(80, 80, 220));
-            yOffset = -10.f;
-        }
-        else {
-            cardShape.setOutlineColor(sf::Color::Black);
-            cardShape.setFillColor(sf::Color::Blue);
-        }
+    window.draw(statusText);
+    window.draw(deckInfoText);
+    endTurnButton.draw(window);
 
-        cardShape.move(0, yOffset);
-        window.draw(cardShape);
-
-        sf::Text cardVal;
-        cardVal.setFont(font);
-        cardVal.setString(std::to_string(currentSnapshot.myHand[i]));
-        cardVal.setCharacterSize(30);
-        cardVal.setFillColor(sf::Color::White);
-
-        sf::FloatRect tb = cardVal.getLocalBounds();
-        cardVal.setOrigin(tb.left + tb.width / 2.0f, tb.top + tb.height / 2.0f);
-        cardVal.setPosition(bounds.left + bounds.width / 2.0f, bounds.top + bounds.height / 2.0f + yOffset);
-        window.draw(cardVal);
+    float oppX = 300.f;
+    for (const auto& opp : opponents) {
+        sf::Text t;
+        t.setFont(font);
+        std::string marker = opp.isTurn ? " [TURN]" : "";
+        t.setString(opp.name + "\nCards: " + std::to_string(opp.cardCount) + marker);
+        t.setCharacterSize(18);
+        t.setPosition(oppX, 30.f);
+        t.setFillColor(opp.isTurn ? sf::Color::Yellow : sf::Color::White);
+        window.draw(t);
+        oppX += 250.f;
     }
-}
 
-sf::FloatRect GameScene::getPileBounds(int pileIndex) const {
-    float startX = 300.f;
-    float startY = 200.f;
-    float gapX = 200.f;
-    return sf::FloatRect(startX + pileIndex * gapX, startY, 120.f, 160.f);
-}
+    for (const auto& p : piles) {
+        drawCard(window, p.topValue, { p.bounds.left, p.bounds.top }, false, true, p.type);
+    }
 
-sf::FloatRect GameScene::getHandCardBounds(int cardIndex, int totalCards) const {
-    float cardWidth = 80.f;
-    float cardHeight = 120.f;
-    float gap = 15.f;
-    float totalWidth = (totalCards * cardWidth) + ((totalCards - 1) * gap);
-    float startX = (1280.f - totalWidth) / 2.0f;
-    return sf::FloatRect(startX + cardIndex * (cardWidth + gap), 550.f, cardWidth, cardHeight);
+    for (const auto& c : myHand) {
+        drawCard(window, c.value, { c.bounds.left, c.bounds.top }, c.isSelected, false);
+    }
 }

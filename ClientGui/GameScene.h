@@ -1,17 +1,32 @@
-#pragma once
-#include <SFML/Graphics.hpp>
+﻿#pragma once
 #include "Scene.h"
 #include "SceneManager.h"
-#include "Game.h"
+#include "NetworkClient.h"
 #include "Button.h"
-#include <memory>
+#include <SFML/Graphics.hpp>
 #include <vector>
-#include <string>
 
-class GameScene : public Scene
-{
+struct VisualCard {
+    int value;
+    sf::FloatRect bounds; // Zona de click
+    bool isSelected;
+};
+
+struct VisualPile {
+    int topValue;
+    int type; // 0 = Crescător (1->99), 1 = Descrescător (100->2)
+    sf::FloatRect bounds;
+};
+
+struct VisualOpponent {
+    std::string name;
+    int cardCount;
+    bool isTurn;
+};
+
+class GameScene : public Scene {
 public:
-    GameScene(sf::Font& font, SceneManager& manager, sf::RenderWindow& window);
+    GameScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId, std::string playerName);
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
@@ -19,34 +34,24 @@ public:
 
 private:
     sf::Font& font;
+    NetworkClient& client;
     SceneManager& sceneManager;
-    sf::RenderWindow& windowRef;
+    int lobbyId;
+    std::string myName;
 
-    std::unique_ptr<Game> m_game;
-    GameSnapshot currentSnapshot;
-    std::string playerName = "Player1";
-
+    // UI
     sf::Text statusText;
-    sf::Text logText;
-    sf::Text deckCountText;
-    sf::Text turnInfoText;
-    sf::RectangleShape logBackground;
+    sf::Text deckInfoText;
     Button endTurnButton;
 
-    int selectedHandIndex = -1;
-    int hoveredHandIndex = -1;
-    int hoveredPileIndex = -1;
+    // Datele jocului
+    std::vector<VisualCard> myHand;
+    std::vector<VisualPile> piles;
+    std::vector<VisualOpponent> opponents;
 
-    std::vector<std::string> gameLogs;
-    sf::Cursor standardCursor;
-    sf::Cursor handCursor;
+    int selectedHandIndex = -1; // -1 = nicio carte selectată
 
-    void refreshSnapshot();
-    void logAction(const std::string& msg);
-    void updateHUD();
-    void updateCursor(sf::RenderWindow& window);
-    bool isMoveValid(int handIdx, int pileIdx);
-
-    sf::FloatRect getPileBounds(int pileIndex) const;
-    sf::FloatRect getHandCardBounds(int cardIndex, int totalCards) const;
+    // Helpers
+    void parseGameState(const std::string& jsonStr);
+    void drawCard(sf::RenderWindow& window, int value, sf::Vector2f pos, bool isSelected, bool isPile, int pileType = -1);
 };

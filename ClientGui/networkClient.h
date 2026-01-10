@@ -23,4 +23,9 @@ public:
     bool sendLobbyChat(int lobbyId, const std::string& playerName, const std::string& message);
 
     bool setPlayerReady(int lobbyId, int playerId, bool ready);
+
+    bool startGame(int lobbyId, int playerId);
+    std::string getGameState(int lobbyId, const std::string& playerName);
+    bool playCard(int lobbyId, const std::string& playerName, int handIndex, int pileIndex);
+    bool endTurn(int lobbyId, const std::string& playerName);
 };

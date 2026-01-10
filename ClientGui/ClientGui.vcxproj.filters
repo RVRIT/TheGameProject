@@ -34,12 +34,6 @@
     <Filter Include="Source Files\tempCPPS">
       <UniqueIdentifier>{cee22637-22b7-49f1-b69b-c3206ff293e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\MOCKGAME">
-      <UniqueIdentifier>{bf3c9551-2b69-4170-a465-7e02c2feb64c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\MOCKGAME">
-      <UniqueIdentifier>{e46619e1-3ced-4f07-bf4f-7454bff7fc7f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -87,11 +81,11 @@
     <ClCompile Include="..\TheGame\Game.cpp">
       <Filter>Source Files\tempCPPS</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>Source Files\MOCKGAME</Filter>
-    </ClCompile>
     <ClCompile Include="LobbyScene.cpp">
       <Filter>Source Files\SCENES</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,10 +138,10 @@
     <ClInclude Include="json.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>Header Files\MOCKGAME</Filter>
-    </ClInclude>
     <ClInclude Include="LobbyScene.h">
+      <Filter>Header Files\SCENES</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
       <Filter>Header Files\SCENES</Filter>
     </ClInclude>
   </ItemGroup>

@@ -37,4 +37,7 @@ private:
     Button sendButton;
 
     void parseLobbyState(const std::string& jsonStr);
+
+    Button startGameButton;
+    bool isHost = false;
 };
