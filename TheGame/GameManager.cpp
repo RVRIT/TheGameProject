@@ -130,7 +130,7 @@ bool GameManager::restartGame(int lobbyId) {
     return false;
 }
 
-bool GameManager::kickPlayer(int lobbyId, const std::string& playerName) {
+bool GameManager::removePlayer(int lobbyId, const std::string& playerName) {
     Lobby* lobby = getLobby(lobbyId);
     if (!lobby) return false;
 

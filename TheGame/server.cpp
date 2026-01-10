@@ -189,7 +189,7 @@ int main() {
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
 
         if (lobby) {
-            crow::json::wvalue stateJson = lobby->getStateJSON();
+            crow::json::wvalue stateJson = lobby->getStateJson();
             crow::response res(200, stateJson.dump());
             res.set_header("Content-Type", "application/json");
             return res;
@@ -386,7 +386,7 @@ int main() {
             return crow::response(400, "Host cannot kick themselves");
         }
 
-        bool success = GameManager::getInstance().kickPlayer(lobbyId, targetName);
+        bool success = GameManager::getInstance().removePlayer(lobbyId, targetName);
 
         if (success) {
             return crow::response(200, "Player kicked successfully");
@@ -395,7 +395,28 @@ int main() {
             return crow::response(400, "Player not found");
         }
         });
+    CROW_ROUTE(app, "/lobby/<int>/leave").methods("POST"_method)([](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("playerName")) {
+            return crow::response(400, "Missing 'playerName'");
+        }
 
+        std::string playerName = body["playerName"].s();
+
+        Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
+        if (!lobby) return crow::response(404, "Lobby not found");
+      
+
+
+        bool success = GameManager::getInstance().removePlayer(lobbyId, playerName);
+
+        if (success) {
+            return crow::response(200, "Left lobby successfully");
+        }
+        else {
+            return crow::response(400, "Player not found");
+        }
+        });
     CROW_ROUTE(app, "/server/info").methods("GET"_method)([]() {
         crow::json::wvalue res;
         res["status"] = "online";
