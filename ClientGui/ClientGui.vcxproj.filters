@@ -85,7 +85,7 @@
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\SCENES</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

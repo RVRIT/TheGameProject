@@ -1,42 +1,52 @@
-#include "MainMenu.h"
+﻿#include "MainMenu.h"
 #include "SceneManager.h"    
 #include "SettingsMenu.h" 
 #include "GameScene.h" 
 #include <memory>
 #include <iostream> 
 #include "LobbyScene.h"
+#include <cstdlib> 
+#include <ctime>   
 
-MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& windowRef)
+MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& windowRef, std::string username)
     : font(fontRef),
     client(clientRef),
     sceneManager(manager),
     window(windowRef),
+    currentUsername(username), // 2. MODIFICARE: Inițializăm variabila
 
-    playButton("assets/play.png", { 50.f, 50.f },
-        [this]() {
-            std::cout << "Play clicked\n";
+    // --- UI INITIALIZATION ---
+    playButton("assets/play.png", { 50.f, 50.f }, []() {
+    std::cout << "Play clicked\n";
         }),
 
-    createLobbyButton("assets/btn_create_lobby.png", { 50.f, 150.f },
-        [this]() {
-            std::string hostName = "Player1";
-            std::cout << "Requesting Lobby Creation...\n";
-            int newLobbyId = this->client.createLobby(hostName);
+    exitButton("assets/exit.png", { 50.f, 600.f }, [&]() { // Am mutat Exit jos la 800
+    sceneManager.popScene();
+        }),
 
-            if (newLobbyId != -1) {
-                std::cout << "Success! Entering Lobby " << newLobbyId << "\n";
-                sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager, newLobbyId, hostName));
-            }
-            else {
-                std::cout << "Failed to create lobby.\n";
-            }
+    settingsButton("assets/settings.png", { 50.f, 400.f }, [&]() {
+    sceneManager.pushScene(std::make_unique<SettingsMenu>(window, sceneManager, font));
+        }),
+
+    // CREATE LOBBY - Folosește currentUsername
+    createLobbyButton("assets/btn_create_lobby.png", { 50.f, 150.f }, [this]() {
+    std::string hostName = this->currentUsername; // Folosim numele real
+    std::cout << "Requesting Lobby Creation as " << hostName << "...\n";
+
+    int newLobbyId = this->client.createLobby(hostName);
+
+    if (newLobbyId != -1) {
+        sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager, newLobbyId, hostName));
+    }
         }),
 
     lobbyIdInput(font, { 50.f, 300.f }, { 200.f, 40.f }),
 
+
+    // JOIN LOBBY - Folosește currentUsername
     joinLobbyButton("assets/btn_join.png", { 270.f, 300.f }, [this]() {
     std::string idStr = lobbyIdInput.getText();
-    std::string joinerName = "Player2";
+    std::string joinerName = this->currentUsername; // Folosim numele real
 
     if (idStr.empty()) return;
     try {
@@ -46,16 +56,6 @@ MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& ma
         }
     }
     catch (...) {}
-        }),
-
-    settingsButton("assets/settings.png", { 50.f, 400.f },
-        [this]() {
-            sceneManager.pushScene(std::make_unique<SettingsMenu>(window, sceneManager, font));
-        }),
-
-    exitButton("assets/exit.png", { 50.f, 600.f },
-        [this]() {
-            sceneManager.popScene();
         })
 
 {

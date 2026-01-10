@@ -55,13 +55,25 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     }
 }
 
+
 void GameScene::update(sf::Time dt) {
     static float timer = 0.0f;
     timer += dt.asSeconds();
 
     if (timer > 0.5f) {
         timer = 0.0f;
+
         std::string jsonState = client.getGameState(lobbyId, myName);
+
+        /* --- DEBUG -
+        if (jsonState.empty()) {
+            std::cout << "[WARNING] Server returned EMPTY response!\n";
+        }
+        else {
+            std::cout << "[DEBUG] JSON received: " << jsonState << "\n";
+        }
+        */ 
+
         parseGameState(jsonState);
     }
 }
@@ -74,13 +86,21 @@ void GameScene::parseGameState(const std::string& jsonStr) {
 
         piles.clear();
         int pIndex = 0;
-        float startX = 300.f;
+        float startX = 300.f; 
+        
         if (j.contains("piles")) {
             for (const auto& p : j["piles"]) {
                 VisualPile vp;
-                vp.type = p["type"];
+                
+                std::string typeStr = p["type"]; 
+                if (typeStr == "ASC") {
+                    vp.type = 0; // 0 crescator
+                } else {
+					vp.type = 1; // 1 descrescator
+                }
+
                 vp.topValue = p["topValue"];
-                vp.bounds = sf::FloatRect(startX + (pIndex * 150), 300.f, 100.f, 140.f);
+                vp.bounds = sf::FloatRect(startX + (pIndex * 120), 300.f, 100.f, 140.f);
                 piles.push_back(vp);
                 pIndex++;
             }
@@ -94,7 +114,7 @@ void GameScene::parseGameState(const std::string& jsonStr) {
                 VisualCard vc;
                 vc.value = val;
                 vc.isSelected = (cIndex == selectedHandIndex);
-                vc.bounds = sf::FloatRect(handX + (cIndex * 90), 550.f, 70.f, 100.f);
+                vc.bounds = sf::FloatRect(handX + (cIndex * 80), 550.f, 70.f, 100.f);
                 myHand.push_back(vc);
                 cIndex++;
             }
@@ -107,7 +127,13 @@ void GameScene::parseGameState(const std::string& jsonStr) {
                 VisualOpponent vo;
                 vo.name = opp["name"];
                 vo.cardCount = opp["cardCount"];
-                vo.isTurn = opp["isTurn"];
+                
+                if(opp.contains("isTurn")) {
+                    vo.isTurn = opp["isTurn"];
+                } else {
+                    vo.isTurn = false;
+                }
+                
                 opponents.push_back(vo);
             }
         }
@@ -118,16 +144,15 @@ void GameScene::parseGameState(const std::string& jsonStr) {
 
         if (j.contains("isGameOver") && j["isGameOver"].get<bool>()) {
             bool won = j["playerWon"];
-            statusText.setString(won ? "VICTORY!" : "GAME OVER - DEFEAT");
+            statusText.setString(won ? "VICTORY!" : "GAME OVER");
             statusText.setFillColor(won ? sf::Color::Green : sf::Color::Red);
-        }
-        else {
+        } else {
             statusText.setString("Game In Progress");
+            statusText.setFillColor(sf::Color::White);
         }
 
-    }
-    catch (...) {
-        std::cout << "Error parsing game state JSON\n";
+    } catch (const std::exception& e) {
+        std::cout << "Error parsing JSON: " << e.what() << "\n";
     }
 }
 

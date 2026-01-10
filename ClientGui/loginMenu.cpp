@@ -28,7 +28,7 @@ LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& 
 			if (response.first) {
 				std::cout << "LOGIN SUCCESFUL!\n";
 				errorText.setString("");
-				sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window));
+				sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, usernameText));
 			}
 			else {
 				std::cout << "LOGIN FAILED! RAW JSON: " << response.second << '\n';

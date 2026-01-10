@@ -104,6 +104,8 @@ void LobbyScene::draw(sf::RenderWindow& window) {
     if (isHost) {
         startGameButton.draw(window);
     }
+
+
 }
 
 void LobbyScene::parseLobbyState(const std::string& jsonStr) {

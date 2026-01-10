@@ -4,6 +4,7 @@
 #include "Scene.h"  
 #include "NetworkClient.h"
 #include "TextBox.h"
+#include <string>
 
 
 class SceneManager; 
@@ -12,8 +13,7 @@ class MainMenu : public Scene
 {
 public:
     NetworkClient& client;
-    MainMenu(sf::Font& font, NetworkClient& client, SceneManager& manager, sf::RenderWindow& window);
-
+    MainMenu(sf::Font& font, NetworkClient& client, SceneManager& manager, sf::RenderWindow& window, std::string username);
     virtual void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     virtual void update(sf::Time dt) override;
     virtual void draw(sf::RenderWindow& window) override; 
@@ -34,4 +34,5 @@ private:
 
     TextBox lobbyIdInput;
     Button joinLobbyButton;
+    std::string currentUsername;
 };
