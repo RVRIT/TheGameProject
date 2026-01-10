@@ -9,7 +9,7 @@
 
 class LobbyScene : public Scene {
 public:
-    LobbyScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId, std::string playerName);
+    LobbyScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId, std::string playerName, sf::RenderWindow& window);
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
@@ -40,4 +40,6 @@ private:
 
     Button startGameButton;
     bool isHost = false;
+
+    sf::RenderWindow& window;
 };

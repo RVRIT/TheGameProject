@@ -5,11 +5,11 @@
 
 using json = nlohmann::json;
 
-LobbyScene::LobbyScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, std::string name)
-    : font(f), client(c), sceneManager(mgr), lobbyId(id), myName(name),
+LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, int id, std::string name, sf::RenderWindow& win)
+    : font(fontRef), client(clientRef), sceneManager(manager), lobbyId(id), myName(name), window(win),
 
  
-    backButton("assets/back.png", { 50.f, 50.f }, [&]() { mgr.popScene(); }),
+    backButton("assets/back.png", { 50.f, 50.f }, [&]() { manager.popScene(); }),
 
     chatInput(font, { 800.f, 600.f }, { 300.f, 40.f }),
 
@@ -118,7 +118,7 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
             if (status == "InProgress") {
                 std::cout << "Server says: Game InProgress! Switching scene...\n";
 
-                sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName));
+                sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName, window));
                 return;
             }
         }

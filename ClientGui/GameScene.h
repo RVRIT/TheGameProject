@@ -26,8 +26,7 @@ struct VisualOpponent {
 
 class GameScene : public Scene {
 public:
-    GameScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId, std::string playerName);
-
+    GameScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId, std::string playerName, sf::RenderWindow& window);
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
     void draw(sf::RenderWindow& window) override;
@@ -54,4 +53,9 @@ private:
     // Helpers
     void parseGameState(const std::string& jsonStr);
     void drawCard(sf::RenderWindow& window, int value, sf::Vector2f pos, bool isSelected, bool isPile, int pileType = -1);
+
+    Button backButton;  
+    bool isGameOver = false; 
+
+    sf::RenderWindow& window;
 };
