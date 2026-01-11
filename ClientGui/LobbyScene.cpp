@@ -73,6 +73,26 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
         startGameButton.handleEvent(event, mousePos);
     }
+
+    if (isHost && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+
+        float startY = 150.f;
+        float gapY = 40.f;
+
+        for (size_t i = 0; i < playerList.size(); ++i) {
+            if (playerList[i].first == myName) continue;
+
+            float currentY = startY + (i * gapY);
+
+            sf::FloatRect btnRect(350.f, currentY, 25.f, 25.f);
+
+            if (btnRect.contains(mousePos)) {
+                std::cout << "Kicking ID: " << playerList[i].first << "\n";
+
+                client.kickPlayer(lobbyId, myName, playerList[i].first);
+            }
+        }
+    }
 }
 
 void LobbyScene::update(sf::Time dt) {
@@ -105,6 +125,36 @@ void LobbyScene::draw(sf::RenderWindow& window) {
         startGameButton.draw(window);
     }
 
+    float startY = 150.f;
+    float gapY = 40.f;    
+
+    for (size_t i = 0; i < playerList.size(); ++i) {
+        float currentY = startY + (i * gapY);
+
+        sf::Text t;
+        t.setFont(font);
+        t.setString(playerList[i].second);
+        t.setCharacterSize(24);
+        t.setPosition(50.f, currentY);
+        t.setFillColor(sf::Color::White);
+        window.draw(t);
+
+        if (isHost && playerList[i].first != myName) {
+
+            sf::RectangleShape kickBtn(sf::Vector2f(25.f, 25.f));
+            kickBtn.setPosition(350.f, currentY);
+            kickBtn.setFillColor(sf::Color::Red);
+            kickBtn.setOutlineColor(sf::Color::White);
+            kickBtn.setOutlineThickness(1.f);
+            window.draw(kickBtn);
+
+            sf::Text xText("X", font, 18);
+            xText.setPosition(356.f, currentY - 2.f);
+            xText.setFillColor(sf::Color::White);
+            window.draw(xText);
+        }
+    }
+
 
 }
 
@@ -117,38 +167,38 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
             std::string status = j["status"];
             if (status == "InProgress") {
                 std::cout << "Server says: Game InProgress! Switching scene...\n";
-
                 sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName, window));
                 return;
             }
         }
 
-        std::string pList = "Players:\n";
+        playerList.clear();
         bool firstPlayer = true;
 
         if (j.contains("players")) {
             for (const auto& p : j["players"]) {
-                std::string pName = p["name"];
+                std::string pName = p["name"]; 
                 int pId = p["id"];
                 bool isReady = p["isReady"];
 
-                if (pName == myName) {
-                    myPlayerId = pId;
-                }
+                if (pName == myName) myPlayerId = pId;
 
                 if (firstPlayer) {
-                    if (myPlayerId == pId) isHost = true;
+                    if (pName == myName) isHost = true;
                     else isHost = false;
-                    firstPlayer = false;
+                    firstPlayer = false; 
                 }
 
-                std::string statusText = isReady ? " [READY]" : " [...]";
-                pList += "- " + pName + statusText + "\n";
+                std::string displayName = pName;
+
+                if (isReady) displayName += " [READY]";
+                else displayName += " [...]";
+
+                if (j["players"][0]["name"] == pName) displayName += " (Host)";
+
+                playerList.push_back({ pName, displayName });
             }
         }
-        infoText.setString(pList);
-
-
     }
     catch (...) {}
 }

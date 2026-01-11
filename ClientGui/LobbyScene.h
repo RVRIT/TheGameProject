@@ -42,4 +42,6 @@ private:
     bool isHost = false;
 
     sf::RenderWindow& window;
+
+    std::vector<std::pair<std::string, std::string>> playerList;
 };

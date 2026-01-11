@@ -28,4 +28,6 @@ public:
     std::string getGameState(int lobbyId, const std::string& playerName);
     bool playCard(int lobbyId, const std::string& playerName, int handIndex, int pileIndex);
     bool endTurn(int lobbyId, const std::string& playerName);
+
+    bool kickPlayer(int lobbyId, const std::string& hostName, const std::string& targetName);
 };

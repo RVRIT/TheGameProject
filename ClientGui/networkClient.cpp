@@ -240,3 +240,28 @@ bool NetworkClient::endTurn(int lobbyId, const std::string& playerName) {
     sf::Http::Response response = http.sendRequest(request);
     return (response.getStatus() == sf::Http::Response::Ok);
 }
+
+bool NetworkClient::kickPlayer(int lobbyId, const std::string& hostName, const std::string& targetName) {
+    sf::Http http(host, port);
+
+    json j;
+    j["hostName"] = hostName;
+    j["targetName"] = targetName; // Acum trimitem string-ul corect
+
+    std::string url = "/lobby/" + std::to_string(lobbyId) + "/kick";
+
+    sf::Http::Request req(url, sf::Http::Request::Post);
+    req.setBody(j.dump());
+    req.setField("Content-Type", "application/json");
+
+    sf::Http::Response response = http.sendRequest(req);
+
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        std::cout << "[CLIENT] Kick successful.\n";
+        return true;
+    }
+    else {
+        std::cout << "[CLIENT] Kick failed: " << response.getBody() << "\n";
+        return false;
+    }
+}

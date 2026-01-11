@@ -14,7 +14,7 @@
 
 int main() {
 
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "The Game");
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "The Game", sf::Style::Titlebar | sf::Style::Close);
 
     sf::Font font;
     font.loadFromFile("assets/PIXEL.TTF");
