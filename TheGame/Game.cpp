@@ -63,6 +63,8 @@ bool Game::attemptPlayCard(size_t handIndex, size_t pileIndex)
 		{
 			m_isGameOver = true;
 			m_playerWon = true;
+			saveGameResults();
+			return true;
 		}
 
 
@@ -253,4 +255,33 @@ int Game::calculateScore(const Player& player) const
 	}
 
 	return score;
+}
+
+void Game::saveGameResults()
+{
+	if (m_statsSaved) return;
+
+	auto endTime = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed = endTime - m_startTime;
+	double durationHours = elapsed.count() / 3600.0;
+
+	std::cout << "Saving stats... Duration: " << elapsed.count() << "s" << std::endl;
+
+	auto& db = DBManager::getInstance();
+
+	for (const auto& player : m_players)
+	{
+		auto userIdOpt = db.getUserId(player.getName());
+		if (userIdOpt.has_value())
+		{
+			int userId = userIdOpt.value();
+			int score = calculateScore(player);
+			std::string result = m_playerWon ? "Win" : "Loss";
+
+			db.insertGameSession(userId, score, elapsed.count(), result);
+
+			db.updateUserStats(userId, m_playerWon, durationHours);
+		}
+	}
+	m_statsSaved = true;
 }
