@@ -140,7 +140,17 @@ crow::json::wvalue Lobby::getStateJson() const {
     return j;
 
 }
-
+bool Lobby::isPlayerInLobby(const std::string& playerName)
+{
+    for (auto& p : m_players)
+    {
+        if (playerName == p.name)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 void Lobby::resetGame() {
     m_game.reset();
     m_status = LobbyStatus::Waiting;

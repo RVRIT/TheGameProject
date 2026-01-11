@@ -49,6 +49,7 @@ public:
     Game* getGame() { return m_game.get(); }
     const Game* getGame() const { return m_game.get(); }
     const std::vector<PlayerInfo>& getPlayers() const;
+    bool isPlayerInLobby(const std::string& playerName);
     LobbyStatus getStatus() const;
     crow::json::wvalue getStateJson() const;
     void resetGame();

@@ -21,6 +21,10 @@ bool GameManager::joinLobby(int lobbyId, const std::string& playerName)
     auto it = m_lobbies.find(lobbyId);
     if (it == m_lobbies.end())
         return false;
+    if (it->second.isPlayerInLobby(playerName))
+    {
+        return false;
+    }
     return it->second.addPlayer(playerName);
 }
 
