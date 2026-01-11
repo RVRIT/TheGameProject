@@ -10,28 +10,28 @@ Player::Player(std::string_view name)
 {
 }
 
-[[nodiscard]] size_t Player::getId() const noexcept
+size_t Player::getId() const noexcept
 {
 	return m_id;
 }
 
-[[nodiscard]] const std::string& Player::getName() const noexcept
+const std::string& Player::getName() const noexcept
 {
 	return m_name;
 }
 
-[[nodiscard]] const std::vector<Card>& Player::getHand() const noexcept
+const std::vector<Card>& Player::getHand() const noexcept
 {
 	return m_hand.getCards();
 }
 
-[[nodiscard]] size_t Player::getHandSize() const noexcept
+size_t Player::getHandSize() const noexcept
 {
 	return m_hand.count();
 }
 
 
-[[nodiscard]] std::vector<Player::Move> Player::findPossibleMoves(
+std::vector<Player::Move> Player::findPossibleMoves(
 	const std::array<Pile, 4>& piles) const
 {
 	std::vector<Move> possibleMoves;
@@ -61,7 +61,7 @@ void Player::addCard(const Card& card)
 	m_hand.add(card);
 }
 
-[[nodiscard]] Card Player::playCard(size_t handIndex)
+Card Player::playCard(size_t handIndex)
 {
 	return m_hand.removeAt(handIndex);
 }

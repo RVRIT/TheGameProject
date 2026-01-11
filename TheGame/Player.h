@@ -23,17 +23,17 @@ private:
 public:
 	explicit Player(std::string_view name);
 
-	[[nodiscard]] size_t getId() const noexcept;
-	[[nodiscard]] const std::string& getName() const noexcept;
-	[[nodiscard]] const std::vector<Card>& getHand() const noexcept;
-	[[nodiscard]] size_t getHandSize() const noexcept;
+	size_t getId() const noexcept;
+	const std::string& getName() const noexcept;
+	const std::vector<Card>& getHand() const noexcept;
+	size_t getHandSize() const noexcept;
 	
 
 	using Move = std::pair<size_t, size_t>;
-	[[nodiscard]] std::vector<Move> findPossibleMoves(
+	std::vector<Move> findPossibleMoves(
 		const std::array<Pile, 4>& piles) const;
 
 	void sortHand();
 	void addCard(const Card& card);
-	[[nodiscard]] Card playCard(size_t handIndex);
+	Card playCard(size_t handIndex);
 };

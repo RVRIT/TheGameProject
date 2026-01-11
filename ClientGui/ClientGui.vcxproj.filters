@@ -69,18 +69,6 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>
-    <ClCompile Include="..\TheGame\Deck.cpp">
-      <Filter>Source Files\tempCPPS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TheGame\Player.cpp">
-      <Filter>Source Files\tempCPPS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TheGame\Pile.cpp">
-      <Filter>Source Files\tempCPPS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TheGame\Game.cpp">
-      <Filter>Source Files\tempCPPS</Filter>
-    </ClCompile>
     <ClCompile Include="LobbyScene.cpp">
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>

@@ -2,14 +2,7 @@
 
 Pile::Pile(PileType type) : m_type{ type }, m_cardCount{0}
 {
-	if (m_type == PileType::ASCENDING)
-	{
-		m_topCardValue = 1;
-	}
-	else
-	{
-		m_topCardValue = 100;
-	}
+	m_topCardValue = (m_type == PileType::ASCENDING) ? START_VALUE_ASC : START_VALUE_DESC;
 }
 
 PileType Pile::getType() const
@@ -22,33 +15,29 @@ uint8_t Pile::getTopValue() const
 	return m_topCardValue;
 }
 
-bool Pile::canPlace(const Card& card) const noexcept
-{
+bool Pile::canPlace(const Card& card) const noexcept {
 	uint8_t val = card.getValue();
-
-	if (m_type == PileType::ASCENDING)
-	{
+	if (m_type == PileType::ASCENDING) {
 		if (val > m_topCardValue) return true;
-		if (val == m_topCardValue - 10) return true;
+		if (val == m_topCardValue - STEP_BACK_RULE) return true;
 	}
-	else
-	{
+	else {
 		if (val < m_topCardValue) return true;
-		if (val == m_topCardValue + 10) return true;
+		if (val == m_topCardValue + STEP_BACK_RULE) return true;
 	}
 	return false;
 }
 
-[[nodiscard]] bool Pile::isTenBackMove(const Card& card) const noexcept
+bool Pile::isTenBackMove(const Card& card) const noexcept
 {
 	uint8_t val = card.getValue();
 	if (m_type == PileType::ASCENDING)
 	{
-		return val == m_topCardValue - 10;
+		return val == m_topCardValue - STEP_BACK_RULE; 
 	}
 	else
 	{
-		return val == m_topCardValue + 10;
+		return val == m_topCardValue + STEP_BACK_RULE;
 	}
 }
 

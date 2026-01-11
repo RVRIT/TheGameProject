@@ -106,33 +106,31 @@ bool Game::attemptEndTurn()
 
 void Game::setupGame()
 {
-	switch (m_players.size())
-	{
-	case 1: m_initialHandSize = 8; break;
-	case 2: m_initialHandSize = 7; break;
-	default: m_initialHandSize = 6; break;
+	switch (m_players.size()) {
+	case 1: m_initialHandSize = HAND_SIZE_1_PLAYER; break;
+	case 2: m_initialHandSize = HAND_SIZE_2_PLAYERS; break;
+	default: m_initialHandSize = HAND_SIZE_3_PLUS_PLAYERS; break;
+
 	}
 
-	for (size_t i = 0; i < m_initialHandSize; ++i)
-	{
-		for (auto& player : m_players)
+		for (size_t i = 0; i < m_initialHandSize; ++i)
 		{
-			if (!m_deck.isEmpty())
+			for (auto& player : m_players)
 			{
-				Card drawnCard = m_deck.drawCard();
-				player.addCard(drawnCard);
+				if (!m_deck.isEmpty())
+				{
+					Card drawnCard = m_deck.drawCard();
+					player.addCard(drawnCard);
+				}
 			}
 		}
-	}
 
-	for (auto& player : m_players)
-	{
-		player.sortHand();
-	}
+		for (auto& player : m_players)
+		{
+			player.sortHand();
+		}
+	
 }
-
-
-
 void Game::nextTurn() noexcept
 {
 	m_cardsPlayedThisTurn = 0; // resetam 
@@ -159,17 +157,17 @@ void Game::drawCardsForCurrentPlayer()
 }
 
 
-[[nodiscard]] bool Game::canPlayerMakeAnyMove(const Player& player) const noexcept
+bool Game::canPlayerMakeAnyMove(const Player& player) const noexcept
 {
 	return !player.findPossibleMoves(m_piles).empty();
 }
 
 size_t Game::getMinCardsRequired() const // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
 {
-	return m_deck.isEmpty() ? 1 : 2;
+	return m_deck.isEmpty() ? MIN_CARDS_TO_PLAY_EMPTY_DECK : MIN_CARDS_TO_PLAY_NORMAL;
 }
 
-[[nodiscard]] bool Game::checkWinCondition() const noexcept
+bool Game::checkWinCondition() const noexcept
 {
 	if (m_deck.isEmpty())
 	{

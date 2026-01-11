@@ -140,9 +140,7 @@ bool DBManager::insertGameSession(int user_id, int score, double duration, const
     }
 }
 // Lobby functions were removed because we moved the logic to GameManager.
-// We don't need to save temporary lobbies in the database anymore.
-
-
+// We don't need to save temporary lobbies in the database anymore
 
 
 

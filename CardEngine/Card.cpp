@@ -10,11 +10,11 @@ Card::Card() :m_value(0)
 Card::Card(uint8_t value)
 	:m_value(value)
 {
-	if (m_value < 2 || m_value>99)
+	if (m_value < MIN_CARD_VALUE || m_value> MAX_CARD_VALUE)
 	{
 		throw std::out_of_range(
-			std::format("The value of the book {} is invalid. It must be between 2 and 99.", 
-			static_cast<int>(m_value))
+			std::format("The value is invalid. It must be between {} and {}.",
+				static_cast<int>(MIN_CARD_VALUE), static_cast<int>(MAX_CARD_VALUE))
 		);
 	}
 }

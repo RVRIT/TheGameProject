@@ -16,6 +16,14 @@
 class Game
 {
 public:
+	static constexpr size_t HAND_SIZE_1_PLAYER = 8;
+	static constexpr size_t HAND_SIZE_2_PLAYERS = 7;
+	static constexpr size_t HAND_SIZE_3_PLUS_PLAYERS = 6;
+
+	static constexpr size_t MIN_CARDS_TO_PLAY_NORMAL = 2;
+	static constexpr size_t MIN_CARDS_TO_PLAY_EMPTY_DECK = 1;
+
+public:
 	std::string getCurrentPlayerName() const {
 		if (m_players.empty()) return "";
 		return std::string(m_players[m_currentPlayerIndex].getName());
@@ -27,23 +35,23 @@ public:
 
 	// COMENZI PENTRU CLIENT(SFML)
 
-	[[nodiscard]] bool attemptPlayCard(size_t handIndex, size_t pileIndex);
-	[[nodiscard]] bool attemptEndTurn();
+	 bool attemptPlayCard(size_t handIndex, size_t pileIndex);
+	 bool attemptEndTurn();
 
 
 	// DATE PENTRU DESENARE
 
-	[[nodiscard]] GameSnapshot getSnapshot(const std::string& requestingPlayerName) const;
+	 GameSnapshot getSnapshot(const std::string& requestingPlayerName) const;
 
 
 	// Getteri utili pentru UI
 
-	[[nodiscard]] bool isGameOver() const { return m_isGameOver; }
-	[[nodiscard]] bool isVictory() const { return m_playerWon; }
+	bool isGameOver() const { return m_isGameOver; }
+	bool isVictory() const { return m_playerWon; }
 
-	[[nodiscard]] size_t getCardsPlayedThisTurn() const { return m_cardsPlayedThisTurn; }
+	size_t getCardsPlayedThisTurn() const { return m_cardsPlayedThisTurn; }
 
-	[[nodiscard]] size_t getMinCardsRequired() const; // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
+	size_t getMinCardsRequired() const; // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
 
 private:
 	void setupGame();
@@ -51,9 +59,9 @@ private:
 	void nextTurn() noexcept;
 	void drawCardsForCurrentPlayer();
 
-	[[nodiscard]] bool checkWinCondition() const noexcept;
-	[[nodiscard]] bool canPlayerMakeAnyMove(const Player& player) const noexcept;
-	[[nodiscard]] int calculateScore(const Player& player) const;
+	bool checkWinCondition() const noexcept;
+	bool canPlayerMakeAnyMove(const Player& player) const noexcept;
+	int calculateScore(const Player& player) const;
 
 	Deck m_deck;
 	std::vector<Player> m_players;
