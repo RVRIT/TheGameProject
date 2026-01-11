@@ -68,6 +68,7 @@ public:
     bool updateUserStats(int user_id, bool won, double hours_played);
     bool checkExistingUser(const std::string& username);
     bool registerUser(const std::string& username, const std::string& hashed_password);
+    bool insertGameSession(int user_id, int score, double duration, const std::string& result);
     std::optional<std::string> getHashedPassword(const std::string& username);
     std::optional<int> getUserId(const std::string& username);
     std::optional<User> getUserStats(const std::string& username);
@@ -83,4 +84,4 @@ public:
 private:
     DBManager() = default;
     std::unique_ptr<StorageType> m_storage; // Smart pointer for orm storage
-};
+};  
