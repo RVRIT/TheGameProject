@@ -35,6 +35,9 @@ Game::Game(const std::vector<std::string_view>& playerNames)
 	}
 
 	setupGame();
+
+	m_startTime = std::chrono::steady_clock::now();
+	m_statsSaved = false;
 }
 
 bool Game::attemptPlayCard(size_t handIndex, size_t pileIndex)
