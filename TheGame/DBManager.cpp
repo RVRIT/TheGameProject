@@ -128,7 +128,17 @@ std::optional<User> DBManager::getUserStats(const std::string& username)
     }
     catch (...) { return std::nullopt; }
 }
-
+bool DBManager::insertGameSession(int user_id, int score, double duration, const std::string& result)
+{
+    try {
+        GameSession session{ -1, user_id, score, duration, result };
+        m_storage->insert(session);
+        return true;
+    }
+    catch (...) {
+        return false;
+    }
+}
 // Lobby functions were removed because we moved the logic to GameManager.
 // We don't need to save temporary lobbies in the database anymore.
 

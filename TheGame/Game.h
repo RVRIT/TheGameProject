@@ -1,5 +1,6 @@
 #pragma once
-
+#include <chrono>
+#include "DBManager.h"
 #include "Player.h"
 #include "Deck.h"
 #include "Pile.h"
@@ -64,4 +65,8 @@ private:
 
 	bool m_isGameOver = false;
 	bool m_playerWon = false;
+
+	std::chrono::steady_clock::time_point m_startTime;
+	bool m_statsSaved = false;
+	void saveGameResults();
 };
