@@ -60,6 +60,7 @@ private:
 	void drawCardsForCurrentPlayer();
 
 	bool checkWinCondition() const noexcept;
+	bool checkLoseCondition() const;
 	bool canPlayerMakeAnyMove(const Player& player) const noexcept;
 	int calculateScore(const Player& player) const;
 

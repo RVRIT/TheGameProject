@@ -66,7 +66,13 @@ bool Game::attemptPlayCard(size_t handIndex, size_t pileIndex)
 			saveGameResults();
 			return true;
 		}
-
+		if (checkLoseCondition() && m_cardsPlayedThisTurn < getMinCardsRequired())
+		{
+			m_isGameOver = true;
+			m_playerWon = false;
+			saveGameResults();
+			return true;
+		}
 
 		return true;
 	}
@@ -182,7 +188,14 @@ bool Game::checkWinCondition() const noexcept
 	}
 	return false;
 }
-
+bool Game::checkLoseCondition() const
+{
+	if(!canPlayerMakeAnyMove(m_players[m_currentPlayerIndex]))
+	{
+		return true;
+	}
+	return false;
+}
 GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 {
 	GameSnapshot snap;
