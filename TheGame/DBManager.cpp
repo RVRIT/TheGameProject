@@ -118,16 +118,7 @@ std::optional<int> DBManager::getUserId(const std::string& username) {
     }
 }
 
-std::optional<User> DBManager::getUserStats(const std::string& username)
-{
-    try {
-        using namespace sqlite_orm;
-        auto users = m_storage->get_all<User>(where(c(&User::username) == username));
-        if (users.empty()) return std::nullopt;
-        return users[0];
-    }
-    catch (...) { return std::nullopt; }
-}
+
 bool DBManager::insertGameSession(int user_id, int score, double duration, const std::string& result)
 {
     try {
@@ -139,6 +130,24 @@ bool DBManager::insertGameSession(int user_id, int score, double duration, const
         return false;
     }
 }
+
+std::optional<User> DBManager::getUserStats(const std::string& username)
+{
+    try {
+       
+        auto users = m_storage->get_all<User>(where(c(&User::username) == username));
+
+        if (users.empty()) {
+            return std::nullopt; 
+        }
+
+        return users[0]; 
+    }
+    catch (...) {
+        return std::nullopt;
+    }
+}
+
 // Lobby functions were removed because we moved the logic to GameManager.
 // We don't need to save temporary lobbies in the database anymore
 
