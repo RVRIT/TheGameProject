@@ -75,6 +75,12 @@
     <ClCompile Include="GameScene.cpp">
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>
+    <ClCompile Include="GameConstants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyMenuScene.cpp">
+      <Filter>Source Files\SCENES</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\background.png">
@@ -130,6 +136,12 @@
       <Filter>Header Files\SCENES</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
+      <Filter>Header Files\SCENES</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LobbyMenuScene.h">
       <Filter>Header Files\SCENES</Filter>
     </ClInclude>
   </ItemGroup>

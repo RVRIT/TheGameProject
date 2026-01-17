@@ -198,7 +198,9 @@ exit 0
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="GameConstants.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="LobbyMenuScene.cpp" />
     <ClCompile Include="LobbyScene.cpp" />
     <ClCompile Include="loginMenu.cpp" />
     <ClCompile Include="main.cpp" />
@@ -221,8 +223,10 @@ exit 0
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="GameConstants.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="LobbyMenuScene.h" />
     <ClInclude Include="LobbyScene.h" />
     <ClInclude Include="loginMenu.h" />
     <ClInclude Include="MainMenu.h" />

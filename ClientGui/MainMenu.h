@@ -30,9 +30,5 @@ private:
     sf::Texture bgTexture;
     sf::Sprite background;
 
-    Button createLobbyButton;   
-
-    TextBox lobbyIdInput;
-    Button joinLobbyButton;
     std::string currentUsername;
 };
