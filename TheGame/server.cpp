@@ -417,6 +417,7 @@ int main() {
             return crow::response(400, "Player not found");
         }
         });
+
     CROW_ROUTE(app, "/server/info").methods("GET"_method)([]() {
         crow::json::wvalue res;
         res["status"] = "online";
@@ -430,6 +431,22 @@ int main() {
         }
 
         return crow::response(200, res.dump());
+        });
+    CROW_ROUTE(app, "/lobby/list").methods("GET"_method)([]() {
+        auto summaries = GameManager::getInstance().listLobbies();
+
+        crow::json::wvalue res;
+        for (size_t i = 0; i < summaries.size(); ++i) {
+            res[i]["id"] = summaries[i].id;
+            res[i]["hostName"] = summaries[i].hostName;
+            res[i]["playersCount"] = summaries[i].playersCount;
+            res[i]["maxPlayers"] = summaries[i].maxPlayers;
+            res[i]["status"] = summaries[i].status;
+        }
+
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
         });
 
     app.port(18080).multithreaded().run();
