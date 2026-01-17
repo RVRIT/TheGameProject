@@ -296,3 +296,19 @@ std::string NetworkClient::getUserStats(const std::string& username) {
     }
     return "{}"; 
 }
+
+bool NetworkClient::leaveLobby(int lobbyId, const std::string& playerName) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/leave");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["playerName"] = playerName;
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
+}

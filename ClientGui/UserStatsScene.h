@@ -21,22 +21,18 @@ private:
     sf::RenderWindow& window;
     std::string currentUsername;
 
-    // --- UI Elements ---
     sf::Sprite background;
     sf::Texture bgTexture;
 
-    // Cardul Profilului
     sf::RectangleShape profileCard;
     sf::Text titleText;
 
-    // Labels (Stânga)
     sf::Text lblUsername;
     sf::Text lblRating;
     sf::Text lblGames;
     sf::Text lblWins;
     sf::Text lblHours;
 
-    // Values (Dreapta - Datele dinamice)
     sf::Text valUsername;
     sf::Text valRating;
     sf::Text valGames;

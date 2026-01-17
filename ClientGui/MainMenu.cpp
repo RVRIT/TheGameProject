@@ -39,8 +39,7 @@ MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& ma
         { Config::Menu::BUTTON_X, Config::Menu::SLOT_2_Y },
         [this]() { 
     sceneManager.pushScene(std::make_unique<UserStatsScene>(
-        font, client, sceneManager, window, currentUsername
-    ));
+        font, client, sceneManager, window, currentUsername));
         })
 
 {

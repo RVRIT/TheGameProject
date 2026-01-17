@@ -15,23 +15,17 @@ public:
     bool sendStartGameRequest(int lobbyId, int playerId);
     std::string getLobbyStatus();
     void sendLobbyMessage(const std::string& msg);
-
     int createLobby(const std::string& hostName);
     bool joinLobby(int lobbyId, const std::string& playerName);
-
     std::string getLobbyState(int lobbyId);
     bool sendLobbyChat(int lobbyId, const std::string& playerName, const std::string& message);
-
     bool setPlayerReady(int lobbyId, int playerId, bool ready);
-
     bool startGame(int lobbyId, int playerId);
     std::string getGameState(int lobbyId, const std::string& playerName);
     bool playCard(int lobbyId, const std::string& playerName, int handIndex, int pileIndex);
     bool endTurn(int lobbyId, const std::string& playerName);
-
     bool kickPlayer(int lobbyId, const std::string& hostName, const std::string& targetName);
-
     std::string getLobbyList();
-
     std::string getUserStats(const std::string& username);
+    bool leaveLobby(int lobbyId, const std::string& playerName);
 };

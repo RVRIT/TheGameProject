@@ -60,9 +60,6 @@
     <ClCompile Include="Button.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files\SCENES</Filter>
-    </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>
@@ -81,8 +78,11 @@
     <ClCompile Include="Card.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
-    <ClCompile Include="UserStatsScene.cpp">
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserStatsScene.cpp">
+      <Filter>Source Files\SCENES</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +120,6 @@
     <ClInclude Include="registerMenu.h">
       <Filter>Header Files\MENUS</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files\SCENES</Filter>
-    </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Header Files\SCENES</Filter>
     </ClInclude>
@@ -150,8 +147,11 @@
     <ClInclude Include="Card.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\SCENES</Filter>
+    </ClInclude>
     <ClInclude Include="UserStatsScene.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\SCENES</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

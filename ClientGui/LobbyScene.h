@@ -48,4 +48,5 @@ private:
 
     sf::RectangleShape listBackground;
     sf::Text listTitle;
+    Button leaveBtn;
 };

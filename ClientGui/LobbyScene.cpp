@@ -21,7 +21,7 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
     }
         }),
 
-    readyButton("assets/btn_not_ready.png", { 550.f, 550.f }, [this]() {
+    readyButton("assets/btn_not_ready.png", { 600.f, 600.f }, [this]() {
     if (myPlayerId == -1) return; 
 
     amIReady = !amIReady;
@@ -39,6 +39,12 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
             std::cout << "Failed to start (Not all ready? Not host?)\n";
         }
     }
+        }),
+    leaveBtn("assets/BackButton.png", { 50.f, 600.f }, [this]() {
+    std::cout << "Leaving lobby...\n";
+    client.leaveLobby(lobbyId, myName);
+
+    sceneManager.popScene();
         })
 {
     titleText.setFont(font);
@@ -62,6 +68,7 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     backButton.handleEvent(event, mousePos);
     sendButton.handleEvent(event, mousePos);
     readyButton.handleEvent(event, mousePos); 
+    leaveBtn.handleEvent(event, mousePos);
     chatInput.handleEvent(event);
 
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
@@ -123,6 +130,7 @@ void LobbyScene::draw(sf::RenderWindow& window) {
     chatInput.draw(window);
     sendButton.draw(window);
 	readyButton.draw(window);
+    leaveBtn.draw(window);
 
     if (isHost) {
         startGameButton.draw(window);
