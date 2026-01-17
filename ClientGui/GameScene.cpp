@@ -44,7 +44,18 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
     window.setView(view);
 
     statusText.setPosition(50, 50);
-    deckInfoText.setPosition(50, 100);
+
+    cardsPlayedText.setFont(font);
+    cardsPlayedText.setCharacterSize(24);
+    cardsPlayedText.setFillColor(sf::Color::Yellow);
+    cardsPlayedText.setString("Played: - / -");
+
+    deckInfoText.setFont(font);
+    deckInfoText.setCharacterSize(24);
+    deckInfoText.setFillColor(sf::Color::White);
+    deckInfoText.setPosition(50.f, 150.f); 
+    deckInfoText.setString("Deck: --");
+
 }
 
 void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
@@ -110,13 +121,28 @@ void GameScene::parseGameState(const std::string& jsonStr) {
     try {
         auto j = json::parse(jsonStr);
 
+        if (j.contains("cardsPlayedThisTurn") && j.contains("minCardsToPlay")) {
+            int played = j["cardsPlayedThisTurn"];
+            int minReq = j["minCardsToPlay"];
+
+            cardsPlayedText.setString("Played: " + std::to_string(played) + " / " + std::to_string(minReq));
+
+            sf::FloatRect tr = cardsPlayedText.getLocalBounds();
+            cardsPlayedText.setPosition(50.f, 50.f);
+
+            if (played >= minReq) cardsPlayedText.setFillColor(sf::Color::Green);
+            else cardsPlayedText.setFillColor(sf::Color::Yellow);
+        }
+
         if (j.contains("isGameOver") && j["isGameOver"].get<bool>()) {
             this->isGameOver = true;
             bool won = j["playerWon"];
             statusText.setString(won ? "VICTORY!" : "GAME OVER");
             statusText.setFillColor(won ? sf::Color::Green : sf::Color::Red);
             statusText.setCharacterSize(60);
-            statusText.setPosition(400.f, 200.f);
+
+            sf::FloatRect sr = statusText.getLocalBounds();
+            statusText.setPosition((1920.f - sr.width) / 2.f, 200.f);
         }
         else {
             this->isGameOver = false;
@@ -129,6 +155,13 @@ void GameScene::parseGameState(const std::string& jsonStr) {
         piles.clear();
         int pIndex = 0;
         if (j.contains("piles")) {
+
+            float cardWidth = 100.f; 
+            float gap = 50.f;        
+            float totalWidth = (4 * cardWidth) + (3 * gap); 
+            float startX = (1920.f - totalWidth) / 2.f;     
+            float pileY = 350.f;                            
+
             for (const auto& p : j["piles"]) {
                 VisualPile vp;
                 std::string typeStr = p["type"];
@@ -137,7 +170,8 @@ void GameScene::parseGameState(const std::string& jsonStr) {
 
                 vp.card = std::make_unique<Card>(cardTexture, font, val);
 
-                vp.card->setPosition(350.f + (pIndex * 150), 300.f); 
+                float currentX = startX + (pIndex * (cardWidth + gap));
+                vp.card->setPosition(currentX, pileY);
 
                 piles.push_back(std::move(vp));
                 pIndex++;
@@ -147,14 +181,12 @@ void GameScene::parseGameState(const std::string& jsonStr) {
         myHand.clear();
         int cIndex = 0;
         if (j.contains("myHand")) {
+ 
             float startX = 400.f;
-
             float gap = 140.f;
 
             for (const auto& val : j["myHand"]) {
                 auto card = std::make_unique<Card>(cardTexture, font, val);
-
-           
                 card->setPosition(startX + (cIndex * gap), 850.f);
 
                 if (cIndex == selectedHandIndex) {
@@ -244,6 +276,8 @@ void GameScene::draw(sf::RenderWindow& window) {
     for (const auto& card : myHand) {
         card->draw(window);
     }
+
+	window.draw(cardsPlayedText);
 }
 
 void GameScene::updateBackgroundScale()

@@ -269,6 +269,9 @@ int main() {
         res["isGameOver"] = snap.isGameOver;
         res["playerWon"] = snap.playerWon;
 
+        res["cardsPlayedThisTurn"] = snap.cardsPlayedThisTurn;
+        res["minCardsToPlay"] = snap.minCardsToPlay;
+
         for (size_t i = 0; i < snap.piles.size(); ++i) {
             res["piles"][i]["type"] = snap.piles[i].type;
             res["piles"][i]["topValue"] = snap.piles[i].topValue;

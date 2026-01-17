@@ -59,4 +59,6 @@ private:
     sf::Shader bgShader;
     sf::RectangleShape shaderRect; 
     sf::Clock shaderTimer;
+
+    sf::Text cardsPlayedText;
 };

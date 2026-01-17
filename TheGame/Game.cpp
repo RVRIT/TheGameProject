@@ -243,7 +243,7 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 				snap.myHand.push_back(card.getValue());
 			}
 
-			snap.cardsPlayedThisTurn = 0; 
+			snap.cardsPlayedThisTurn = m_cardsPlayedThisTurn;
 			snap.minCardsToPlay = getMinCardsRequired();
 		}
 		else
