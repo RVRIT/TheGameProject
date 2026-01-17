@@ -436,7 +436,7 @@ int main() {
     CROW_ROUTE(app, "/lobby/list").methods("GET"_method)([]() {
         auto summaries = GameManager::getInstance().listLobbies();
 
-        crow::json::wvalue res;
+        crow::json::wvalue res = crow::json::wvalue::list();
         for (size_t i = 0; i < summaries.size(); ++i) {
             res[i]["id"] = summaries[i].id;
             res[i]["hostName"] = summaries[i].hostName;
