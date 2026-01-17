@@ -1,4 +1,6 @@
 #include "GameManager.h"
+#include "DBManager.h"
+#include "GameSnapshot.h"
 #include <stdexcept>
 
 GameManager& GameManager::getInstance()
@@ -199,3 +201,46 @@ std::vector<std::string> GameManager::getLobbyPlayerNames(int lobbyId) const
     }
     return names;
 }
+
+bool GameManager::saveGameResults(int lobbyId, const std::string& winnerUsername, double durationHours)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+
+    auto it = m_lobbies.find(lobbyId);
+    if (it == m_lobbies.end())
+        return false;
+
+    Lobby& lobby = it->second;
+
+    Game* game = lobby.getGame();
+    if (!game)
+        return false;
+
+    DBManager& db = DBManager::getInstance();
+
+    int updatedUsers = 0;
+
+    for (const auto& p : lobby.getPlayers())
+    {
+        auto userIdOpt = db.getUserId(p.name);
+        if (!userIdOpt)
+            continue;
+
+        bool won = (p.name == winnerUsername);
+
+        GameSnapshot snap = game->getSnapshot(p.name);
+        int cardsLeftInHand = static_cast<int>(snap.myHand.size());
+
+        db.updateUserStats(*userIdOpt, won, durationHours, cardsLeftInHand);
+
+        int score = 0;
+        db.insertGameSession(*userIdOpt, score, durationHours, won ? "win" : "loss");
+
+        updatedUsers++;
+    }
+
+    m_lobbies.erase(it);
+
+    return updatedUsers > 0;
+}
+
