@@ -432,6 +432,7 @@ int main() {
 
         return crow::response(200, res.dump());
         });
+
     CROW_ROUTE(app, "/lobby/list").methods("GET"_method)([]() {
         auto summaries = GameManager::getInstance().listLobbies();
 
@@ -448,6 +449,26 @@ int main() {
         r.set_header("Content-Type", "application/json");
         return r;
         });
+
+    CROW_ROUTE(app, "/lobby/<int>").methods("DELETE"_method)([](int lobbyId) {
+        bool ok = GameManager::getInstance().deleteLobby(lobbyId);
+
+        crow::json::wvalue res;
+        if (!ok) {
+            res["status"] = "error";
+            res["message"] = "Lobby not found";
+            crow::response r(404, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
+        }
+
+        res["status"] = "success";
+        res["message"] = "Lobby deleted";
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
+        });
+
 
     app.port(18080).multithreaded().run();
 }
