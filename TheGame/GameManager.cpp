@@ -152,3 +152,50 @@ bool GameManager::removePlayer(int lobbyId, const std::string& playerName) {
     }
     return false;
 }
+
+std::vector<GameManager::LobbySummary> GameManager::listLobbies() const
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+
+    std::vector<LobbySummary> out;
+    out.reserve(m_lobbies.size());
+
+    for (const auto& [id, lobby] : m_lobbies) {
+        LobbySummary s;
+        s.id = id;
+
+        const auto& players = lobby.getPlayers();
+        s.playersCount = static_cast<int>(players.size());
+        s.hostName = players.empty() ? "" : players[0].name;
+
+        s.maxPlayers = 5;
+
+        auto st = lobby.getStatus();
+        if (st == LobbyStatus::Waiting) s.status = "Waiting";
+        else if (st == LobbyStatus::InProgress) s.status = "InProgress";
+        else s.status = "Finished";
+
+        out.push_back(std::move(s));
+    }
+
+    return out;
+}
+
+bool GameManager::deleteLobby(int lobbyId)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    return m_lobbies.erase(lobbyId) > 0;
+}
+
+std::vector<std::string> GameManager::getLobbyPlayerNames(int lobbyId) const
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    auto it = m_lobbies.find(lobbyId);
+    if (it == m_lobbies.end()) return {};
+
+    std::vector<std::string> names;
+    for (const auto& p : it->second.getPlayers()) {
+        names.push_back(p.name);
+    }
+    return names;
+}

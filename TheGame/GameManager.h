@@ -24,6 +24,18 @@ public:
     bool leaveLobby(int lobbyId, const std::string& playerName);
     bool restartGame(int lobbyId);
     bool removePlayer(int lobbyId, const std::string& playerName);
+
+    struct LobbySummary {
+        int id;
+        std::string hostName;
+        int playersCount;
+        int maxPlayers;
+        std::string status; 
+    };
+
+    std::vector<LobbySummary> listLobbies() const;
+    bool deleteLobby(int lobbyId);
+    std::vector<std::string> getLobbyPlayerNames(int lobbyId) const;
 private:
     GameManager() = default;
     std::map<int, Lobby> m_lobbies;
