@@ -155,11 +155,6 @@ void LobbyMenuScene::draw(sf::RenderWindow& window) {
         tempText.setPosition(startX + 10.f, startY + 18.f);
         window.draw(tempText);
 
-        if (status == "Waiting") tempText.setString("JOIN");
-        else tempText.setString(status);
-
-        tempText.setPosition(startX + 560.f, startY + 18.f);
-        window.draw(tempText);
 
         startY += gap;
     }

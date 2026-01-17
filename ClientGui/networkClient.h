@@ -32,4 +32,6 @@ public:
     bool kickPlayer(int lobbyId, const std::string& hostName, const std::string& targetName);
 
     std::string getLobbyList();
+
+    std::string getUserStats(const std::string& username);
 };

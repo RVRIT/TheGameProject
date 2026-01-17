@@ -27,6 +27,7 @@ private:
     Button playButton;
     Button exitButton;
     Button settingsButton;
+    Button statsButton;
     sf::Texture bgTexture;
     sf::Sprite background;
 

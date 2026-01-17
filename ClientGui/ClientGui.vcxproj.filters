@@ -31,9 +31,6 @@
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{11a014d4-7656-4bd2-b521-5b09b0c8b737}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tempCPPS">
-      <UniqueIdentifier>{cee22637-22b7-49f1-b69b-c3206ff293e7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -83,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="Card.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UserStatsScene.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +149,9 @@
     </ClInclude>
     <ClInclude Include="Card.h">
       <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UserStatsScene.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

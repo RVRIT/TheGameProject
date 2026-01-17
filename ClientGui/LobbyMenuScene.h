@@ -35,7 +35,6 @@ private:
     sf::RectangleShape listBackground;
     sf::Text listTitle;
 
-    // AICI E SCHIMBAREA: Nu mai folosim vector<LobbyItem>, ci direct JSON-ul
     nlohmann::json lobbiesData;
 
     float refreshTimer = 0.0f;

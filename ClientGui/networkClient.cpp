@@ -281,3 +281,18 @@ std::string NetworkClient::getLobbyList() {
 
     return "[]";
 }
+
+std::string NetworkClient::getUserStats(const std::string& username) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Get);
+    request.setUri("/user/stats?username=" + username);
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        return response.getBody();
+    }
+    return "{}"; 
+}

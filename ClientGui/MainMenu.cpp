@@ -9,6 +9,7 @@
 #include <ctime>   
 #include "GameConstants.h"
 #include "LobbyMenuScene.h"
+#include "UserStatsScene.h"
 
 
 MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& windowRef, std::string username)
@@ -32,7 +33,15 @@ MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& ma
         }),
 
   
-    settingsButton("assets/settings.png", { -1000.f, -1000.f }, []() {}) 
+    settingsButton("assets/settings.png", { -1000.f, -1000.f }, []() {}),
+
+    statsButton("assets/userStats.png",
+        { Config::Menu::BUTTON_X, Config::Menu::SLOT_2_Y },
+        [this]() { 
+    sceneManager.pushScene(std::make_unique<UserStatsScene>(
+        font, client, sceneManager, window, currentUsername
+    ));
+        })
 
 {
     if (bgTexture.loadFromFile("assets/backgroundMainMenu.png")) {
@@ -53,6 +62,7 @@ void MainMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     playButton.handleEvent(event, mousePos);
     exitButton.handleEvent(event, mousePos);
     settingsButton.handleEvent(event, mousePos);
+    statsButton.handleEvent(event, mousePos);
 
 }
 
@@ -61,6 +71,7 @@ void MainMenu::draw(sf::RenderWindow& window) {
     playButton.draw(window);
     exitButton.draw(window);
     settingsButton.draw(window);
+    statsButton.draw(window);
 
 }
 
