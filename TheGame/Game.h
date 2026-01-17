@@ -24,10 +24,7 @@ public:
 	static constexpr size_t MIN_CARDS_TO_PLAY_EMPTY_DECK = 1;
 
 public:
-	std::string getCurrentPlayerName() const {
-		if (m_players.empty()) return "";
-		return std::string(m_players[m_currentPlayerIndex].getName());
-	}
+	std::string getCurrentPlayerName() const;
 	bool isPlayerTurn(const std::string& playerName) const {
 		return getCurrentPlayerName() == playerName;
 	}
@@ -46,10 +43,10 @@ public:
 
 	// Getteri utili pentru UI
 
-	bool isGameOver() const { return m_isGameOver; }
-	bool isVictory() const { return m_playerWon; }
+	 bool isGameOver() const;
+	 bool isVictory() const;
 
-	size_t getCardsPlayedThisTurn() const { return m_cardsPlayedThisTurn; }
+	size_t getCardsPlayedThisTurn() const;
 
 	size_t getMinCardsRequired() const; // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
 

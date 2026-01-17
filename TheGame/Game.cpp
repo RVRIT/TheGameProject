@@ -10,6 +10,17 @@
 #include <thread>
 #include <optional>
 
+bool Game::isPlayerTurn(const std::string& playerName) const
+{
+	return getCurrentPlayerName() == playerName;
+}
+
+std::string Game::getCurrentPlayerName() const
+{
+	if (m_players.empty()) return "";
+	return std::string(m_players[m_currentPlayerIndex].getName());
+}
+
 Game::Game(const std::vector<std::string_view>& playerNames)
 	: m_piles{
 		Pile(PileType::ASCENDING),
@@ -252,6 +263,21 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 
 	return snap;
 
+}
+
+bool Game::isGameOver() const
+{
+	return m_isGameOver;
+}
+
+bool Game::isVictory() const
+{
+	return m_playerWon;
+}
+
+size_t Game::getCardsPlayedThisTurn() const
+{
+	return m_cardsPlayedThisTurn;
 }
 
 int Game::calculateScore(const Player& player) const

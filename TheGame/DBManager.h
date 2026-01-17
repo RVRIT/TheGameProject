@@ -55,10 +55,7 @@ using StorageType = decltype(createStorage("")); //return type for CreateStorage
 
 class DBManager {
 public:
-    static DBManager& getInstance() {
-        static DBManager instance;
-        return instance;
-    }
+    static DBManager& getInstance();
 
     DBManager(const DBManager&) = delete;
     DBManager& operator=(const DBManager&) = delete;
