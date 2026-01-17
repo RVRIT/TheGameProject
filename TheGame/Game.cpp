@@ -285,13 +285,18 @@ void Game::saveGameResults()
 		auto userIdOpt = db.getUserId(player.getName());
 		if (userIdOpt.has_value())
 		{
+
 			int userId = userIdOpt.value();
-			int score = calculateScore(player);
+			
+			int sessionScore = calculateScore(player);
 			std::string result = m_playerWon ? "Win" : "Loss";
 
-			db.insertGameSession(userId, score, elapsed.count(), result);
+			db.insertGameSession(userId, sessionScore, elapsed.count(), result);
 
-			db.updateUserStats(userId, m_playerWon, durationHours);
+			int cardsLeft = static_cast<int>(player.getHandSize());
+
+			//update global rating (1-5) based on wins and cards left
+			db.updateUserStats(userId, m_playerWon, durationHours, cardsLeft);
 		}
 	}
 	m_statsSaved = true;
