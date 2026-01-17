@@ -417,6 +417,7 @@ int main() {
             return crow::response(400, "Player not found");
         }
         });
+
     CROW_ROUTE(app, "/server/info").methods("GET"_method)([]() {
         crow::json::wvalue res;
         res["status"] = "online";
@@ -431,6 +432,100 @@ int main() {
 
         return crow::response(200, res.dump());
         });
+
+    CROW_ROUTE(app, "/lobby/list").methods("GET"_method)([]() {
+        auto summaries = GameManager::getInstance().listLobbies();
+
+        crow::json::wvalue res = crow::json::wvalue::list();
+        for (size_t i = 0; i < summaries.size(); ++i) {
+            res[i]["id"] = summaries[i].id;
+            res[i]["hostName"] = summaries[i].hostName;
+            res[i]["playersCount"] = summaries[i].playersCount;
+            res[i]["maxPlayers"] = summaries[i].maxPlayers;
+            res[i]["status"] = summaries[i].status;
+        }
+
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
+        });
+
+    CROW_ROUTE(app, "/lobby/<int>").methods("DELETE"_method)([](int lobbyId) {
+        bool ok = GameManager::getInstance().deleteLobby(lobbyId);
+
+        crow::json::wvalue res;
+        if (!ok) {
+            res["status"] = "error";
+            res["message"] = "Lobby not found";
+            crow::response r(404, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
+        }
+
+        res["status"] = "success";
+        res["message"] = "Lobby deleted";
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
+        });
+
+    CROW_ROUTE(app, "/lobby/<int>/finish").methods("POST"_method)
+        ([&db](const crow::request& req, int lobbyId) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("winnerUsername")) {
+            return crow::response(400, "Missing 'winnerUsername'");
+        }
+
+        std::string winner = body["winnerUsername"].s();
+
+        double durationHours = 0.0;
+        if (body.has("durationHours")) {
+            durationHours = body["durationHours"].d();
+            if (durationHours < 0.0) durationHours = 0.0;
+        }
+
+        auto playerNames = GameManager::getInstance().getLobbyPlayerNames(lobbyId);
+        if (playerNames.empty()) {
+            return crow::response(404, "Lobby not found");
+        }
+
+        bool hasScores = body.has("scores");
+        auto scoresObj = hasScores ? body["scores"] : crow::json::rvalue();
+
+        int updatedUsers = 0;
+
+        for (const auto& name : playerNames) {
+            auto userIdOpt = db.getUserId(name);
+            if (!userIdOpt) {
+                continue;
+            }
+
+            int userId = *userIdOpt;
+            bool won = (name == winner);
+
+            int score = 0;
+            if (hasScores && scoresObj.has(name)) {
+                score = scoresObj[name].i();
+            }
+
+            db.updateUserStats(userId, won, durationHours);
+            db.insertGameSession(userId, score, durationHours, won ? "win" : "loss");
+
+            updatedUsers++;
+        }
+
+        GameManager::getInstance().deleteLobby(lobbyId);
+
+        crow::json::wvalue res;
+        res["status"] = "success";
+        res["updatedUsers"] = updatedUsers;
+        res["message"] = "Match finished, stats saved, lobby removed";
+
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
+            });
+
 
     app.port(18080).multithreaded().run();
 }
