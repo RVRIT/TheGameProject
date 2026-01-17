@@ -508,7 +508,7 @@ int main() {
                 score = scoresObj[name].i();
             }
 
-            db.updateUserStats(userId, won, durationHours);
+            //db.updateUserStats(userId, won, durationHours);
             db.insertGameSession(userId, score, durationHours, won ? "win" : "loss");
 
             updatedUsers++;

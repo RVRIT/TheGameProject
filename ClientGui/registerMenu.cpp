@@ -9,7 +9,7 @@ using json = nlohmann::json;
 RegisterMenu::RegisterMenu(sf::Font& font, NetworkClient& clientRef, SceneManager& manager) :
     client(clientRef),
     sceneManager(manager),
-    CreateAccount("assets/CreateAccountButton.png", { 100.f, 500.f }, [this]() {
+    CreateAccount("assets/CreateAccountButton.png", { 100.f, 400.f }, [this]() {
     std::string usernameText = username.getText();
     std::string passwordText = password.getText();
 
@@ -42,7 +42,7 @@ RegisterMenu::RegisterMenu(sf::Font& font, NetworkClient& clientRef, SceneManage
         }
     }
         }),
-    Back("assets/BackButton.png", { 450.f, 500.f }, [this]() {
+    Back("assets/BackButton.png", { 380.f, 400.f }, [this]() {
     sceneManager.popScene();
         }),
     username(font, { 100.f, 200.f }, { 500.f, 50.f }),

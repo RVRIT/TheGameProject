@@ -25,7 +25,7 @@ MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& ma
         }),
 
     exitButton("assets/exit.png",
-        { Config::Menu::BUTTON_X, Config::Menu::SLOT_3_Y },
+        { Config::Menu::BUTTON_X, Config::Menu::SLOT_4_Y },
         [&]() {
             sceneManager.popScene(); 
             window.close();

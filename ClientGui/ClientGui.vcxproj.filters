@@ -81,6 +81,9 @@
     <ClCompile Include="LobbyMenuScene.cpp">
       <Filter>Source Files\SCENES</Filter>
     </ClCompile>
+    <ClCompile Include="Card.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\background.png">
@@ -143,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="LobbyMenuScene.h">
       <Filter>Header Files\SCENES</Filter>
+    </ClInclude>
+    <ClInclude Include="Card.h">
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

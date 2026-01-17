@@ -12,6 +12,7 @@ public:
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
     void draw(sf::RenderWindow& window) override;
+    void updateBackgroundScale();
 
 private:
     sf::Font& font;

@@ -34,23 +34,10 @@ LobbyMenuScene::LobbyMenuScene(sf::Font& fontRef, NetworkClient& clientRef, Scen
         })
 {
 
-    if (bgTexture.loadFromFile("assets/backgroundMainMenu.png")) {
+    if (bgTexture.loadFromFile("assets/LobbySceneBackground.png")) {
         background.setTexture(bgTexture);
+        updateBackgroundScale();
     }
-
-    listBackground.setSize({ 600.f, 600.f });
-    listBackground.setPosition(600.f, 150.f); 
-    listBackground.setFillColor(sf::Color(0, 0, 0, 150)); 
-    listBackground.setOutlineColor(sf::Color::White);
-    listBackground.setOutlineThickness(2.f);
-
-    listTitle.setFont(font);
-    listTitle.setString("AVAILABLE LOBBIES (Refresh coming soon...)");
-    listTitle.setCharacterSize(30);
-    listTitle.setPosition(620.f, 160.f);
-
-    sf::View view(sf::FloatRect(0.f, 0.f, static_cast<float>(Config::WINDOW_WIDTH), static_cast<float>(Config::WINDOW_HEIGHT)));
-    window.setView(view);
 
 
 
@@ -84,4 +71,15 @@ void LobbyMenuScene::draw(sf::RenderWindow& window) {
 
 void LobbyMenuScene::refreshLobbyList() {
     // TODO: Aici vei implementa GET /lobbies când primești endpoint-ul
+}
+
+void LobbyMenuScene::updateBackgroundScale()
+{
+    sf::Vector2u win = window.getSize();
+    sf::Vector2u tex = bgTexture.getSize();
+
+    background.setScale(
+        float(win.x) / tex.x,
+        float(win.y) / tex.y
+    );
 }

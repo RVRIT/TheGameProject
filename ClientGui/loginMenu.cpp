@@ -13,7 +13,7 @@ LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& 
 	client(clientRef),
 	sceneManager(manager),
 	window(win),
-	LoginButton("assets/LoginButton.png", { 700.f, 400.f },
+	LoginButton("assets/LoginButton.png", { 725.f, 475.f },
 		[this]() { 
 			std::string usernameText = username.getText();
 			std::string passwordText = password.getText();
@@ -48,12 +48,12 @@ LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& 
 				}
 			}
 		}),
-	RegisterButton("assets/RegisterButton.png", { 1000.f, 400.f },
+	RegisterButton("assets/RegisterButton.png", { 1025.f, 475.f },
 		[this]() { 
 			sceneManager.pushScene(std::make_unique<RegisterMenu>(font, client, sceneManager));
 		}),
-	username(fontRef, { 700.f, 200.f }, { 500.f, 50.f }),
-	password(fontRef, { 700.f, 300.f }, { 500.f, 50.f })
+	username(fontRef, { 725.f, 275.f }, { 500.f, 50.f }),
+	password(fontRef, { 725.f, 375.f }, { 500.f, 50.f })
 {
 	bgTexture.loadFromFile("assets/backgroundTry2.png");
 	background.setTexture(bgTexture);
@@ -61,7 +61,7 @@ LoginMenu::LoginMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& 
 	errorText.setFont(font);
 	errorText.setFillColor(sf::Color::Red);
 	errorText.setCharacterSize(12);
-	errorText.setPosition(700.f, 500.f);
+	errorText.setPosition(725.f, 575.f);
 }
 
 

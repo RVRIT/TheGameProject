@@ -1,23 +1,18 @@
 ﻿#pragma once
-#include "Scene.h"
 #include "SceneManager.h"
 #include "NetworkClient.h"
 #include "Button.h"
-#include <SFML/Graphics.hpp>
+#include "Card.h" // <--- INCLUDE NOU
 #include <vector>
+#include <memory> // pentru unique_ptr
 
-struct VisualCard {
-    int value;
-    sf::FloatRect bounds; // Zona de click
-    bool isSelected;
-};
-
+// Structură simplă pentru Teancuri (Piles)
 struct VisualPile {
-    int topValue;
-    int type; // 0 = Crescător (1->99), 1 = Descrescător (100->2)
-    sf::FloatRect bounds;
+    int type; // 0 = ASC, 1 = DESC
+    std::unique_ptr<Card> card; // <--- Folosim Clasa Card aici!
 };
 
+// Structură pentru adversari (rămâne la fel)
 struct VisualOpponent {
     std::string name;
     int cardCount;
@@ -26,36 +21,38 @@ struct VisualOpponent {
 
 class GameScene : public Scene {
 public:
-    GameScene(sf::Font& font, NetworkClient& client, SceneManager& manager, int lobbyId, std::string playerName, sf::RenderWindow& window);
+    GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, std::string name, sf::RenderWindow& win);
+
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
     void draw(sf::RenderWindow& window) override;
 
 private:
+    void parseGameState(const std::string& jsonStr);
+
     sf::Font& font;
     NetworkClient& client;
     SceneManager& sceneManager;
+    sf::RenderWindow& window;
+
     int lobbyId;
     std::string myName;
+    bool isGameOver = false;
 
-    // UI
+    sf::Sprite background;
+    sf::Texture bgTexture;
+
     sf::Text statusText;
     sf::Text deckInfoText;
     Button endTurnButton;
+    Button backButton;
 
-    // Datele jocului
-    std::vector<VisualCard> myHand;
+    sf::Texture cardTexture; 
+  
+    std::vector<std::unique_ptr<Card>> myHand;
+
     std::vector<VisualPile> piles;
+
     std::vector<VisualOpponent> opponents;
-
-    int selectedHandIndex = -1; // -1 = nicio carte selectată
-
-    // Helpers
-    void parseGameState(const std::string& jsonStr);
-    void drawCard(sf::RenderWindow& window, int value, sf::Vector2f pos, bool isSelected, bool isPile, int pileType = -1);
-
-    Button backButton;  
-    bool isGameOver = false; 
-
-    sf::RenderWindow& window;
+    int selectedHandIndex = -1;
 };

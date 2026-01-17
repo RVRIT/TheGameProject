@@ -5,9 +5,8 @@
 
 using json = nlohmann::json;
 
-// 1. Constructorul reparat (primește window)
 GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, std::string name, sf::RenderWindow& win)
-    : font(f), client(c), sceneManager(mgr), lobbyId(id), myName(name), window(win), // Init window
+    : font(f), client(c), sceneManager(mgr), lobbyId(id), myName(name), window(win),
 
     endTurnButton("assets/exit.png", { 1000.f, 600.f }, [this]() {
     if (!isGameOver) {
@@ -16,20 +15,28 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
     }
         }),
 
-    // 2. Butonul Back reparat (folosește 'window' local, nu getWindow)
     backButton("assets/exit.png", { 500.f, 400.f }, [this]() {
     std::cout << "Returning to Main Menu...\n";
     sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, myName));
         })
 {
+    if (bgTexture.loadFromFile("assets/gameBG.png")) {
+        background.setTexture(bgTexture);
+
+    }
+
+    if (!cardTexture.loadFromFile("assets/card_base.png")) {
+        std::cout << "ERROR: Could not load assets/card_base.png\n";
+    }
+
     statusText.setFont(font);
-    statusText.setCharacterSize(24);
-    statusText.setPosition(50, 50);
+    statusText.setCharacterSize(12);
+    statusText.setPosition(20.f, 20.f);
     statusText.setFillColor(sf::Color::White);
 
     deckInfoText.setFont(font);
     deckInfoText.setCharacterSize(20);
-    deckInfoText.setPosition(50, 100);
+    deckInfoText.setPosition(20.f, 60.f);
     deckInfoText.setFillColor(sf::Color::White);
 }
 
@@ -44,19 +51,31 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     endTurnButton.handleEvent(event, mousePos);
 
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-        // Click pe cartile din mana
+
         for (size_t i = 0; i < myHand.size(); ++i) {
-            if (myHand[i].bounds.contains(mousePos)) {
+            if (myHand[i]->getBounds().contains(mousePos)) {
+
+                if (selectedHandIndex != -1 && selectedHandIndex < myHand.size()) {
+                    myHand[selectedHandIndex]->deselect();
+                }
+
                 selectedHandIndex = static_cast<int>(i);
+
+                myHand[i]->select();
                 return;
             }
         }
-        // Click pe teancuri
+
         if (selectedHandIndex != -1) {
             for (size_t i = 0; i < piles.size(); ++i) {
-                if (piles[i].bounds.contains(mousePos)) {
+                if (piles[i].card->getBounds().contains(mousePos)) {
+
+                    std::cout << "Trying to play card index " << selectedHandIndex << " on pile " << i << "\n";
+
                     if (client.playCard(lobbyId, myName, selectedHandIndex, static_cast<int>(i))) {
+                        if (selectedHandIndex < myHand.size()) myHand[selectedHandIndex]->deselect();
                         selectedHandIndex = -1;
+
                         update(sf::seconds(1.0f));
                     }
                 }
@@ -76,14 +95,12 @@ void GameScene::update(sf::Time dt) {
     }
 }
 
-// 3. Funcția parseGameState reparată (fără erori de sintaxă la 'j')
 void GameScene::parseGameState(const std::string& jsonStr) {
     if (jsonStr.empty()) return;
 
     try {
-        auto j = json::parse(jsonStr); // Aici se definește 'j'
+        auto j = json::parse(jsonStr);
 
-        // 1. Verificăm Game Over
         if (j.contains("isGameOver") && j["isGameOver"].get<bool>()) {
             this->isGameOver = true;
             bool won = j["playerWon"];
@@ -100,7 +117,6 @@ void GameScene::parseGameState(const std::string& jsonStr) {
             statusText.setFillColor(sf::Color::White);
         }
 
-        // 2. Teancuri
         piles.clear();
         int pIndex = 0;
         if (j.contains("piles")) {
@@ -108,29 +124,38 @@ void GameScene::parseGameState(const std::string& jsonStr) {
                 VisualPile vp;
                 std::string typeStr = p["type"];
                 vp.type = (typeStr == "ASC") ? 0 : 1;
-                vp.topValue = p["topValue"];
-                vp.bounds = sf::FloatRect(300.f + (pIndex * 120), 300.f, 100.f, 140.f);
-                piles.push_back(vp);
+                int val = p["topValue"];
+
+                vp.card = std::make_unique<Card>(cardTexture, font, val);
+
+                vp.card->setPosition(300.f + (pIndex * 150), 300.f); 
+
+                piles.push_back(std::move(vp));
                 pIndex++;
             }
         }
 
-        // 3. Mână
         myHand.clear();
         int cIndex = 0;
         if (j.contains("myHand")) {
             for (const auto& val : j["myHand"]) {
-                VisualCard vc;
-                vc.value = val;
-                vc.isSelected = (cIndex == selectedHandIndex);
-                vc.bounds = sf::FloatRect(150.f + (cIndex * 80), 550.f, 70.f, 100.f);
-                myHand.push_back(vc);
+                auto card = std::make_unique<Card>(cardTexture, font, val);
+
+                card->setPosition(150.f + (cIndex * 90), 600.f);
+
+                if (cIndex == selectedHandIndex) {
+                    card->select();
+                }
+
+                myHand.push_back(std::move(card));
                 cIndex++;
             }
         }
-        if (selectedHandIndex >= static_cast<int>(myHand.size())) selectedHandIndex = -1;
 
-        // 4. Adversari
+        if (selectedHandIndex >= static_cast<int>(myHand.size())) {
+            selectedHandIndex = -1;
+        }
+
         opponents.clear();
         if (j.contains("opponents")) {
             for (const auto& opp : j["opponents"]) {
@@ -142,57 +167,19 @@ void GameScene::parseGameState(const std::string& jsonStr) {
             }
         }
 
-        // 5. Deck info
         if (j.contains("deckSize")) {
             deckInfoText.setString("Deck: " + std::to_string(j["deckSize"].get<int>()));
         }
 
     }
-    catch (...) {
-        std::cout << "Error parsing JSON in GameScene\n";
-    }
-}
-
-void GameScene::drawCard(sf::RenderWindow& window, int value, sf::Vector2f pos, bool isSelected, bool isPile, int pileType) {
-    sf::RectangleShape rect(sf::Vector2f(isPile ? 100.f : 70.f, isPile ? 140.f : 100.f));
-    rect.setPosition(pos);
-
-    if (isPile) {
-        rect.setFillColor(pileType == 0 ? sf::Color(240, 240, 240) : sf::Color(150, 150, 150));
-        rect.setOutlineColor(sf::Color::Yellow);
-    }
-    else {
-        rect.setFillColor(isSelected ? sf::Color::Green : sf::Color::White);
-    }
-
-    rect.setOutlineThickness(2.f);
-    window.draw(rect);
-
-    sf::Text t;
-    t.setFont(font);
-    t.setString(std::to_string(value));
-    t.setCharacterSize(isPile ? 30 : 24);
-    t.setFillColor(sf::Color::Black);
-
-    sf::FloatRect tr = t.getLocalBounds();
-    t.setOrigin(tr.left + tr.width / 2.0f, tr.top + tr.height / 2.0f);
-    t.setPosition(pos.x + rect.getSize().x / 2.0f, pos.y + rect.getSize().y / 2.0f);
-    window.draw(t);
-
-    if (isPile) {
-        sf::Text label;
-        label.setFont(font);
-        label.setString(pileType == 0 ? "UP" : "DOWN");
-        label.setCharacterSize(14);
-        label.setFillColor(sf::Color::Red);
-        label.setPosition(pos.x, pos.y - 20.f);
-        window.draw(label);
+    catch (const std::exception& e) {
+        std::cout << "JSON Parse Error: " << e.what() << "\n";
     }
 }
 
 void GameScene::draw(sf::RenderWindow& window) {
-    window.clear(sf::Color(34, 139, 34));
 
+    window.draw(background);
     if (isGameOver) {
         window.draw(statusText);
         backButton.draw(window);
@@ -203,24 +190,36 @@ void GameScene::draw(sf::RenderWindow& window) {
     window.draw(deckInfoText);
     endTurnButton.draw(window);
 
-    float oppX = 300.f;
+    float oppX = 400.f;
     for (const auto& opp : opponents) {
         sf::Text t;
         t.setFont(font);
         std::string marker = opp.isTurn ? " [TURN]" : "";
         t.setString(opp.name + "\nCards: " + std::to_string(opp.cardCount) + marker);
         t.setCharacterSize(18);
-        t.setPosition(oppX, 30.f);
+        t.setPosition(oppX, 50.f);
         t.setFillColor(opp.isTurn ? sf::Color::Yellow : sf::Color::White);
         window.draw(t);
         oppX += 200.f;
     }
 
     for (const auto& p : piles) {
-        drawCard(window, p.topValue, { p.bounds.left, p.bounds.top }, false, true, p.type);
+        sf::Text label;
+        label.setFont(font);
+        label.setString(p.type == 0 ? "UP" : "DOWN");
+        label.setCharacterSize(16);
+        label.setFillColor(sf::Color::White);
+        label.setStyle(sf::Text::Bold);
+
+        sf::FloatRect cardBounds = p.card->getBounds();
+        label.setPosition(cardBounds.left, cardBounds.top - 25.f);
+
+        window.draw(label);
+
+        p.card->draw(window);
     }
 
-    for (const auto& c : myHand) {
-        drawCard(window, c.value, { c.bounds.left, c.bounds.top }, c.isSelected, false);
+    for (const auto& card : myHand) {
+        card->draw(window);
     }
 }
