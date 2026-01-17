@@ -65,7 +65,7 @@ public:
 
     bool initialize(const std::string& db_path);
     bool insertGameSession(int user_id, int score);
-    bool updateUserStats(int user_id, bool won, double hours_played);
+    bool updateUserStats(int user_id, bool won, double hours_played, int cardsLeftInHand);
     bool checkExistingUser(const std::string& username);
     bool registerUser(const std::string& username, const std::string& hashed_password);
     bool insertGameSession(int user_id, int score, double duration, const std::string& result);

@@ -1,5 +1,5 @@
-#ifndef LOBBY_H
-#define LOBBY_H
+#pragma once
+
 
 #include <vector>
 #include <string>
@@ -63,5 +63,3 @@ private:
     static const size_t MAX_PLAYERS = 5;
     static const size_t MAX_CHAT_MESSAGES = 100;
 };
-
-#endif
