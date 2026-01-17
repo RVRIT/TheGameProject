@@ -265,3 +265,19 @@ bool NetworkClient::kickPlayer(int lobbyId, const std::string& hostName, const s
         return false;
     }
 }
+
+std::string NetworkClient::getLobbyList() {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Get);
+    request.setUri("/lobby/list");
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        return response.getBody();
+    }
+
+    return "[]";
+}

@@ -30,4 +30,6 @@ public:
     bool endTurn(int lobbyId, const std::string& playerName);
 
     bool kickPlayer(int lobbyId, const std::string& hostName, const std::string& targetName);
+
+    std::string getLobbyList();
 };

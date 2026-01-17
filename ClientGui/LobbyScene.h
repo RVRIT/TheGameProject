@@ -6,6 +6,7 @@
 #include "TextBox.h" 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "json.hpp"
 
 class LobbyScene : public Scene {
 public:
@@ -44,4 +45,7 @@ private:
     sf::RenderWindow& window;
 
     std::vector<std::pair<std::string, std::string>> playerList;
+
+    sf::RectangleShape listBackground;
+    sf::Text listTitle;
 };

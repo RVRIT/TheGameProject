@@ -21,7 +21,7 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
     }
         }),
 
-    readyButton("assets/btn_not_ready.png", { 500.f, 500.f }, [this]() {
+    readyButton("assets/btn_not_ready.png", { 550.f, 550.f }, [this]() {
     if (myPlayerId == -1) return; 
 
     amIReady = !amIReady;
@@ -29,7 +29,7 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
     std::cout << "Ready clicked. State: " << amIReady << "\n";
         }),
 
-    startGameButton("assets/play.png", { 400.f, 400.f }, [this]() {
+    startGameButton("assets/play.png", { 550.f, 50.f }, [this]() {
     std::cout << "Host clicked Start Game...\n";
     if (myPlayerId != -1) {
         if (client.startGame(lobbyId, myPlayerId)) {
@@ -44,12 +44,7 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
     titleText.setFont(font);
     titleText.setString("Lobby ID: " + std::to_string(lobbyId));
     titleText.setCharacterSize(40);
-    titleText.setPosition(400, 50);
-
-    infoText.setFont(font);
-    infoText.setString("Waiting for players...");
-    infoText.setCharacterSize(24);
-    infoText.setPosition(400, 150);
+    titleText.setPosition(50, 50);
 
     chatBackground.setSize({ 400.f, 500.f });
     chatBackground.setFillColor(sf::Color(0, 0, 0, 150));
@@ -115,6 +110,7 @@ void LobbyScene::update(sf::Time dt) {
 }
 
 void LobbyScene::draw(sf::RenderWindow& window) {
+    window.clear(sf::Color(30, 30, 30));
 
     window.draw(titleText);
     window.draw(infoText);
