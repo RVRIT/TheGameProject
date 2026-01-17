@@ -69,6 +69,14 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     readyButton.handleEvent(event, mousePos); 
     chatInput.handleEvent(event);
 
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+        std::string msg = chatInput.getText();
+        if (!msg.empty()) {
+            client.sendLobbyChat(lobbyId, myName, msg);
+            chatInput.clear();
+        }
+    }
+
     if (isHost) {
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
         startGameButton.handleEvent(event, mousePos);
@@ -159,6 +167,7 @@ void LobbyScene::draw(sf::RenderWindow& window) {
 }
 
 void LobbyScene::parseLobbyState(const std::string& jsonStr) {
+    std::cout << "[DEBUG JSON]: " << jsonStr << std::endl;
     if (jsonStr.empty()) return;
     try {
         auto j = json::parse(jsonStr);
@@ -170,6 +179,20 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                 sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName, window));
                 return;
             }
+        }
+
+        if (j.contains("chat") && !j["chat"].is_null()) {
+            std::string allMessages = "";
+
+            for (const auto& msgObj : j["chat"]) {
+                if (msgObj.contains("sender") && msgObj.contains("content")) {
+                    std::string sender = msgObj["sender"];
+                    std::string content = msgObj["content"];
+
+                    allMessages += sender + ": " + content + "\n";
+                }
+            }
+            chatDisplay.setString(allMessages);
         }
 
         playerList.clear();

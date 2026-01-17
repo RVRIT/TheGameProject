@@ -188,6 +188,7 @@ bool Game::checkWinCondition() const noexcept
 	}
 	return false;
 }
+
 bool Game::checkLoseCondition() const
 {
 	if(!canPlayerMakeAnyMove(m_players[m_currentPlayerIndex]))
