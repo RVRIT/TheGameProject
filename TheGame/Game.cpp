@@ -13,6 +13,7 @@
 bool Game::isPlayerTurn(const std::string& playerName) const
 {
 	return getCurrentPlayerName() == playerName;
+
 }
 
 std::string Game::getCurrentPlayerName() const

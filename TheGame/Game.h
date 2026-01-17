@@ -25,9 +25,7 @@ public:
 
 public:
 	std::string getCurrentPlayerName() const;
-	bool isPlayerTurn(const std::string& playerName) const {
-		return getCurrentPlayerName() == playerName;
-	}
+	bool isPlayerTurn(const std::string& playerName) const;
 	explicit Game(const std::vector<std::string_view>& PlayerNames);
 
 	// COMENZI PENTRU CLIENT(SFML)
