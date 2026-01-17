@@ -112,12 +112,15 @@ bool Game::attemptEndTurn()
 
 void Game::setupGame()
 {
-	switch (m_players.size()) {
-	case 1: m_initialHandSize = HAND_SIZE_1_PLAYER; break;
-	case 2: m_initialHandSize = HAND_SIZE_2_PLAYERS; break;
-	default: m_initialHandSize = HAND_SIZE_3_PLUS_PLAYERS; break;
+	switch (m_players.size()) 
+	{
+		case 1: m_initialHandSize = 8; break; 
+		case 2: m_initialHandSize = 8; break; 
+		case 3: m_initialHandSize = 7; break; 
+		default: m_initialHandSize = 6; break; 
 
 	}
+
 
 		for (size_t i = 0; i < m_initialHandSize; ++i)
 		{
@@ -139,7 +142,7 @@ void Game::setupGame()
 }
 void Game::nextTurn() noexcept
 {
-	m_cardsPlayedThisTurn = 0; // resetam 
+	m_cardsPlayedThisTurn = 0; 
 	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
 }
 
@@ -227,9 +230,6 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 				snap.myHand.push_back(card.getValue());
 			}
 
-			// Temporary placeholder: 'cardsPlayed' is currently a local variable in the run loop. 
-			// Will be connected to a class member variable when switching to Server architecture.
-			//acum trebuie modificata functia pentru ca am creat calculate score
 			snap.cardsPlayedThisTurn = 0; 
 			snap.minCardsToPlay = getMinCardsRequired();
 		}
