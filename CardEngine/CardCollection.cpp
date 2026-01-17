@@ -51,6 +51,16 @@ void CardCollection::shuffle()
     internalShuffler.shuffle(m_cards);
 }
 
+std::vector<Card>& CardCollection::getData()
+{
+    return m_cards;
+}
+
+const std::vector<Card>& CardCollection::getCards() const
+{
+    return m_cards;
+}
+
 void CardCollection::sort()
 {
     std::sort(m_cards.begin(), m_cards.end());

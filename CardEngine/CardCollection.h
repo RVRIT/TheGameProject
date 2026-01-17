@@ -35,8 +35,8 @@ public:
 
     // modifiable
 
-    std::vector<Card>& getData() { return m_cards; }
+    std::vector<Card>& getData();
     
     // non modifiable
-    const std::vector<Card>& getCards() const { return m_cards; }
+    const std::vector<Card>& getCards() const;
 };

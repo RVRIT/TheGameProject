@@ -2,6 +2,13 @@
 
 using namespace sqlite_orm;
 
+
+DBManager& DBManager::getInstance() 
+{
+    static DBManager instance;
+    return instance;
+}
+
 bool DBManager::initialize(const std::string& db_path)
 {
     try {

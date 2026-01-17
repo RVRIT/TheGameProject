@@ -24,7 +24,7 @@ public:
     bool leaveLobby(int lobbyId, const std::string& playerName);
     bool restartGame(int lobbyId);
     bool removePlayer(int lobbyId, const std::string& playerName);
-
+    bool saveGameResults(int lobbyId, const std::string& winnerUsername, double durationHours);
     struct LobbySummary {
         int id;
         std::string hostName;

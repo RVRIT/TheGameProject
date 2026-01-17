@@ -1,5 +1,11 @@
 #include "lobby.h"
 #include <algorithm>
+Lobby::Lobby(int id, const std::string& hostName, LobbyStatus m_status) 
+    : id{ id }, m_status{ m_status }
+{
+    addPlayer(hostName);
+}
+
 bool Lobby::addPlayer(const std::string& name) {
     if (m_status != LobbyStatus::Waiting || m_players.size() >= MAX_PLAYERS) {
         return false;
@@ -96,6 +102,16 @@ GameSnapshot Lobby::CreateGameSnapshot() {
     snapshot.isGameOver = false;
 
     return snapshot;
+}
+
+Game* Lobby::getGame()
+{
+    return m_game.get();
+}
+
+const Game* Lobby::getGame() const
+{
+    return m_game.get();
 }
 
 const std::vector<PlayerInfo>& Lobby::getPlayers() const {

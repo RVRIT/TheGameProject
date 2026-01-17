@@ -63,6 +63,7 @@ int main() {
         std::string username = body["username"].s();
         std::string password = body["password"].s();
         crow::json::wvalue res;
+
         std::regex validUsernamePattern("^[a-zA-Z0-9]+$");
         if (!std::regex_match(username, validUsernamePattern)) {
             res["status"] = "error";
@@ -71,8 +72,7 @@ int main() {
             r.set_header("Content-Type", "application/json");
             return r;
         }
-        if (username.length() < 3 || username.length() > 20)
-        {
+        if (username.length() < 3 || username.length() > 20) {
             res["status"] = "error";
             res["message"] = "Username must be between 3-20 characters long";
             crow::response r(400, res.dump());
@@ -86,14 +86,14 @@ int main() {
             r.set_header("Content-Type", "application/json");
             return r;
         }
-        if (password.length() < 6)
-        {
+        if (password.length() < 6) {
             res["status"] = "error";
             res["message"] = "Password must be at least 6 characters long";
             crow::response r(400, res.dump());
             r.set_header("Content-Type", "application/json");
             return r;
         }
+
         std::string hashed = PasswordService::hashPassword(password);
         if (db.registerUser(username, hashed)) {
             res["status"] = "success";
@@ -124,7 +124,9 @@ int main() {
         res["lobbyId"] = newLobbyId;
         res["message"] = "Lobby created successfully";
 
-        return crow::response(201, res.dump());
+        crow::response r(201, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
         });
 
     CROW_ROUTE(app, "/lobby/join").methods("POST"_method)([](const crow::request& req) {
@@ -140,7 +142,9 @@ int main() {
         if (success) {
             crow::json::wvalue res;
             res["message"] = "Joined successfully";
-            return crow::response(200, res.dump());
+            crow::response r(200, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         else {
             return crow::response(404, "Lobby full or not found");
@@ -178,7 +182,9 @@ int main() {
             }
 
             crow::json::wvalue res = crow::json::wvalue(jsonMessages);
-            return crow::response(200, res.dump());
+            crow::response r(200, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         catch (const std::out_of_range& e) {
             return crow::response(404, e.what());
@@ -214,7 +220,9 @@ int main() {
         if (success) {
             crow::json::wvalue res;
             res["message"] = "Updated status";
-            return crow::response(200, res.dump());
+            crow::response r(200, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         else {
             return crow::response(404, "Lobby or player not found");
@@ -239,6 +247,7 @@ int main() {
             return crow::response(400, "Cannot start game");
         }
         });
+
     CROW_ROUTE(app, "/lobby/<int>/game/state").methods("GET"_method)([](const crow::request& req, int lobbyId) {
         char* playerNameQuery = req.url_params.get("playerName");
         if (!playerNameQuery) return crow::response(400, "Missing 'playerName' query param");
@@ -273,8 +282,11 @@ int main() {
             res["opponents"][i]["isTurn"] = snap.opponents[i].isCurrentPlayer;
         }
 
-        return crow::response(200, res.dump());
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
         });
+
     CROW_ROUTE(app, "/lobby/<int>/game/play").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("playerName") || !body.has("handIndex") || !body.has("pileIndex")) {
@@ -290,12 +302,16 @@ int main() {
         crow::json::wvalue res;
         if (success) {
             res["status"] = "success";
-            return crow::response(200, res.dump());
+            crow::response r(200, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         else {
             res["status"] = "error";
             res["message"] = "Not your turn or invalid move";
-            return crow::response(403, res.dump());
+            crow::response r(403, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         });
 
@@ -311,12 +327,16 @@ int main() {
         crow::json::wvalue res;
         if (success) {
             res["status"] = "success";
-            return crow::response(200, res.dump());
+            crow::response r(200, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         else {
             res["status"] = "error";
             res["message"] = "Cannot end turn (not your turn or rules not met)";
-            return crow::response(400, res.dump());
+            crow::response r(400, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         });
 
@@ -336,7 +356,9 @@ int main() {
         res["hours_played"] = userOpt->hours_played;
         res["rating"] = userOpt->rating;
 
-        return crow::response(200, res.dump());
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
         });
 
     CROW_ROUTE(app, "/lobby/<int>/restart").methods("POST"_method)([](const crow::request& req, int lobbyId) {
@@ -344,8 +366,6 @@ int main() {
         if (!body || !body.has("playerName")) {
             return crow::response(400, "Missing 'playerName'");
         }
-
-        std::string playerName = body["playerName"].s();
 
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
         if (!lobby) {
@@ -358,7 +378,9 @@ int main() {
             crow::json::wvalue res;
             res["status"] = "success";
             res["message"] = "Game reset to lobby state";
-            return crow::response(200, res.dump());
+            crow::response r(200, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
         else {
             return crow::response(500, "Could not restart game");
@@ -395,6 +417,7 @@ int main() {
             return crow::response(400, "Player not found");
         }
         });
+
     CROW_ROUTE(app, "/lobby/<int>/leave").methods("POST"_method)([](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("playerName")) {
@@ -405,8 +428,6 @@ int main() {
 
         Lobby* lobby = GameManager::getInstance().getLobby(lobbyId);
         if (!lobby) return crow::response(404, "Lobby not found");
-      
-
 
         bool success = GameManager::getInstance().removePlayer(lobbyId, playerName);
 
@@ -430,7 +451,9 @@ int main() {
             res["server_time"] = mbstr;
         }
 
-        return crow::response(200, res.dump());
+        crow::response r(200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
         });
 
     CROW_ROUTE(app, "/lobby/list").methods("GET"_method)([]() {
@@ -470,7 +493,7 @@ int main() {
         });
 
     CROW_ROUTE(app, "/lobby/<int>/finish").methods("POST"_method)
-        ([&db](const crow::request& req, int lobbyId) {
+        ([&](const crow::request& req, int lobbyId) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("winnerUsername")) {
             return crow::response(400, "Missing 'winnerUsername'");
@@ -484,48 +507,23 @@ int main() {
             if (durationHours < 0.0) durationHours = 0.0;
         }
 
-        auto playerNames = GameManager::getInstance().getLobbyPlayerNames(lobbyId);
-        if (playerNames.empty()) {
-            return crow::response(404, "Lobby not found");
+        bool ok = GameManager::getInstance().saveGameResults(lobbyId, winner, durationHours);
+        if (!ok) {
+            crow::json::wvalue res;
+            res["status"] = "error";
+            res["message"] = "Cannot finish match";
+            crow::response r(400, res.dump());
+            r.set_header("Content-Type", "application/json");
+            return r;
         }
-
-        bool hasScores = body.has("scores");
-        auto scoresObj = hasScores ? body["scores"] : crow::json::rvalue();
-
-        int updatedUsers = 0;
-
-        for (const auto& name : playerNames) {
-            auto userIdOpt = db.getUserId(name);
-            if (!userIdOpt) {
-                continue;
-            }
-
-            int userId = *userIdOpt;
-            bool won = (name == winner);
-
-            int score = 0;
-            if (hasScores && scoresObj.has(name)) {
-                score = scoresObj[name].i();
-            }
-
-            //db.updateUserStats(userId, won, durationHours);
-            db.insertGameSession(userId, score, durationHours, won ? "win" : "loss");
-
-            updatedUsers++;
-        }
-
-        GameManager::getInstance().deleteLobby(lobbyId);
 
         crow::json::wvalue res;
         res["status"] = "success";
-        res["updatedUsers"] = updatedUsers;
         res["message"] = "Match finished, stats saved, lobby removed";
-
         crow::response r(200, res.dump());
         r.set_header("Content-Type", "application/json");
         return r;
             });
-
 
     app.port(18080).multithreaded().run();
 }
