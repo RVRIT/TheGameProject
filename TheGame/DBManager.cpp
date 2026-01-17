@@ -39,7 +39,7 @@ bool DBManager::insertGameSession(int user_id, int score)
     }
 }
 
-bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
+bool DBManager::updateUserStats(int user_id, bool won, double hours_played, int cardsLeftInHand)
 {
     try {
 
@@ -51,7 +51,32 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
         if (won) {
             user.games_won++;
         }
-        m_storage->update(user); //sending the update back to the database
+
+        double winRatio = 0.0;
+        if (user.games_played > 0) {
+            winRatio = static_cast<double>(user.games_won) / user.games_played;
+        }
+
+      
+        double calculatedRating = winRatio * 5.0;
+
+        if (calculatedRating < 1.0) 
+            calculatedRating = 1.0;
+
+        if (!won && cardsLeftInHand > 0) {
+            
+            double penalty = cardsLeftInHand * 0.05;
+            calculatedRating -= penalty;
+        }
+
+        
+        if (calculatedRating < 1.0) calculatedRating = 1.0;
+        if (calculatedRating > 5.0) calculatedRating = 5.0;
+
+        user.rating = calculatedRating;
+
+       
+        m_storage->update(user);
         return true;
     }
     catch (...) {
