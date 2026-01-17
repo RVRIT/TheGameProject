@@ -2,6 +2,7 @@
 #include <string>
 
 namespace Config {
+
     namespace Menu {
         constexpr float BUTTON_X = 548.f; 
 

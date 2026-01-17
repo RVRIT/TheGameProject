@@ -115,7 +115,6 @@ void LobbyScene::update(sf::Time dt) {
 }
 
 void LobbyScene::draw(sf::RenderWindow& window) {
-    window.clear(sf::Color(50, 50, 50));
 
     window.draw(titleText);
     window.draw(infoText);
@@ -176,6 +175,10 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
             std::string status = j["status"];
             if (status == "InProgress") {
                 std::cout << "Server says: Game InProgress! Switching scene...\n";
+                window.create(sf::VideoMode(1920, 1080), "The Game", sf::Style::Fullscreen);
+                window.setFramerateLimit(60);
+                window.setMouseCursorVisible(true);
+
                 sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName, window));
                 return;
             }

@@ -8,36 +8,43 @@ using json = nlohmann::json;
 GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, std::string name, sf::RenderWindow& win)
     : font(f), client(c), sceneManager(mgr), lobbyId(id), myName(name), window(win),
 
-    endTurnButton("assets/exit.png", { 1000.f, 600.f }, [this]() {
+    endTurnButton("assets/nextTurn.png", { 1600.f, 700.f }, [this]() {
     if (!isGameOver) {
-        std::cout << "Requesting End Turn...\n";
         this->client.endTurn(lobbyId, myName);
     }
         }),
 
-    backButton("assets/exit.png", { 500.f, 400.f }, [this]() {
-    std::cout << "Returning to Main Menu...\n";
+    backButton("assets/exit.png", { 860.f, 600.f }, [this]() {
     sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, myName));
         })
 {
     if (bgTexture.loadFromFile("assets/gameBG.png")) {
         background.setTexture(bgTexture);
+		updateBackgroundScale();
+        }
+ 
+    bool shaderLoaded = false;
+    if (sf::Shader::isAvailable()) {
+        if (bgShader.loadFromFile("assets/background.frag", sf::Shader::Fragment)) {
+            shaderLoaded = true;
 
+            bgShader.setUniform("iResolution", sf::Vector2f(1920.f, 1080.f));
+        }
+        else {
+            std::cout << "[WARNING] Shader failed to load. Using background.\n";
+        }
     }
 
-    if (!cardTexture.loadFromFile("assets/card_base.png")) {
-        std::cout << "ERROR: Could not load assets/card_base.png\n";
-    }
+    shaderRect.setSize(sf::Vector2f(1920.f, 1080.f));
+    shaderRect.setPosition(0, 0);
+    
+    if (!cardTexture.loadFromFile("assets/card_base.png")) { /*...*/ }
 
-    statusText.setFont(font);
-    statusText.setCharacterSize(12);
-    statusText.setPosition(20.f, 20.f);
-    statusText.setFillColor(sf::Color::White);
+    sf::View view(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));
+    window.setView(view);
 
-    deckInfoText.setFont(font);
-    deckInfoText.setCharacterSize(20);
-    deckInfoText.setPosition(20.f, 60.f);
-    deckInfoText.setFillColor(sf::Color::White);
+    statusText.setPosition(50, 50);
+    deckInfoText.setPosition(50, 100);
 }
 
 void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
@@ -93,6 +100,8 @@ void GameScene::update(sf::Time dt) {
         std::string jsonState = client.getGameState(lobbyId, myName);
         parseGameState(jsonState);
     }
+
+    bgShader.setUniform("iTime", shaderTimer.getElapsedTime().asSeconds());
 }
 
 void GameScene::parseGameState(const std::string& jsonStr) {
@@ -128,7 +137,7 @@ void GameScene::parseGameState(const std::string& jsonStr) {
 
                 vp.card = std::make_unique<Card>(cardTexture, font, val);
 
-                vp.card->setPosition(300.f + (pIndex * 150), 300.f); 
+                vp.card->setPosition(350.f + (pIndex * 150), 300.f); 
 
                 piles.push_back(std::move(vp));
                 pIndex++;
@@ -138,10 +147,15 @@ void GameScene::parseGameState(const std::string& jsonStr) {
         myHand.clear();
         int cIndex = 0;
         if (j.contains("myHand")) {
+            float startX = 400.f;
+
+            float gap = 140.f;
+
             for (const auto& val : j["myHand"]) {
                 auto card = std::make_unique<Card>(cardTexture, font, val);
 
-                card->setPosition(150.f + (cIndex * 90), 600.f);
+           
+                card->setPosition(startX + (cIndex * gap), 850.f);
 
                 if (cIndex == selectedHandIndex) {
                     card->select();
@@ -179,7 +193,15 @@ void GameScene::parseGameState(const std::string& jsonStr) {
 
 void GameScene::draw(sf::RenderWindow& window) {
 
-    window.draw(background);
+    window.clear(sf::Color::Black);
+
+    if (sf::Shader::isAvailable()) {
+        window.draw(shaderRect, &bgShader);
+    }
+    else {
+        window.draw(background);
+    }
+
     if (isGameOver) {
         window.draw(statusText);
         backButton.draw(window);
@@ -222,4 +244,15 @@ void GameScene::draw(sf::RenderWindow& window) {
     for (const auto& card : myHand) {
         card->draw(window);
     }
+}
+
+void GameScene::updateBackgroundScale()
+{
+    sf::Vector2u win = window.getSize();
+    sf::Vector2u tex = bgTexture.getSize();
+
+    background.setScale(
+        float(win.x) / tex.x,
+        float(win.y) / tex.y
+    );
 }

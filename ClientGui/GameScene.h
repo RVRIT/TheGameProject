@@ -2,17 +2,15 @@
 #include "SceneManager.h"
 #include "NetworkClient.h"
 #include "Button.h"
-#include "Card.h" // <--- INCLUDE NOU
+#include "Card.h" 
 #include <vector>
-#include <memory> // pentru unique_ptr
+#include <memory> 
 
-// Structură simplă pentru Teancuri (Piles)
 struct VisualPile {
     int type; // 0 = ASC, 1 = DESC
-    std::unique_ptr<Card> card; // <--- Folosim Clasa Card aici!
+    std::unique_ptr<Card> card; 
 };
 
-// Structură pentru adversari (rămâne la fel)
 struct VisualOpponent {
     std::string name;
     int cardCount;
@@ -26,6 +24,8 @@ public:
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override;
     void update(sf::Time dt) override;
     void draw(sf::RenderWindow& window) override;
+    void updateBackgroundScale();
+
 
 private:
     void parseGameState(const std::string& jsonStr);
@@ -47,12 +47,16 @@ private:
     Button endTurnButton;
     Button backButton;
 
-    sf::Texture cardTexture; 
-  
+    sf::Texture cardTexture;
+
     std::vector<std::unique_ptr<Card>> myHand;
 
     std::vector<VisualPile> piles;
 
     std::vector<VisualOpponent> opponents;
     int selectedHandIndex = -1;
+
+    sf::Shader bgShader;
+    sf::RectangleShape shaderRect; 
+    sf::Clock shaderTimer;
 };
