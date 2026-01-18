@@ -59,6 +59,13 @@ private:
     sf::Shader bgShader;
     sf::RectangleShape shaderRect; 
     sf::Clock shaderTimer;
+    bool shaderLoaded = false;
 
     sf::Text cardsPlayedText;
+
+    bool isMenuOpen = false;           
+    sf::RectangleShape menuOverlay;    
+    sf::RectangleShape menuContainer;  
+    sf::Text menuTitle;
+    Button btnExit;
 };

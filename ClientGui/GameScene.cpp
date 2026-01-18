@@ -16,14 +16,30 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
 
     backButton("assets/exit.png", { 860.f, 600.f }, [this]() {
     sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, myName));
+        }),
+
+    btnExit("assets/exit.png", { 860.f, 550.f }, [this]() {
+    std::cout << "Exiting game...\n";
+    client.leaveLobby(lobbyId, myName);
+
+    window.setSize(sf::Vector2u(1280, 720));
+    sf::View view(sf::FloatRect(0.f, 0.f, 1280.f, 720.f));
+    window.setView(view);
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    window.setPosition(sf::Vector2i(
+        (desktop.width - 1280) / 2,
+        (desktop.height - 720) / 2));
+
+    sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, myName));
         })
+
 {
+
     if (bgTexture.loadFromFile("assets/gameBG.png")) {
         background.setTexture(bgTexture);
 		updateBackgroundScale();
         }
  
-    bool shaderLoaded = false;
     if (sf::Shader::isAvailable()) {
         if (bgShader.loadFromFile("assets/background.frag", sf::Shader::Fragment)) {
             shaderLoaded = true;
@@ -38,7 +54,7 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
     shaderRect.setSize(sf::Vector2f(1920.f, 1080.f));
     shaderRect.setPosition(0, 0);
     
-    if (!cardTexture.loadFromFile("assets/card_base.png")) { /*...*/ }
+    if (!cardTexture.loadFromFile("assets/card_base.png")) { }
 
     sf::View view(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));
     window.setView(view);
@@ -56,6 +72,11 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
     deckInfoText.setPosition(50.f, 150.f); 
     deckInfoText.setString("Deck: --");
 
+    isMenuOpen = false;
+    menuOverlay.setSize({ 300.f, 380.f });
+    menuOverlay.setFillColor(sf::Color(0, 0, 0, 150)); 
+    menuOverlay.setPosition(850.f, 500.f);
+
 }
 
 void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
@@ -64,6 +85,16 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     if (isGameOver) {
         backButton.handleEvent(event, mousePos);
         return;
+    }
+
+    if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
+        isMenuOpen = !isMenuOpen; 
+    }
+
+    if (isMenuOpen) {
+
+        btnExit.handleEvent(event, mousePos);
+        return; 
     }
 
     endTurnButton.handleEvent(event, mousePos);
@@ -227,11 +258,19 @@ void GameScene::draw(sf::RenderWindow& window) {
 
     window.clear(sf::Color::Black);
 
-    if (sf::Shader::isAvailable()) {
+
+    if (shaderLoaded==true) {
         window.draw(shaderRect, &bgShader);
     }
     else {
         window.draw(background);
+    }
+
+
+    if (isMenuOpen) {
+        window.draw(menuOverlay);   
+        btnExit.draw(window);       
+
     }
 
     if (isGameOver) {
@@ -289,4 +328,5 @@ void GameScene::updateBackgroundScale()
         float(win.x) / tex.x,
         float(win.y) / tex.y
     );
+
 }
