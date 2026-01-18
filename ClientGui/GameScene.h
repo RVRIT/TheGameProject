@@ -61,4 +61,10 @@ private:
     sf::Clock shaderTimer;
 
     sf::Text cardsPlayedText;
+
+    bool isMenuOpen = false;           
+    sf::RectangleShape menuOverlay;    
+    sf::RectangleShape menuContainer;  
+    sf::Text menuTitle;
+    Button btnExit;
 };
