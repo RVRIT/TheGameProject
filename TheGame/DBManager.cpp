@@ -59,28 +59,33 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played, int 
             user.games_won++;
         }
 
-        double winRatio = 0.0;
-        if (user.games_played > 0) {
-            winRatio = static_cast<double>(user.games_won) / user.games_played;
-        }
+        double currentMatchScore = 0.0;
 
-      
-        double calculatedRating = winRatio * 5.0;
-
-        if (calculatedRating < 1.0) 
-            calculatedRating = 1.0;
-
-        if (!won && cardsLeftInHand > 0) {
+        if (won) {
             
-            double penalty = cardsLeftInHand * 0.05;
-            calculatedRating -= penalty;
+            currentMatchScore = 5.0;
         }
 
-        
-        if (calculatedRating < 1.0) calculatedRating = 1.0;
-        if (calculatedRating > 5.0) calculatedRating = 5.0;
+        else {
+            
+            double penalty = cardsLeftInHand * 0.3;
+            currentMatchScore = 4.5 - penalty;
 
-        user.rating = calculatedRating;
+            
+            if (currentMatchScore < 1.0) currentMatchScore = 1.0;
+        }
+
+        if (user.games_played == 1) {
+            
+            user.rating = currentMatchScore;
+        }
+        else {
+            
+            user.rating = ((user.rating * (user.games_played - 1)) + currentMatchScore) / user.games_played;
+        }
+
+        if (user.rating > 5.0) user.rating = 5.0;
+        if (user.rating < 1.0) user.rating = 1.0;
 
        
         m_storage->update(user);
