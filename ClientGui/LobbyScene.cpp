@@ -21,7 +21,7 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
     }
         }),
 
-    readyButton("assets/btn_not_ready.png", { 500.f, 500.f }, [this]() {
+    readyButton("assets/btn_not_ready.png", { 600.f, 600.f }, [this]() {
     if (myPlayerId == -1) return; 
 
     amIReady = !amIReady;
@@ -29,7 +29,7 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
     std::cout << "Ready clicked. State: " << amIReady << "\n";
         }),
 
-    startGameButton("assets/play.png", { 400.f, 400.f }, [this]() {
+    startGameButton("assets/play.png", { 550.f, 50.f }, [this]() {
     std::cout << "Host clicked Start Game...\n";
     if (myPlayerId != -1) {
         if (client.startGame(lobbyId, myPlayerId)) {
@@ -39,17 +39,26 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
             std::cout << "Failed to start (Not all ready? Not host?)\n";
         }
     }
+        }),
+    leaveBtn("assets/BackButton.png", { 50.f, 600.f }, [this]() {
+    std::cout << "Leaving lobby...\n";
+
+    if (myName == hostName) {
+        std::cout << "[CLIENT] Deleting lobby...\n";
+        client.deleteLobby(lobbyId);
+    }
+    else {
+        std::cout << "[CLIENT] Leaving lobby...\n";
+        client.leaveLobby(lobbyId, myName);
+    }
+
+    sceneManager.popScene();
         })
 {
     titleText.setFont(font);
     titleText.setString("Lobby ID: " + std::to_string(lobbyId));
     titleText.setCharacterSize(40);
-    titleText.setPosition(400, 50);
-
-    infoText.setFont(font);
-    infoText.setString("Waiting for players...");
-    infoText.setCharacterSize(24);
-    infoText.setPosition(400, 150);
+    titleText.setPosition(50, 50);
 
     chatBackground.setSize({ 400.f, 500.f });
     chatBackground.setFillColor(sf::Color(0, 0, 0, 150));
@@ -67,7 +76,16 @@ void LobbyScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     backButton.handleEvent(event, mousePos);
     sendButton.handleEvent(event, mousePos);
     readyButton.handleEvent(event, mousePos); 
+    leaveBtn.handleEvent(event, mousePos);
     chatInput.handleEvent(event);
+
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+        std::string msg = chatInput.getText();
+        if (!msg.empty()) {
+            client.sendLobbyChat(lobbyId, myName, msg);
+            chatInput.clear();
+        }
+    }
 
     if (isHost) {
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -107,7 +125,7 @@ void LobbyScene::update(sf::Time dt) {
 }
 
 void LobbyScene::draw(sf::RenderWindow& window) {
-    window.clear(sf::Color(50, 50, 50));
+    window.clear(sf::Color(30, 30, 30));
 
     window.draw(titleText);
     window.draw(infoText);
@@ -120,6 +138,7 @@ void LobbyScene::draw(sf::RenderWindow& window) {
     chatInput.draw(window);
     sendButton.draw(window);
 	readyButton.draw(window);
+    leaveBtn.draw(window);
 
     if (isHost) {
         startGameButton.draw(window);
@@ -159,6 +178,7 @@ void LobbyScene::draw(sf::RenderWindow& window) {
 }
 
 void LobbyScene::parseLobbyState(const std::string& jsonStr) {
+    std::cout << "[DEBUG JSON]: " << jsonStr << std::endl;
     if (jsonStr.empty()) return;
     try {
         auto j = json::parse(jsonStr);
@@ -167,9 +187,31 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
             std::string status = j["status"];
             if (status == "InProgress") {
                 std::cout << "Server says: Game InProgress! Switching scene...\n";
+                window.create(sf::VideoMode(1920, 1080), "The Game", sf::Style::Fullscreen);
+                window.setFramerateLimit(60);
+                window.setMouseCursorVisible(true);
+
                 sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName, window));
                 return;
             }
+        }
+
+        if (j.contains("hostName")) {
+            this->hostName = j["hostName"];
+        }
+
+        if (j.contains("chat") && !j["chat"].is_null()) {
+            std::string allMessages = "";
+
+            for (const auto& msgObj : j["chat"]) {
+                if (msgObj.contains("sender") && msgObj.contains("content")) {
+                    std::string sender = msgObj["sender"];
+                    std::string content = msgObj["content"];
+
+                    allMessages += sender + ": " + content + "\n";
+                }
+            }
+            chatDisplay.setString(allMessages);
         }
 
         playerList.clear();
@@ -181,6 +223,14 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                 int pId = p["id"];
                 bool isReady = p["isReady"];
 
+                double pRating = 0.0;
+                if (p.contains("rating")) {
+                    pRating = p["rating"].get<double>();
+                }
+
+                std::ostringstream rs;
+                rs << std::fixed << std::setprecision(0) << pRating; 
+
                 if (pName == myName) myPlayerId = pId;
 
                 if (firstPlayer) {
@@ -189,7 +239,7 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                     firstPlayer = false; 
                 }
 
-                std::string displayName = pName;
+                std::string displayName = pName + " (" + rs.str() + ")"; 
 
                 if (isReady) displayName += " [READY]";
                 else displayName += " [...]";

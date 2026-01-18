@@ -19,7 +19,10 @@ bool Pile::canPlace(const Card& card) const noexcept {
 	uint8_t val = card.getValue();
 	if (m_type == PileType::ASCENDING) {
 		if (val > m_topCardValue) return true;
-		if (val == m_topCardValue - STEP_BACK_RULE) return true;
+		if (m_topCardValue >= STEP_BACK_RULE)  // preventing underflow
+		{
+			if (val == m_topCardValue - STEP_BACK_RULE) return true;
+		}
 	}
 	else {
 		if (val < m_topCardValue) return true;
@@ -33,7 +36,9 @@ bool Pile::isTenBackMove(const Card& card) const noexcept
 	uint8_t val = card.getValue();
 	if (m_type == PileType::ASCENDING)
 	{
-		return val == m_topCardValue - STEP_BACK_RULE; 
+		if (m_topCardValue < STEP_BACK_RULE) return false; // preventing underflow
+
+		return val == m_topCardValue - STEP_BACK_RULE;
 	}
 	else
 	{

@@ -29,6 +29,16 @@ void Button::handleEvent(const sf::Event& event, const sf::Vector2f& mousePositi
     }
 }
 
+void Button::setSize(const sf::Vector2f& size) {
+    sf::Vector2u originalSize = sprite.getTexture()->getSize();
+
+    float scaleX = size.x / static_cast<float>(originalSize.x);
+    float scaleY = size.y / static_cast<float>(originalSize.y);
+
+    sprite.setScale(scaleX, scaleY);
+}
+
+
 void Button::draw(sf::RenderWindow& window) {
     window.draw(sprite);
 }

@@ -10,6 +10,18 @@
 #include <thread>
 #include <optional>
 
+bool Game::isPlayerTurn(const std::string& playerName) const
+{
+	return getCurrentPlayerName() == playerName;
+
+}
+
+std::string Game::getCurrentPlayerName() const
+{
+	if (m_players.empty()) return "";
+	return std::string(m_players[m_currentPlayerIndex].getName());
+}
+
 Game::Game(const std::vector<std::string_view>& playerNames)
 	: m_piles{
 		Pile(PileType::ASCENDING),
@@ -112,11 +124,23 @@ bool Game::attemptEndTurn()
 
 void Game::setupGame()
 {
-	switch (m_players.size()) {
-	case 1: m_initialHandSize = HAND_SIZE_1_PLAYER; break;
-	case 2: m_initialHandSize = HAND_SIZE_2_PLAYERS; break;
-	default: m_initialHandSize = HAND_SIZE_3_PLUS_PLAYERS; break;
+	switch (m_players.size())
+	{
+	case 2:
+		m_initialHandSize = HAND_SIZE_2_PLAYERS; // 8 CARDS
+		break;
+	case 3:
+		m_initialHandSize = HAND_SIZE_3_PLAYERS; // 7 CARDS
+		break;
+	case 4:
+	case 5:
+		m_initialHandSize = HAND_SIZE_4_OR_5_PLAYERS; // 6 CARDS
+		break;
+	default:
 
+		// FOR TESTING
+		m_initialHandSize = HAND_SIZE_2_PLAYERS;
+		break;
 	}
 
 		for (size_t i = 0; i < m_initialHandSize; ++i)
@@ -137,10 +161,21 @@ void Game::setupGame()
 		}
 	
 }
-void Game::nextTurn() noexcept
+void Game::nextTurn() 
 {
-	m_cardsPlayedThisTurn = 0; // resetam 
+	m_cardsPlayedThisTurn = 0; 
 	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
+
+	Player& currentPlayer = m_players[m_currentPlayerIndex];
+
+	//if no move can be made by the current player , the game is lost
+
+	if (!canPlayerMakeAnyMove(currentPlayer))
+	{
+		m_isGameOver = true;
+		m_playerWon = false; 
+		saveGameResults();   
+	}
 }
 
 
@@ -163,7 +198,7 @@ void Game::drawCardsForCurrentPlayer()
 }
 
 
-bool Game::canPlayerMakeAnyMove(const Player& player) const noexcept
+bool Game::canPlayerMakeAnyMove(const Player& player) const
 {
 	return !player.findPossibleMoves(m_piles).empty();
 }
@@ -173,7 +208,7 @@ size_t Game::getMinCardsRequired() const // Returns 2 normally, or 1 if the deck
 	return m_deck.isEmpty() ? MIN_CARDS_TO_PLAY_EMPTY_DECK : MIN_CARDS_TO_PLAY_NORMAL;
 }
 
-bool Game::checkWinCondition() const noexcept
+bool Game::checkWinCondition() const
 {
 	if (m_deck.isEmpty())
 	{
@@ -188,6 +223,7 @@ bool Game::checkWinCondition() const noexcept
 	}
 	return false;
 }
+
 bool Game::checkLoseCondition() const
 {
 	if(!canPlayerMakeAnyMove(m_players[m_currentPlayerIndex]))
@@ -227,10 +263,7 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 				snap.myHand.push_back(card.getValue());
 			}
 
-			// Temporary placeholder: 'cardsPlayed' is currently a local variable in the run loop. 
-			// Will be connected to a class member variable when switching to Server architecture.
-			//acum trebuie modificata functia pentru ca am creat calculate score
-			snap.cardsPlayedThisTurn = 0; 
+			snap.cardsPlayedThisTurn = m_cardsPlayedThisTurn;
 			snap.minCardsToPlay = getMinCardsRequired();
 		}
 		else
@@ -252,6 +285,21 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 
 	return snap;
 
+}
+
+bool Game::isGameOver() const
+{
+	return m_isGameOver;
+}
+
+bool Game::isVictory() const
+{
+	return m_playerWon;
+}
+
+size_t Game::getCardsPlayedThisTurn() const
+{
+	return m_cardsPlayedThisTurn;
 }
 
 int Game::calculateScore(const Player& player) const
@@ -285,13 +333,18 @@ void Game::saveGameResults()
 		auto userIdOpt = db.getUserId(player.getName());
 		if (userIdOpt.has_value())
 		{
+
 			int userId = userIdOpt.value();
-			int score = calculateScore(player);
+			
+			int sessionScore = calculateScore(player);
 			std::string result = m_playerWon ? "Win" : "Loss";
 
-			db.insertGameSession(userId, score, elapsed.count(), result);
+			db.insertGameSession(userId, sessionScore, elapsed.count(), result);
 
-			db.updateUserStats(userId, m_playerWon, durationHours);
+			int cardsLeft = static_cast<int>(player.getHandSize());
+
+			//update global rating (1-5) based on wins and cards left
+			db.updateUserStats(userId, m_playerWon, durationHours, cardsLeft);
 		}
 	}
 	m_statsSaved = true;

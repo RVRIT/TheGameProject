@@ -12,6 +12,7 @@
 #include "GameScene.h"
 #include "LobbyScene.h"
 
+
 int main() {
 
     sf::RenderWindow window(sf::VideoMode(1280, 720), "The Game", sf::Style::Titlebar | sf::Style::Close);

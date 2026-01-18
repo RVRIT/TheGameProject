@@ -7,6 +7,7 @@ public:
     Button(const std::string& texturePath, sf::Vector2f position, std::function<void()> callback = nullptr);
     void handleEvent(const sf::Event& event, const sf::Vector2f& mousePosition);
     void draw(sf::RenderWindow& window);
+    void setSize(const sf::Vector2f& size);
 
 private:
     sf::Sprite sprite;

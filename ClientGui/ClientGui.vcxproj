@@ -198,7 +198,10 @@ exit 0
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="GameConstants.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="LobbyMenuScene.cpp" />
     <ClCompile Include="LobbyScene.cpp" />
     <ClCompile Include="loginMenu.cpp" />
     <ClCompile Include="main.cpp" />
@@ -209,6 +212,7 @@ exit 0
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SettingsMenu.cpp" />
     <ClCompile Include="TextBox.cpp" />
+    <ClCompile Include="UserStatsScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\background.png" />
@@ -221,8 +225,11 @@ exit 0
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="GameConstants.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="LobbyMenuScene.h" />
     <ClInclude Include="LobbyScene.h" />
     <ClInclude Include="loginMenu.h" />
     <ClInclude Include="MainMenu.h" />
@@ -232,6 +239,7 @@ exit 0
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SettingsMenu.h" />
     <ClInclude Include="textBox.h" />
+    <ClInclude Include="UserStatsScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

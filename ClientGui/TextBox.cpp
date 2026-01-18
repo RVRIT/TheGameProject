@@ -20,7 +20,7 @@ void TextBox::handleEvent(const sf::Event& event) {
             static_cast<float>(event.mouseButton.y)
         );
         selected = box.getGlobalBounds().contains(mouse);
-        box.setOutlineColor(selected ? sf::Color::Blue : sf::Color::Black);
+        box.setOutlineColor(selected ? sf::Color::Red : sf::Color::Black);
     }
 
     if (selected && event.type == sf::Event::TextEntered) {

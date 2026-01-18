@@ -55,31 +55,28 @@ using StorageType = decltype(createStorage("")); //return type for CreateStorage
 
 class DBManager {
 public:
-    static DBManager& getInstance() {
-        static DBManager instance;
-        return instance;
-    }
+    static DBManager& getInstance();
 
     DBManager(const DBManager&) = delete;
     DBManager& operator=(const DBManager&) = delete;
 
     bool initialize(const std::string& db_path);
     bool insertGameSession(int user_id, int score);
-    bool updateUserStats(int user_id, bool won, double hours_played);
+    bool updateUserStats(int user_id, bool won, double hours_played, int cardsLeftInHand);
     bool checkExistingUser(const std::string& username);
     bool registerUser(const std::string& username, const std::string& hashed_password);
     bool insertGameSession(int user_id, int score, double duration, const std::string& result);
     std::optional<std::string> getHashedPassword(const std::string& username);
     std::optional<int> getUserId(const std::string& username);
     std::optional<User> getUserStats(const std::string& username);
-
+    std::optional<float> getUserRating(const std::string& username);
 
     // Removed Lobby functions (create, join, etc.) from here.
     // We now handle active lobbies in the GameManager (in memory) using a map.
     // The database is only used for Users and saved Game History.
 
-
-
+public:
+    static constexpr double RATING_PENALTY_PER_CARD = 0.3;
 
 private:
     DBManager() = default;

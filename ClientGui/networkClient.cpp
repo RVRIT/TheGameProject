@@ -107,7 +107,9 @@ bool NetworkClient::sendLobbyChat(int lobbyId, const std::string& playerName, co
 
     sf::Http::Response response = http.sendRequest(request);
     return (response.getStatus() == sf::Http::Response::Ok);
+
 }
+
 
 int NetworkClient::createLobby(const std::string& hostName) {
     sf::Http http(host, port);
@@ -264,4 +266,63 @@ bool NetworkClient::kickPlayer(int lobbyId, const std::string& hostName, const s
         std::cout << "[CLIENT] Kick failed: " << response.getBody() << "\n";
         return false;
     }
+}
+
+std::string NetworkClient::getLobbyList() {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Get);
+    request.setUri("/lobby/list");
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        return response.getBody();
+    }
+
+    return "[]";
+}
+
+std::string NetworkClient::getUserStats(const std::string& username) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Get);
+    request.setUri("/user/stats?username=" + username);
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    if (response.getStatus() == sf::Http::Response::Ok) {
+        return response.getBody();
+    }
+    return "{}"; 
+}
+
+bool NetworkClient::leaveLobby(int lobbyId, const std::string& playerName) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Post);
+    request.setUri("/lobby/" + std::to_string(lobbyId) + "/leave");
+    request.setField("Content-Type", "application/json");
+
+    json payload;
+    payload["playerName"] = playerName;
+    request.setBody(payload.dump());
+
+    sf::Http::Response response = http.sendRequest(request);
+    return (response.getStatus() == sf::Http::Response::Ok);
+}
+
+bool NetworkClient::deleteLobby(int lobbyId) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Delete);
+    request.setUri("/lobby/" + std::to_string(lobbyId));
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    return (response.getStatus() == sf::Http::Response::Ok);
 }

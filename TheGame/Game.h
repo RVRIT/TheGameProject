@@ -16,21 +16,16 @@
 class Game
 {
 public:
-	static constexpr size_t HAND_SIZE_1_PLAYER = 8;
-	static constexpr size_t HAND_SIZE_2_PLAYERS = 7;
-	static constexpr size_t HAND_SIZE_3_PLUS_PLAYERS = 6;
+	static constexpr size_t HAND_SIZE_2_PLAYERS = 8;
+	static constexpr size_t HAND_SIZE_3_PLAYERS = 7;
+	static constexpr size_t HAND_SIZE_4_OR_5_PLAYERS = 6;
 
 	static constexpr size_t MIN_CARDS_TO_PLAY_NORMAL = 2;
 	static constexpr size_t MIN_CARDS_TO_PLAY_EMPTY_DECK = 1;
 
 public:
-	std::string getCurrentPlayerName() const {
-		if (m_players.empty()) return "";
-		return std::string(m_players[m_currentPlayerIndex].getName());
-	}
-	bool isPlayerTurn(const std::string& playerName) const {
-		return getCurrentPlayerName() == playerName;
-	}
+	std::string getCurrentPlayerName() const;
+	bool isPlayerTurn(const std::string& playerName) const;
 	explicit Game(const std::vector<std::string_view>& PlayerNames);
 
 	// COMENZI PENTRU CLIENT(SFML)
@@ -46,22 +41,22 @@ public:
 
 	// Getteri utili pentru UI
 
-	bool isGameOver() const { return m_isGameOver; }
-	bool isVictory() const { return m_playerWon; }
+	 bool isGameOver() const;
+	 bool isVictory() const;
 
-	size_t getCardsPlayedThisTurn() const { return m_cardsPlayedThisTurn; }
+	size_t getCardsPlayedThisTurn() const;
 
 	size_t getMinCardsRequired() const; // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
 
 private:
 	void setupGame();
 	
-	void nextTurn() noexcept;
+	void nextTurn();
 	void drawCardsForCurrentPlayer();
 
-	bool checkWinCondition() const noexcept;
+	bool checkWinCondition() const;
 	bool checkLoseCondition() const;
-	bool canPlayerMakeAnyMove(const Player& player) const noexcept;
+	bool canPlayerMakeAnyMove(const Player& player) const;
 	int calculateScore(const Player& player) const;
 
 	Deck m_deck;

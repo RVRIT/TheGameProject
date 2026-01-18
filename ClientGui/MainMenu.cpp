@@ -7,6 +7,10 @@
 #include "LobbyScene.h"
 #include <cstdlib> 
 #include <ctime>   
+#include "GameConstants.h"
+#include "LobbyMenuScene.h"
+#include "UserStatsScene.h"
+
 
 MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& manager, sf::RenderWindow& windowRef, std::string username)
     : font(fontRef),
@@ -15,53 +19,27 @@ MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& ma
     window(windowRef),
     currentUsername(username),
 
-    // 1. PLAY BUTTON
-    playButton("assets/play.png", { 50.f, 50.f }, []() {
-    std::cout << "Play clicked\n";
+    playButton("assets/play.png",
+        { Config::Menu::BUTTON_X, Config::Menu::SLOT_1_Y },
+        [this]() {
+            sceneManager.pushScene(std::make_unique<LobbyMenuScene>(font, client, sceneManager, window, currentUsername));
         }),
 
-    // 2. EXIT BUTTON
-    exitButton("assets/exit.png", { 50.f, 600.f }, [&]() {
-    sceneManager.popScene();
+    exitButton("assets/exit.png",
+        { Config::Menu::BUTTON_X, Config::Menu::SLOT_4_Y },
+        [&]() {
+            sceneManager.popScene(); 
+            window.close();
         }),
 
-    // 3. SETTINGS BUTTON
-    settingsButton("assets/settings.png", { 50.f, 400.f }, [&]() {
-    sceneManager.pushScene(std::make_unique<SettingsMenu>(window, sceneManager, font));
-        }),
+  
+    settingsButton("assets/settings.png", { -1000.f, -1000.f }, []() {}),
 
-    // 4. CREATE LOBBY BUTTON (Corectat)
-    createLobbyButton("assets/btn_create_lobby.png", { 50.f, 150.f }, [this]() {
-    std::string hostName = this->currentUsername;
-    std::cout << "Requesting Lobby Creation as " << hostName << "...\n";
-
-    int newLobbyId = this->client.createLobby(hostName);
-
-    if (newLobbyId != -1) {
-        // Aici aveam nevoie de 'window' la final - este corect acum
-        sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager, newLobbyId, this->currentUsername, window));
-    }
-    // AM ȘTERS codul greșit cu 'id' care era aici
-        }),
-
-    // 5. INPUT BOX
-    lobbyIdInput(font, { 50.f, 300.f }, { 200.f, 40.f }),
-
-    // 6. JOIN LOBBY BUTTON (Corectat)
-    joinLobbyButton("assets/btn_join.png", { 270.f, 300.f }, [this]() {
-    std::string idStr = lobbyIdInput.getText();
-    std::string joinerName = this->currentUsername;
-
-    if (idStr.empty()) return;
-    try {
-        int id = std::stoi(idStr); // Aici definim 'id'
-
-        if (client.joinLobby(id, joinerName)) {
-            // FIX: Am adăugat ', window' la finalul listei de argumente!
-            sceneManager.pushScene(std::make_unique<LobbyScene>(font, client, sceneManager, id, joinerName, window));
-        }
-    }
-    catch (...) {}
+    statsButton("assets/userStats.png",
+        { Config::Menu::BUTTON_X, Config::Menu::SLOT_2_Y },
+        [this]() { 
+    sceneManager.pushScene(std::make_unique<UserStatsScene>(
+        font, client, sceneManager, window, currentUsername));
         })
 
 {
@@ -69,6 +47,8 @@ MainMenu::MainMenu(sf::Font& fontRef, NetworkClient& clientRef, SceneManager& ma
         background.setTexture(bgTexture);
         updateBackgroundScale();
     }
+
+    
 }
 
 void MainMenu::update(sf::Time dt)
@@ -81,9 +61,8 @@ void MainMenu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     playButton.handleEvent(event, mousePos);
     exitButton.handleEvent(event, mousePos);
     settingsButton.handleEvent(event, mousePos);
-    createLobbyButton.handleEvent(event, mousePos);
-    lobbyIdInput.handleEvent(event);
-    joinLobbyButton.handleEvent(event, mousePos);
+    statsButton.handleEvent(event, mousePos);
+
 }
 
 void MainMenu::draw(sf::RenderWindow& window) {
@@ -91,9 +70,8 @@ void MainMenu::draw(sf::RenderWindow& window) {
     playButton.draw(window);
     exitButton.draw(window);
     settingsButton.draw(window);
-    createLobbyButton.draw(window);
-    lobbyIdInput.draw(window);
-    joinLobbyButton.draw(window);
+    statsButton.draw(window);
+
 }
 
 void MainMenu::updateBackgroundScale()

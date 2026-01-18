@@ -2,6 +2,13 @@
 
 using namespace sqlite_orm;
 
+
+DBManager& DBManager::getInstance() 
+{
+    static DBManager instance;
+    return instance;
+}
+
 bool DBManager::initialize(const std::string& db_path)
 {
     try {
@@ -39,7 +46,7 @@ bool DBManager::insertGameSession(int user_id, int score)
     }
 }
 
-bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
+bool DBManager::updateUserStats(int user_id, bool won, double hours_played, int cardsLeftInHand)
 {
     try {
 
@@ -51,7 +58,37 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played)
         if (won) {
             user.games_won++;
         }
-        m_storage->update(user); //sending the update back to the database
+
+        double currentMatchScore = 0.0;
+
+        if (won) {
+            
+            currentMatchScore = 5.0;
+        }
+
+        else {
+            
+            double penalty = cardsLeftInHand * DBManager::RATING_PENALTY_PER_CARD;
+            currentMatchScore = 4.5 - penalty;
+
+            
+            if (currentMatchScore < 1.0) currentMatchScore = 1.0;
+        }
+
+        if (user.games_played == 1) {
+            
+            user.rating = currentMatchScore;
+        }
+        else {
+            
+            user.rating = ((user.rating * (user.games_played - 1)) + currentMatchScore) / user.games_played;
+        }
+
+        if (user.rating > 5.0) user.rating = 5.0;
+        if (user.rating < 1.0) user.rating = 1.0;
+
+       
+        m_storage->update(user);
         return true;
     }
     catch (...) {
@@ -147,7 +184,20 @@ std::optional<User> DBManager::getUserStats(const std::string& username)
         return std::nullopt;
     }
 }
-
+std::optional<float> DBManager::getUserRating(const std::string & username)
+{
+    try
+    {
+        auto users = m_storage->get_all<User>(where(c(&User::username) == username));
+        if (users.empty()) {
+            return std::nullopt;
+        }
+        return users[0].rating;
+    }
+    catch (...) {
+        return std::nullopt;
+    }
+}
 // Lobby functions were removed because we moved the logic to GameManager.
 // We don't need to save temporary lobbies in the database anymore
 
