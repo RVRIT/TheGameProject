@@ -151,6 +151,7 @@ bool GameManager::removePlayer(int lobbyId, const std::string& playerName) {
     return false;
 }
 
+
 std::vector<GameManager::LobbySummary> GameManager::listLobbies() const
 {
     std::lock_guard<std::mutex> lock(m_mtx);

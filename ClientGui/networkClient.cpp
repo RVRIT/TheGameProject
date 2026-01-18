@@ -312,3 +312,15 @@ bool NetworkClient::leaveLobby(int lobbyId, const std::string& playerName) {
     sf::Http::Response response = http.sendRequest(request);
     return (response.getStatus() == sf::Http::Response::Ok);
 }
+
+bool NetworkClient::deleteLobby(int lobbyId) {
+    sf::Http http(host, port);
+    sf::Http::Request request;
+
+    request.setMethod(sf::Http::Request::Delete);
+    request.setUri("/lobby/" + std::to_string(lobbyId));
+
+    sf::Http::Response response = http.sendRequest(request);
+
+    return (response.getStatus() == sf::Http::Response::Ok);
+}

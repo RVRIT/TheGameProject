@@ -42,7 +42,15 @@ LobbyScene::LobbyScene(sf::Font& fontRef, NetworkClient& clientRef, SceneManager
         }),
     leaveBtn("assets/BackButton.png", { 50.f, 600.f }, [this]() {
     std::cout << "Leaving lobby...\n";
-    client.leaveLobby(lobbyId, myName);
+
+    if (myName == hostName) {
+        std::cout << "[CLIENT] Deleting lobby...\n";
+        client.deleteLobby(lobbyId);
+    }
+    else {
+        std::cout << "[CLIENT] Leaving lobby...\n";
+        client.leaveLobby(lobbyId, myName);
+    }
 
     sceneManager.popScene();
         })
@@ -186,6 +194,10 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                 sceneManager.changeScene(std::make_unique<GameScene>(font, client, sceneManager, lobbyId, myName, window));
                 return;
             }
+        }
+
+        if (j.contains("hostName")) {
+            this->hostName = j["hostName"];
         }
 
         if (j.contains("chat") && !j["chat"].is_null()) {
