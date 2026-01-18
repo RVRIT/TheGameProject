@@ -1,6 +1,6 @@
 ## The Game
 
-A C++ implementation of the well-known card-based co-op game **"The Game"**.
+A C++ implementation of the well-known card-based board game **"The Game"**.
 
 This project supports **2+ players** and includes the original gameplay mechanics:
 - higher cards go on **ascending** piles
@@ -61,4 +61,4 @@ The game ends when:
 
 The project is inspired by the original board game:
 
-**The Game** — https://officialgamerules.org/game-rules/the-game/
+**The Game** â€” https://officialgamerules.org/game-rules/the-game/
