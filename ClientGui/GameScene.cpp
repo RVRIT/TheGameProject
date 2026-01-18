@@ -31,7 +31,9 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
         (desktop.height - 720) / 2));
 
     sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, myName));
-        })
+        }),
+
+    chatInput(font, { 1550.f, 500.f }, { 300.f, 40.f })
 
 {
 
@@ -76,6 +78,12 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
     menuOverlay.setSize({ 300.f, 380.f });
     menuOverlay.setFillColor(sf::Color(0, 0, 0, 150)); 
     menuOverlay.setPosition(850.f, 500.f);
+
+    chatBg.setSize({ 320.f, 450.f });
+    chatBg.setPosition(1540.f, 60.f);
+    chatBg.setFillColor(sf::Color(0, 0, 0, 180)); // Negru transparent
+    chatBg.setOutlineColor(sf::Color::White);
+    chatBg.setOutlineThickness(1.f);
 
 }
 
@@ -131,6 +139,20 @@ void GameScene::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
             }
         }
     }
+
+    chatInput.handleEvent(event);
+
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+        std::string msg = chatInput.getText();
+        if (!msg.empty()) {
+
+            std::cout << "[DEBUG] Enter apasat! Mesaj: '" << msg << "'\n";
+            client.sendLobbyChat(lobbyId, myName, msg);
+
+            chatInput.clear();
+        }
+    }
+
 }
 
 void GameScene::update(sf::Time dt) {
@@ -141,7 +163,10 @@ void GameScene::update(sf::Time dt) {
         timer = 0.0f;
         std::string jsonState = client.getGameState(lobbyId, myName);
         parseGameState(jsonState);
+
+        pollChat();
     }
+
 
     bgShader.setUniform("iTime", shaderTimer.getElapsedTime().asSeconds());
 }
@@ -181,6 +206,17 @@ void GameScene::parseGameState(const std::string& jsonStr) {
             statusText.setPosition(50, 50);
             statusText.setString("Game In Progress");
             statusText.setFillColor(sf::Color::White);
+        }
+
+        if (j.contains("chat")) {
+            std::vector<std::string> msgs;
+
+            for (const auto& item : j["chat"]) {
+                std::string line = item["name"].get<std::string>() + ": " + item["message"].get<std::string>();
+                msgs.push_back(line);
+            }
+
+            updateChatVisuals(msgs);
         }
 
         piles.clear();
@@ -317,6 +353,13 @@ void GameScene::draw(sf::RenderWindow& window) {
     }
 
 	window.draw(cardsPlayedText);
+
+    window.draw(chatBg);
+    chatInput.draw(window);
+
+    for (const auto& msg : chatHistory) {
+        window.draw(msg);
+    }
 }
 
 void GameScene::updateBackgroundScale()
@@ -329,4 +372,62 @@ void GameScene::updateBackgroundScale()
         float(win.y) / tex.y
     );
 
+}
+
+
+void GameScene::updateChatVisuals(const std::vector<std::string>& rawMessages) {
+    chatHistory.clear();
+
+    float startX = 1550.f;
+    float startY = 70.f; 
+    float gap = 25.f;    
+
+    int startIdx = std::max(0, (int)rawMessages.size() - 15);
+
+    for (int i = startIdx; i < rawMessages.size(); ++i) {
+        sf::Text t;
+        t.setFont(font);
+        t.setString(rawMessages[i]);
+        t.setCharacterSize(16); 
+        t.setFillColor(sf::Color::White);
+        t.setPosition(startX, startY);
+
+        chatHistory.push_back(t);
+        startY += gap;
+    }
+}
+
+void GameScene::pollChat() {
+    try {
+        std::string lobbyJson = client.getLobbyState(lobbyId);
+
+        if (lobbyJson.empty()) return;
+
+        auto j = json::parse(lobbyJson);
+
+        if (j.contains("chat")) {
+            std::vector<std::string> msgs;
+            for (const auto& item : j["chat"]) {
+                std::string expeditor = "";
+                std::string continut = "";
+
+                if (item.contains("sender")) expeditor = item["sender"];
+                else if (item.contains("name")) expeditor = item["name"];
+                else if (item.contains("username")) expeditor = item["username"];
+
+                if (item.contains("content")) continut = item["content"];
+                else if (item.contains("message")) continut = item["message"];
+
+                if (!expeditor.empty() && !continut.empty()) {
+                    msgs.push_back(expeditor + ": " + continut);
+                }
+            }
+
+            if (!msgs.empty()) {
+                updateChatVisuals(msgs);
+            }
+        }
+    }
+    catch (...) {
+    }
 }

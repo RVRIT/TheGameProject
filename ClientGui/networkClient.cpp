@@ -107,7 +107,9 @@ bool NetworkClient::sendLobbyChat(int lobbyId, const std::string& playerName, co
 
     sf::Http::Response response = http.sendRequest(request);
     return (response.getStatus() == sf::Http::Response::Ok);
+
 }
+
 
 int NetworkClient::createLobby(const std::string& hostName) {
     sf::Http http(host, port);

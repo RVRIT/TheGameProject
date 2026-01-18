@@ -3,6 +3,7 @@
 #include "NetworkClient.h"
 #include "Button.h"
 #include "Card.h" 
+#include "TextBox.h"
 #include <vector>
 #include <memory> 
 
@@ -68,4 +69,11 @@ private:
     sf::RectangleShape menuContainer;  
     sf::Text menuTitle;
     Button btnExit;
+
+    sf::RectangleShape chatBg;    
+    TextBox chatInput;              
+    std::vector<sf::Text> chatHistory; 
+
+    void updateChatVisuals(const std::vector<std::string>& rawMessages);
+    void pollChat();
 };
