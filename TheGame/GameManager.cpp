@@ -165,7 +165,7 @@ std::vector<GameManager::LobbySummary> GameManager::listLobbies() const
         const auto& players = lobby.getPlayers();
         s.playersCount = static_cast<int>(players.size());
         s.hostName = players.empty() ? "" : players[0].name;
-
+        s.avgRating = players.empty() ? 0.0 : lobby.getAverageRating();
         s.maxPlayers = 5;
 
         auto st = lobby.getStatus();

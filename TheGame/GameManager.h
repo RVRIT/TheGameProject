@@ -31,6 +31,7 @@ public:
         std::string hostName;
         int playersCount;
         int maxPlayers;
+        float avgRating;
         std::string status; 
     };
 

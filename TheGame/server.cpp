@@ -671,6 +671,7 @@ int main() {
                 res[i]["playersCount"] = summaries[i].playersCount;
                 res[i]["maxPlayers"] = summaries[i].maxPlayers;
                 res[i]["status"] = summaries[i].status;
+                res[i]["avgRating"] = summaries[i].avgRating;
             }
 
             crow::response r(200, res.dump());
