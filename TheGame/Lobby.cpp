@@ -48,7 +48,7 @@ bool Lobby::sendChatMessage(const std::string& sender, const std::string& conten
     std::regex numberPattern(R"(\b\d+\b)");
     std::string filteredContent = std::regex_replace(content, numberPattern, "[#]");
 
-    m_chatHistory.push_back({ sender, content });
+    m_chatHistory.push_back({ sender, filteredContent });
     if (m_chatHistory.size() > MAX_CHAT_MESSAGES) {
         m_chatHistory.erase(m_chatHistory.begin());
     }
