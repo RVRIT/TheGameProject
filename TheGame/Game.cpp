@@ -161,10 +161,21 @@ void Game::setupGame()
 		}
 	
 }
-void Game::nextTurn() noexcept
+void Game::nextTurn() 
 {
 	m_cardsPlayedThisTurn = 0; 
 	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
+
+	Player& currentPlayer = m_players[m_currentPlayerIndex];
+
+	//if no move can be made by the current player , the game is lost
+
+	if (!canPlayerMakeAnyMove(currentPlayer))
+	{
+		m_isGameOver = true;
+		m_playerWon = false; 
+		saveGameResults();   
+	}
 }
 
 
@@ -187,7 +198,7 @@ void Game::drawCardsForCurrentPlayer()
 }
 
 
-bool Game::canPlayerMakeAnyMove(const Player& player) const noexcept
+bool Game::canPlayerMakeAnyMove(const Player& player) const
 {
 	return !player.findPossibleMoves(m_piles).empty();
 }
@@ -197,7 +208,7 @@ size_t Game::getMinCardsRequired() const // Returns 2 normally, or 1 if the deck
 	return m_deck.isEmpty() ? MIN_CARDS_TO_PLAY_EMPTY_DECK : MIN_CARDS_TO_PLAY_NORMAL;
 }
 
-bool Game::checkWinCondition() const noexcept
+bool Game::checkWinCondition() const
 {
 	if (m_deck.isEmpty())
 	{

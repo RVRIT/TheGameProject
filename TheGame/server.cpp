@@ -6,6 +6,7 @@
 #include "GameManager.h"
 #include "Lobby.h"
 #include <ctime>
+#include <cmath>
 
 using namespace crow;
 
@@ -528,6 +529,41 @@ int main() {
         r.set_header("Content-Type", "application/json");
         return r;
             });
+
+    CROW_ROUTE(app, "/lobby/quickplay").methods("POST"_method)([&db](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("playerName")) {
+            return crow::response(400, "Missing 'playerName'");
+        }
+
+        std::string playerName = body["playerName"].s();
+
+        auto ratingOpt = db.getUserRating(playerName);
+        if (!ratingOpt) {
+            return crow::response(404, "User not found");
+        }
+        float playerRating = *ratingOpt;
+
+        auto& gm = GameManager::getInstance();
+        auto result = gm.quickplay(playerName, playerRating);
+
+        crow::json::wvalue res;
+        res["lobbyId"] = result.lobbyId;
+        res["created"] = result.created;
+
+        int bucketLow = static_cast<int>(std::floor(playerRating));
+        res["bucketLow"] = bucketLow;
+        res["bucketHigh"] = bucketLow + 1;
+
+        res["playerRating"] = playerRating;
+
+        auto avgOpt = gm.getLobbyAverageRating(result.lobbyId);
+        if (avgOpt) res["lobbyAvgRating"] = *avgOpt;
+
+        crow::response r(result.created ? 201 : 200, res.dump());
+        r.set_header("Content-Type", "application/json");
+        return r;
+        });
 
     app.port(18080).multithreaded().run();
 }
