@@ -33,7 +33,7 @@ GameScene::GameScene(sf::Font& f, NetworkClient& c, SceneManager& mgr, int id, s
     sceneManager.changeScene(std::make_unique<MainMenu>(font, client, sceneManager, window, myName));
         }),
 
-    chatInput(font, { 1550.f, 500.f }, { 300.f, 40.f })
+    chatInput(font, { 1550.f, 520.f }, { 300.f, 40.f })
 
 {
 
