@@ -1,17 +1,17 @@
 #include "lobby.h"
 #include <algorithm>
-Lobby::Lobby(int id, const std::string& hostName, LobbyStatus m_status) 
+Lobby::Lobby(int id, const std::string& hostName, float hostRating, LobbyStatus m_status) 
     : id{ id }, m_status{ m_status }
 {
-    addPlayer(hostName);
+    addPlayer(hostName, hostRating);
 }
 
-bool Lobby::addPlayer(const std::string& name) {
+bool Lobby::addPlayer(const std::string& name, float playerRating) {
     if (m_status != LobbyStatus::Waiting || m_players.size() >= MAX_PLAYERS) {
         return false;
     }
     int newId = static_cast<int>(m_players.size());
-    m_players.push_back({newId, name, false});
+    m_players.push_back({ newId, name, false, playerRating });
     return true;
 }
 
@@ -122,6 +122,14 @@ LobbyStatus Lobby::getStatus() const {
     return m_status;
 }
 
+float Lobby::getAverageRating() const {
+    if (m_players.empty()) return 0.0f;
+
+    double sum = 0.0;
+    for (const auto& p : m_players) sum += p.rating;
+
+    return static_cast<float>(sum / m_players.size());
+}
 
 crow::json::wvalue Lobby::getStateJson() const {
     crow::json::wvalue j;
@@ -144,7 +152,9 @@ crow::json::wvalue Lobby::getStateJson() const {
         playersArr[i]["id"] = m_players[i].id;
         playersArr[i]["name"] = m_players[i].name;
         playersArr[i]["isReady"] = m_players[i].isReady;
+        playersArr[i]["rating"] = m_players[i].rating;  
     }
+    j["avgRating"] = getAverageRating();
     j["players"] = std::move(playersArr);
     crow::json::wvalue chatArr;
     for (size_t i = 0; i < m_chatHistory.size(); ++i) {

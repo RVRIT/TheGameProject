@@ -111,14 +111,15 @@ int main() {
         }
         });
 
-    CROW_ROUTE(app, "/lobby/create").methods("POST"_method)([](const crow::request& req) {
+    CROW_ROUTE(app, "/lobby/create").methods("POST"_method)([&db](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("hostName")) {
             return crow::response(400, "Missing 'hostName'");
         }
 
         std::string hostName = body["hostName"].s();
-        int newLobbyId = GameManager::getInstance().createLobby(hostName);
+        float hostRating = db.getUserRating(hostName).value();
+        int newLobbyId = GameManager::getInstance().createLobby(hostName, hostRating);
 
         crow::json::wvalue res;
         res["lobbyId"] = newLobbyId;
@@ -129,7 +130,7 @@ int main() {
         return r;
         });
 
-    CROW_ROUTE(app, "/lobby/join").methods("POST"_method)([](const crow::request& req) {
+    CROW_ROUTE(app, "/lobby/join").methods("POST"_method)([&db](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body || !body.has("lobbyId") || !body.has("playerName")) {
             return crow::response(400, "Missing 'lobbyId' or 'playerName'");
@@ -137,8 +138,8 @@ int main() {
 
         int lobbyId = body["lobbyId"].i();
         std::string playerName = body["playerName"].s();
-
-        bool success = GameManager::getInstance().joinLobby(lobbyId, playerName);
+        float playerRating = db.getUserRating(playerName).value();
+        bool success = GameManager::getInstance().joinLobby(lobbyId, playerName, playerRating);
         if (success) {
             crow::json::wvalue res;
             res["message"] = "Joined successfully";

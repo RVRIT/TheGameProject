@@ -12,8 +12,8 @@ public:
     GameManager(const GameManager&) = delete;
     GameManager& operator=(const GameManager&) = delete;
 
-    int createLobby(const std::string& hostName);
-    bool joinLobby(int lobbyId, const std::string& playerName);
+    int createLobby(const std::string& hostName, float hostRating);
+    bool joinLobby(int lobbyId, const std::string& playerName, float playerRating);
     bool sendChatMessage(int lobbyId, const std::string& sender, const std::string& content);
     std::vector<ChatMessage> getChatHistory(int lobbyId) const;
     bool setPlayerReady(int lobbyId, int playerId, bool ready);
@@ -36,6 +36,7 @@ public:
     std::vector<LobbySummary> listLobbies() const;
     bool deleteLobby(int lobbyId);
     std::vector<std::string> getLobbyPlayerNames(int lobbyId) const;
+    std::optional<float> getLobbyAverageRating(int lobbyId) const;
 private:
     GameManager() = default;
     std::map<int, Lobby> m_lobbies;

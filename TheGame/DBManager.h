@@ -69,7 +69,7 @@ public:
     std::optional<std::string> getHashedPassword(const std::string& username);
     std::optional<int> getUserId(const std::string& username);
     std::optional<User> getUserStats(const std::string& username);
-
+    std::optional<float> getUserRating(const std::string& username);
 
     // Removed Lobby functions (create, join, etc.) from here.
     // We now handle active lobbies in the GameManager (in memory) using a map.

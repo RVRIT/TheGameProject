@@ -9,15 +9,15 @@ GameManager& GameManager::getInstance()
     return instance;
 }
 
-int GameManager::createLobby(const std::string& hostName)
+int GameManager::createLobby(const std::string& hostName, float hostRating)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     int newId = m_nextLobbyId++;
-    m_lobbies.try_emplace(newId, newId, hostName);
+    m_lobbies.try_emplace(newId, newId, hostName, hostRating);
     return newId;
 }
 
-bool GameManager::joinLobby(int lobbyId, const std::string& playerName)
+bool GameManager::joinLobby(int lobbyId, const std::string& playerName, float playerRating)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);
@@ -27,7 +27,7 @@ bool GameManager::joinLobby(int lobbyId, const std::string& playerName)
     {
         return false;
     }
-    return it->second.addPlayer(playerName);
+    return it->second.addPlayer(playerName, playerRating);
 }
 
 bool GameManager::sendChatMessage(int lobbyId, const std::string& sender, const std::string& content)
@@ -242,5 +242,12 @@ bool GameManager::saveGameResults(int lobbyId, const std::string& winnerUsername
     m_lobbies.erase(it);
 
     return updatedUsers > 0;
+}
+std::optional<float> GameManager::getLobbyAverageRating(int lobbyId) const
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    auto it = m_lobbies.find(lobbyId);
+    if (it == m_lobbies.end()) return std::nullopt;
+    return it->second.getAverageRating();
 }
 
