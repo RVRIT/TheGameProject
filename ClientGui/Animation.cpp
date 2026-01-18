@@ -43,3 +43,15 @@ void Animation::updateFrame() {
 void Animation::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(sprite, states);
 }
+
+void Animation::setPosition(sf::Vector2f pos){
+    sprite.setPosition(pos);
+}
+
+void Animation::setScale(float x, float y) {
+    sprite.setScale(x, y);
+}
+
+bool Animation::isFinished() const {
+    return finished;
+}

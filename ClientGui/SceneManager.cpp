@@ -46,3 +46,8 @@ void SceneManager::draw()
         scenes.top()->draw(window);
     }
 }
+
+bool SceneManager::isEmpty() const
+{
+    return scenes.empty();
+}

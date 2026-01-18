@@ -8,8 +8,8 @@ public:
 	TextBox(const sf::Font& font, sf::Vector2f position, sf::Vector2f size);
 	void handleEvent(const sf::Event& event);
 	void draw(sf::RenderWindow& window);
-	std::string getText() const { return input; }
-	void setSelected(bool sel) { selected = sel; }
+	std::string getText() const;
+	void setSelected(bool sel);
 	void clear();
 
 private:

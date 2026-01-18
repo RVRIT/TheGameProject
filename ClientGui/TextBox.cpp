@@ -43,3 +43,11 @@ void TextBox::draw(sf::RenderWindow& window) {
 void TextBox::clear() {
     this->text.setString("");
 }
+
+std::string TextBox::getText() const {
+    return input;
+}
+
+void TextBox::setSelected(bool sel) {
+    selected = sel;
+}

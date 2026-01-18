@@ -34,7 +34,7 @@ LobbyMenuScene::LobbyMenuScene(sf::Font& fontRef, NetworkClient& clientRef, Scen
     }
         }),
 
-    backButton("assets/back.png", { 50.f, 800.f }, [this]() {
+    backButton("assets/BackButton.png", { 100.f, 600.f }, [this]() {
     sceneManager.popScene(); 
         })
 {

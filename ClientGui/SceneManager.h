@@ -16,7 +16,7 @@ public:
     void update(sf::Time dt);
     void draw();
 
-    bool isEmpty() const { return scenes.empty(); }
+    bool isEmpty() const;
 
 private:
     std::stack<std::unique_ptr<Scene>> scenes;

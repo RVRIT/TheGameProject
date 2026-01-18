@@ -30,9 +30,9 @@ public:
         bool reverseOncePlayed = false);
 
     void update();
-    bool isFinished() const { return finished; }
-    void setPosition(sf::Vector2f pos) { sprite.setPosition(pos); }
-    void setScale(float x, float y) { sprite.setScale(x, y); }
+    bool isFinished() const;
+    void setPosition(sf::Vector2f pos); 
+    void setScale(float x, float y); 
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
