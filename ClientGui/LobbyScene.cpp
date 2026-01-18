@@ -211,6 +211,14 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                 int pId = p["id"];
                 bool isReady = p["isReady"];
 
+                double pRating = 0.0;
+                if (p.contains("rating")) {
+                    pRating = p["rating"].get<double>();
+                }
+
+                std::ostringstream rs;
+                rs << std::fixed << std::setprecision(0) << pRating; 
+
                 if (pName == myName) myPlayerId = pId;
 
                 if (firstPlayer) {
@@ -219,7 +227,7 @@ void LobbyScene::parseLobbyState(const std::string& jsonStr) {
                     firstPlayer = false; 
                 }
 
-                std::string displayName = pName;
+                std::string displayName = pName + " (" + rs.str() + ")"; 
 
                 if (isReady) displayName += " [READY]";
                 else displayName += " [...]";

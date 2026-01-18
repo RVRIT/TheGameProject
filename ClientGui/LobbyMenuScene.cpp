@@ -2,6 +2,8 @@
 #include "LobbyScene.h"     
 #include "GameConstants.h"
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 #include "json.hpp"
 using json = nlohmann::json;
@@ -135,6 +137,15 @@ void LobbyMenuScene::draw(sf::RenderWindow& window) {
         int maxP = item["maxPlayers"];
         std::string status = item["status"];
 
+        double avgRating = 0.0;
+        if (item.contains("avgRating")) {
+            avgRating = item["avgRating"].get<double>();
+        }
+
+        std::ostringstream rateStream;
+        rateStream << std::fixed << std::setprecision(1) << avgRating;
+        std::string ratingStr = rateStream.str();
+
         tempRect.setSize({ 580.f, 60.f });
         tempRect.setPosition(startX, startY);
         tempRect.setOutlineColor(sf::Color::White);
@@ -146,11 +157,14 @@ void LobbyMenuScene::draw(sf::RenderWindow& window) {
 
         window.draw(tempRect);
 
-        std::string info = "ID: " + std::to_string(id) + " | Host: " + host +
-            " (" + std::to_string(players) + "/" + std::to_string(maxP) + ")";
+        std::string info = "ID: " + std::to_string(id) +
+            " | Host: " + host +
+            " (" + std::to_string(players) + "/" + std::to_string(maxP) + ")" +
+            " | " + ratingStr;
+
 
         tempText.setString(info);
-        tempText.setCharacterSize(20);
+        tempText.setCharacterSize(16);
         tempText.setFillColor(sf::Color::White);
         tempText.setPosition(startX + 10.f, startY + 18.f);
         window.draw(tempText);
