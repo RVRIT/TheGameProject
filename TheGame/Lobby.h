@@ -45,7 +45,6 @@ public:
 
     GameSnapshot CreateGameSnapshot();
     Game* getGame();
-    const Game* getGame() const;
     const std::vector<PlayerInfo>& getPlayers() const;
     bool isPlayerInLobby(const std::string& playerName);
     LobbyStatus getStatus() const;

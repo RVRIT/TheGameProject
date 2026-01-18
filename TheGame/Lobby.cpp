@@ -98,7 +98,7 @@ GameSnapshot Lobby::CreateGameSnapshot() {
         opi.cardCount = 0;
         opi.canMakeMove = false;
         opi.isCurrentPlayer = false;
-        snapshot.opponents.push_back(opi);
+        snapshot.players.push_back(opi);
     }
 
     snapshot.deckSize = 52;
@@ -113,10 +113,6 @@ Game* Lobby::getGame()
     return m_game.get();
 }
 
-const Game* Lobby::getGame() const
-{
-    return m_game.get();
-}
 
 const std::vector<PlayerInfo>& Lobby::getPlayers() const {
     return m_players;
@@ -138,7 +134,6 @@ float Lobby::getAverageRating() const {
 crow::json::wvalue Lobby::getStateJson() const {
     crow::json::wvalue j;
 
-    // Status
     if (m_status == LobbyStatus::Waiting) {
         j["status"] = "Waiting";
     }

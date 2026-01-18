@@ -167,9 +167,6 @@ void Game::nextTurn()
 	m_currentPlayerIndex = (m_currentPlayerIndex + 1) % m_players.size();
 
 	Player& currentPlayer = m_players[m_currentPlayerIndex];
-
-	//if no move can be made by the current player , the game is lost
-
 	if (!canPlayerMakeAnyMove(currentPlayer))
 	{
 		m_isGameOver = true;
@@ -274,14 +271,14 @@ GameSnapshot Game::getSnapshot(const std::string& requestingPlayerName) const
 			other.canMakeMove = canMove;
 			other.isCurrentPlayer = isTurn;
 
-			snap.opponents.push_back(other);
+			snap.players.push_back(other);
 		}
 	}
 
 	snap.isGameOver = m_isGameOver;
 	snap.playerWon = m_playerWon;
 
-	snap.message = "";						// Empty message for now
+	snap.message = "";
 
 	return snap;
 
@@ -342,8 +339,6 @@ void Game::saveGameResults()
 			db.insertGameSession(userId, sessionScore, elapsed.count(), result);
 
 			int cardsLeft = static_cast<int>(player.getHandSize());
-
-			//update global rating (1-5) based on wins and cards left
 			db.updateUserStats(userId, m_playerWon, durationHours, cardsLeft);
 		}
 	}

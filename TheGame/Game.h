@@ -28,25 +28,18 @@ public:
 	bool isPlayerTurn(const std::string& playerName) const;
 	explicit Game(const std::vector<std::string_view>& PlayerNames);
 
-	// COMENZI PENTRU CLIENT(SFML)
-
 	 bool attemptPlayCard(size_t handIndex, size_t pileIndex);
 	 bool attemptEndTurn();
 
-
-	// DATE PENTRU DESENARE
-
 	 GameSnapshot getSnapshot(const std::string& requestingPlayerName) const;
 
-
-	// Getteri utili pentru UI
 
 	 bool isGameOver() const;
 	 bool isVictory() const;
 
 	size_t getCardsPlayedThisTurn() const;
 
-	size_t getMinCardsRequired() const; // Returns 2 normally, or 1 if the deck is empty (Endgame Rule).
+	size_t getMinCardsRequired() const; 
 
 private:
 	void setupGame();

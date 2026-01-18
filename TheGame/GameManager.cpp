@@ -144,7 +144,7 @@ bool GameManager::removePlayer(int lobbyId, const std::string& playerName) {
         lobby.removePlayer(playerIdToRemove);
         if (lobby.getPlayers().empty())
         {
-            m_lobbies.erase(it);        // if lobby is empty , we remove it
+            m_lobbies.erase(it);
         }
         return true;
     }

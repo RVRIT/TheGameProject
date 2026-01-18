@@ -37,7 +37,7 @@ bool DBManager::insertGameSession(int user_id, int score)
 {
     try {
 
-        GameSession session{ -1, user_id, score, 0.0, "" }; // duration 0, result empty for now
+        GameSession session{ -1, user_id, score, 0.0, "" };
         m_storage->insert(session);
         return true;
     }
@@ -52,7 +52,6 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played, int 
 
         auto user = m_storage->get<User>(user_id);
 
-        // changing values in the memory
         user.games_played++;
         user.hours_played += hours_played;
         if (won) {
@@ -111,7 +110,6 @@ bool DBManager::checkExistingUser(const std::string& username)
 bool DBManager::registerUser(const std::string& username, const std::string& hashed_password)
 {
     try {
-        // ID -1 for auto increment
 
         User newUser{ -1, username, hashed_password, 0.0, 0.0, 0, 0 };
         m_storage->insert(newUser);
@@ -125,8 +123,7 @@ bool DBManager::registerUser(const std::string& username, const std::string& has
 
 std::optional<std::string> DBManager::getHashedPassword(const std::string& username) {
 
-    try {
-        // We search for users with this name (there should be at most 1 because of the UNIQUE constraint)    
+    try {  
 
         auto users = m_storage->get_all<User>(where(c(&User::username) == username));
 
@@ -198,8 +195,6 @@ std::optional<float> DBManager::getUserRating(const std::string & username)
         return std::nullopt;
     }
 }
-// Lobby functions were removed because we moved the logic to GameManager.
-// We don't need to save temporary lobbies in the database anymore
 
 
 

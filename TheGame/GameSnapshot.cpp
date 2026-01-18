@@ -13,13 +13,13 @@ crow::json::wvalue toJson(const GameSnapshot& snapshot) {
     j["minCardsToPlay"] = snapshot.minCardsToPlay;
 
     crow::json::wvalue oppArr;
-    for (size_t i = 0; i < snapshot.opponents.size(); ++i) {
-        oppArr[i]["name"] = snapshot.opponents[i].name;
-        oppArr[i]["cardCount"] = snapshot.opponents[i].cardCount;
-        oppArr[i]["canMakeMove"] = snapshot.opponents[i].canMakeMove;
-        oppArr[i]["isCurrentPlayer"] = snapshot.opponents[i].isCurrentPlayer;
+    for (size_t i = 0; i < snapshot.players.size(); ++i) {
+        oppArr[i]["name"] = snapshot.players[i].name;
+        oppArr[i]["cardCount"] = snapshot.players[i].cardCount;
+        oppArr[i]["canMakeMove"] = snapshot.players[i].canMakeMove;
+        oppArr[i]["isCurrentPlayer"] = snapshot.players[i].isCurrentPlayer;
     }
-    j["opponents"] = std::move(oppArr);
+    j["players"] = std::move(oppArr);
 
     crow::json::wvalue pilesArr;
     for (size_t i = 0; i < snapshot.piles.size(); ++i) {

@@ -18,10 +18,10 @@ struct User {
 
 struct GameSession {
     int id;
-    int user_id; // Foreign Key
+    int user_id;
     int score;
     double duration;
-    std::string result; // "Win" or "Loss"
+    std::string result;
 };
 
 inline auto createStorage(const std::string& dbPath) {
@@ -51,7 +51,7 @@ inline auto createStorage(const std::string& dbPath) {
     );
 }
 
-using StorageType = decltype(createStorage("")); //return type for CreateStorage
+using StorageType = decltype(createStorage(""));
 
 class DBManager {
 public:
@@ -71,14 +71,10 @@ public:
     std::optional<User> getUserStats(const std::string& username);
     std::optional<float> getUserRating(const std::string& username);
 
-    // Removed Lobby functions (create, join, etc.) from here.
-    // We now handle active lobbies in the GameManager (in memory) using a map.
-    // The database is only used for Users and saved Game History.
-
 public:
     static constexpr double RATING_PENALTY_PER_CARD = 0.3;
 
 private:
     DBManager() = default;
-    std::unique_ptr<StorageType> m_storage; // Smart pointer for orm storage
+    std::unique_ptr<StorageType> m_storage;
 };  

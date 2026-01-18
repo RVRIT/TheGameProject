@@ -269,14 +269,14 @@ void GameScene::parseGameState(const std::string& jsonStr) {
             selectedHandIndex = -1;
         }
 
-        opponents.clear();
-        if (j.contains("opponents")) {
-            for (const auto& opp : j["opponents"]) {
+        players.clear();
+        if (j.contains("players")) {
+            for (const auto& opp : j["players"]) {
                 VisualOpponent vo;
                 vo.name = opp["name"];
                 vo.cardCount = opp["cardCount"];
                 vo.isTurn = opp.contains("isTurn") ? opp["isTurn"].get<bool>() : false;
-                opponents.push_back(vo);
+                players.push_back(vo);
             }
         }
 
@@ -320,7 +320,7 @@ void GameScene::draw(sf::RenderWindow& window) {
     endTurnButton.draw(window);
 
     float oppX = 400.f;
-    for (const auto& opp : opponents) {
+    for (const auto& opp : players) {
         sf::Text t;
         t.setFont(font);
         std::string marker = opp.isTurn ? " [TURN]" : "";

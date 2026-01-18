@@ -383,10 +383,10 @@ int main() {
 
             res["myHand"] = snap.myHand;
 
-            for (size_t i = 0; i < snap.opponents.size(); ++i) {
-                res["opponents"][i]["name"] = snap.opponents[i].name;
-                res["opponents"][i]["cardCount"] = snap.opponents[i].cardCount;
-                res["opponents"][i]["isTurn"] = snap.opponents[i].isCurrentPlayer;
+            for (size_t i = 0; i < snap.players.size(); ++i) {
+                res["players"][i]["name"] = snap.players[i].name;
+                res["players"][i]["cardCount"] = snap.players[i].cardCount;
+                res["players"][i]["isTurn"] = snap.players[i].isCurrentPlayer;
             }
 
             crow::response r(200, res.dump());
@@ -627,36 +627,7 @@ int main() {
         }
         });
 
-    CROW_ROUTE(app, "/server/info").methods("GET"_method)([]() {
-
-        try
-        {
-
-            crow::json::wvalue res;
-            res["status"] = "online";
-            res["version"] = "1.0.0";
-            res["game"] = "The Game";
-
-            std::time_t t = std::time(nullptr);
-            char mbstr[100];
-            if (std::strftime(mbstr, sizeof(mbstr), "%c", std::localtime(&t))) {
-                res["server_time"] = mbstr;
-            }
-
-            crow::response r(200, res.dump());
-            r.set_header("Content-Type", "application/json");
-            return r;
-        }
-        catch (const std::exception& e) {
-            std::cerr << "[EXCEPTION] /server/info: " << e.what() << std::endl;
-            return crow::response(500, "Internal Server Error");
-        }
-        catch (...) {
-            std::cerr << "[CRITICAL] Unknown error in /server/info" << std::endl;
-            return crow::response(500, "Critical Error");
-        }
-        });
-
+    
     CROW_ROUTE(app, "/lobby/list").methods("GET"_method)([]() {
 
         try

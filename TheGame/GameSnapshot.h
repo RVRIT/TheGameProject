@@ -28,7 +28,7 @@ struct GameSnapshot {
     int cardsPlayedThisTurn;
     int minCardsToPlay;
 
-    std::vector<OtherPlayerInfo> opponents;
+    std::vector<OtherPlayerInfo> players;
 
     std::vector<PileInfo> piles;
     int deckSize;

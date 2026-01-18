@@ -54,7 +54,7 @@ private:
 
     std::vector<VisualPile> piles;
 
-    std::vector<VisualOpponent> opponents;
+    std::vector<VisualOpponent> players;
     int selectedHandIndex = -1;
 
     sf::Shader bgShader;
