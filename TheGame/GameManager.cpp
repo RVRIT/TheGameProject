@@ -67,21 +67,6 @@ Lobby* GameManager::getLobby(int lobbyId)
     return nullptr;
 }
 
-bool GameManager::leaveLobby(int lobbyId, const std::string& playerName)
-{
-    std::lock_guard<std::mutex> lock(m_mtx);
-    auto it = m_lobbies.find(lobbyId);
-    if (it == m_lobbies.end()) return false;
-
-    
-     //  it->second.removePlayerByName(playerName);   //needs to be implemented in Lobby
-
-    if (it->second.getPlayers().empty()) {
-        m_lobbies.erase(it);
-    }
-    return true;
-}
-
 bool GameManager::attemptPlayCardInLobby(int lobbyId, const std::string& playerName, size_t handIndex, size_t pileIndex) {
     std::lock_guard<std::mutex> lock(m_mtx);
     auto it = m_lobbies.find(lobbyId);
@@ -137,19 +122,28 @@ bool GameManager::restartGame(int lobbyId) {
 }
 
 bool GameManager::removePlayer(int lobbyId, const std::string& playerName) {
-    Lobby* lobby = getLobby(lobbyId);
-    if (!lobby) return false;
+    std::lock_guard<std::mutex> lock(m_mtx);
+
+    auto it = m_lobbies.find(lobbyId); 
+    if (it == m_lobbies.end()) return false;
+
+    Lobby& lobby = it->second;
 
     int playerIdToRemove = -1;
-    for (const auto& p : lobby->getPlayers()) {
+    for (const auto& p : lobby.getPlayers()) {
         if (p.name == playerName) {
             playerIdToRemove = p.id;
             break;
         }
     }
 
-    if (playerIdToRemove != -1) {
-        lobby->removePlayer(playerIdToRemove);
+    if (playerIdToRemove != -1) 
+    {
+        lobby.removePlayer(playerIdToRemove);
+        if (lobby.getPlayers().empty())
+        {
+            m_lobbies.erase(it);        // if lobby is empty , we remove it
+        }
         return true;
     }
     return false;
