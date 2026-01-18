@@ -68,7 +68,7 @@ bool DBManager::updateUserStats(int user_id, bool won, double hours_played, int 
 
         else {
             
-            double penalty = cardsLeftInHand * 0.3;
+            double penalty = cardsLeftInHand * DBManager::RATING_PENALTY_PER_CARD;
             currentMatchScore = 4.5 - penalty;
 
             

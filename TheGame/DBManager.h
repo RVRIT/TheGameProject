@@ -75,8 +75,8 @@ public:
     // We now handle active lobbies in the GameManager (in memory) using a map.
     // The database is only used for Users and saved Game History.
 
-
-
+public:
+    static constexpr double RATING_PENALTY_PER_CARD = 0.3;
 
 private:
     DBManager() = default;
