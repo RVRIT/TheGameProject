@@ -16,9 +16,9 @@
 class Game
 {
 public:
-	static constexpr size_t HAND_SIZE_1_PLAYER = 8;
-	static constexpr size_t HAND_SIZE_2_PLAYERS = 7;
-	static constexpr size_t HAND_SIZE_3_PLUS_PLAYERS = 6;
+	static constexpr size_t HAND_SIZE_2_PLAYERS = 8;
+	static constexpr size_t HAND_SIZE_3_PLAYERS = 7;
+	static constexpr size_t HAND_SIZE_4_OR_5_PLAYERS = 6;
 
 	static constexpr size_t MIN_CARDS_TO_PLAY_NORMAL = 2;
 	static constexpr size_t MIN_CARDS_TO_PLAY_EMPTY_DECK = 1;

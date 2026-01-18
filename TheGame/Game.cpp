@@ -124,15 +124,24 @@ bool Game::attemptEndTurn()
 
 void Game::setupGame()
 {
-	switch (m_players.size()) 
+	switch (m_players.size())
 	{
-		case 1: m_initialHandSize = 8; break; 
-		case 2: m_initialHandSize = 8; break; 
-		case 3: m_initialHandSize = 7; break; 
-		default: m_initialHandSize = 6; break; 
+	case 2:
+		m_initialHandSize = HAND_SIZE_2_PLAYERS; // 8 CARDS
+		break;
+	case 3:
+		m_initialHandSize = HAND_SIZE_3_PLAYERS; // 7 CARDS
+		break;
+	case 4:
+	case 5:
+		m_initialHandSize = HAND_SIZE_4_OR_5_PLAYERS; // 6 CARDS
+		break;
+	default:
 
+		// FOR TESTING
+		m_initialHandSize = HAND_SIZE_2_PLAYERS;
+		break;
 	}
-
 
 		for (size_t i = 0; i < m_initialHandSize; ++i)
 		{
