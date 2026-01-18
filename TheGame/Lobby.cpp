@@ -1,5 +1,6 @@
 #include "lobby.h"
 #include <algorithm>
+#include <regex>
 Lobby::Lobby(int id, const std::string& hostName, float hostRating, LobbyStatus m_status) 
     : id{ id }, m_status{ m_status }
 {
@@ -43,6 +44,9 @@ bool Lobby::isAllReady() const {
 
 bool Lobby::sendChatMessage(const std::string& sender, const std::string& content) {
     if (content.empty() || sender.empty()) return false;
+
+    std::regex numberPattern(R"(\b\d+\b)");
+    std::string filteredContent = std::regex_replace(content, numberPattern, "[#]");
 
     m_chatHistory.push_back({ sender, content });
     if (m_chatHistory.size() > MAX_CHAT_MESSAGES) {
