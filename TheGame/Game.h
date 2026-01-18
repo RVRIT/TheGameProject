@@ -51,12 +51,12 @@ public:
 private:
 	void setupGame();
 	
-	void nextTurn() noexcept;
+	void nextTurn();
 	void drawCardsForCurrentPlayer();
 
-	bool checkWinCondition() const noexcept;
+	bool checkWinCondition() const;
 	bool checkLoseCondition() const;
-	bool canPlayerMakeAnyMove(const Player& player) const noexcept;
+	bool canPlayerMakeAnyMove(const Player& player) const;
 	int calculateScore(const Player& player) const;
 
 	Deck m_deck;
