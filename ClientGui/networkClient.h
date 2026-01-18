@@ -28,4 +28,6 @@ public:
     std::string getLobbyList();
     std::string getUserStats(const std::string& username);
     bool leaveLobby(int lobbyId, const std::string& playerName);
+    bool deleteLobby(int lobbyId);
+    void sendChat(int lobbyId, const std::string& username, const std::string& message);
 };
