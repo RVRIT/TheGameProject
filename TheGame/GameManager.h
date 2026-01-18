@@ -3,6 +3,7 @@
 #include <string>
 #include <mutex>
 #include <vector>
+#include <optional>
 #include "Lobby.h"
 class GameManager
 {
@@ -37,6 +38,14 @@ public:
     bool deleteLobby(int lobbyId);
     std::vector<std::string> getLobbyPlayerNames(int lobbyId) const;
     std::optional<float> getLobbyAverageRating(int lobbyId) const;
+
+    struct QuickplayResult {
+        int lobbyId;
+        bool created;
+    };
+
+    QuickplayResult quickplay(const std::string& playerName, float playerRating);
+
 private:
     GameManager() = default;
     std::map<int, Lobby> m_lobbies;

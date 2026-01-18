@@ -2,6 +2,8 @@
 #include "DBManager.h"
 #include "GameSnapshot.h"
 #include <stdexcept>
+#include <cmath>
+#include <limits>
 
 GameManager& GameManager::getInstance()
 {
@@ -237,6 +239,7 @@ bool GameManager::saveGameResults(int lobbyId, const std::string& winnerUsername
 
     return updatedUsers > 0;
 }
+
 std::optional<float> GameManager::getLobbyAverageRating(int lobbyId) const
 {
     std::lock_guard<std::mutex> lock(m_mtx);
@@ -244,4 +247,51 @@ std::optional<float> GameManager::getLobbyAverageRating(int lobbyId) const
     if (it == m_lobbies.end()) return std::nullopt;
     return it->second.getAverageRating();
 }
+
+GameManager::QuickplayResult GameManager::quickplay(const std::string& playerName, float playerRating)
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+
+    const int bucket = static_cast<int>(std::floor(playerRating));
+
+    int bestLobbyId = -1;
+    float bestScore = std::numeric_limits<float>::max();
+
+    for (auto& [id, lobby] : m_lobbies)
+    {
+        if (lobby.isPlayerInLobby(playerName))
+            continue;
+
+        if (lobby.getStatus() != LobbyStatus::Waiting)
+            continue;
+
+        if (lobby.getPlayers().size() >= 5)
+            continue;
+
+        const float avg = lobby.getAverageRating();
+        if (static_cast<int>(std::floor(avg)) != bucket)
+            continue;
+
+        const float score = std::abs(avg - playerRating);
+        if (score < bestScore)
+        {
+            bestScore = score;
+            bestLobbyId = id;
+        }
+    }
+
+    if (bestLobbyId != -1)
+    {
+        Lobby& lobby = m_lobbies.at(bestLobbyId);
+        if (lobby.addPlayer(playerName, playerRating))
+        {
+            return { bestLobbyId, false };
+        }
+    }
+
+    int newId = m_nextLobbyId++;
+    m_lobbies.try_emplace(newId, newId, playerName, playerRating);
+    return { newId, true };
+}
+
 
