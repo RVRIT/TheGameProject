@@ -59,6 +59,7 @@ private:
     sf::Shader bgShader;
     sf::RectangleShape shaderRect; 
     sf::Clock shaderTimer;
+    bool shaderLoaded = false;
 
     sf::Text cardsPlayedText;
 
